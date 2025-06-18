@@ -136,30 +136,32 @@ private fun RowScope.BottomNavItem(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null // 리플 효과 제거
-            ) { onClick() },
-        contentAlignment = Alignment.Center
+            ) { onClick() }
     ) {
+        // 선택된 아이템 상단 인디케이터 - Box 최상단에 배치
+        if (selected) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(y = (-1).dp)  // 위로 0.5dp 이동
+                    .width(40.dp)
+                    .height(3.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(
+                            bottomStart = 4.dp,
+                            bottomEnd = 4.dp
+                        )
+                    )
+            )
+        }
+        
+        // 아이콘과 라벨을 담은 Column
         Column(
+            modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // 선택된 아이템 상단 인디케이터
-            if (selected) {
-                Box(
-                    modifier = Modifier
-                        .width(40.dp)
-                        .height(3.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = androidx.compose.foundation.shape.RoundedCornerShape(
-                                bottomStart = 2.dp,
-                                bottomEnd = 2.dp
-                            )
-                        )
-                        .offset(y = (-12).dp)
-                )
-            }
-            
             // 아이콘
             Icon(
                 imageVector = icon,
