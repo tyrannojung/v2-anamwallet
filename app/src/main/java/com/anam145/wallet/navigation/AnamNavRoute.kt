@@ -1,0 +1,99 @@
+package com.anam145.wallet.navigation
+
+/**
+ * ANAM Wallet의 네비게이션 경로 정의
+ * 
+ * 앱 내의 모든 화면에 대한 경로를 sealed class로 관리합니다.
+ * 이를 통해 타입 안전성을 보장하고 잘못된 경로 사용을 방지합니다.
+ * 
+ * ## Sealed Class란?
+ * - 제한된 계층 구조를 가진 클래스
+ * - 모든 하위 클래스가 컴파일 시점에 알려짐
+ * - when 표현식에서 else 브랜치 불필요
+ * 
+ * ## 장점:
+ * 1. 타입 안전성 - 오타로 인한 런타임 에러 방지
+ * 2. IDE 자동완성 지원
+ * 3. 리팩토링 시 모든 사용처 자동 변경
+ * 
+ * ## 사용 예시:
+ * // ✅ 타입 안전한 네비게이션
+ * navController.navigate(AnamNavRoute.Main.route)  // 자동완성 지원
+ * 
+ * // ✅ 안전한 파라미터 처리
+ * navController.navigate(
+ *     AnamNavRoute.MiniAppDetail.createRoute(appId)  // "miniapp/123"
+ * )
+ * 
+ * // ❌ 기존 방식의 문제점
+ * navController.navigate("mian")  // 오타! 런타임 에러 발생
+ * navController.navigate("miniapp/" + appId)  // 수동 문자열 조합
+ */
+sealed class AnamNavRoute(val route: String) {
+    
+    // ========== Bottom Navigation 화면들 ==========
+    // 하단 네비게이션 바에 표시되는 주요 화면들
+    
+    /** 메인 화면 - 홈 대시보드 */
+    data object Main : AnamNavRoute("main")
+    
+    /** 허브 화면 - 미니앱 및 서비스 목록 */
+    data object Hub : AnamNavRoute("hub")
+    
+    /** 브라우저 화면 - 웹 브라우징 */
+    data object Browser : AnamNavRoute("browser")
+    
+    /** 신원(Identity) 화면 - DID/VC 관리 */
+    data object Identity : AnamNavRoute("identity")
+    
+    /** 설정 화면 - 앱 설정 및 프로필 */
+    data object Settings : AnamNavRoute("settings")
+    
+    // ========== 상세 화면들 ==========
+    // 특정 아이템이나 기능의 상세 화면들
+    
+    /** 
+    * 미니앱 상세 화면
+    * 
+    * 사용 예시:
+    * // 미니앱 ID가 "weather-app"인 경우
+    * navController.navigate(
+    *     AnamNavRoute.MiniAppDetail.createRoute("weather-app")
+    * )
+    * // 결과: "miniapp/weather-app"
+    */
+    data object MiniAppDetail : AnamNavRoute("miniapp/{appId}") {
+        /** 특정 미니앱으로 이동하기 위한 경로 생성 */
+        fun createRoute(appId: String) = "miniapp/$appId"
+    }
+    
+    /** 모듈 상세 화면 (블록체인 모듈 등) */
+    data object ModuleDetail : AnamNavRoute("module/{moduleId}") {
+        /** 특정 모듈로 이동하기 위한 경로 생성 */
+        fun createRoute(moduleId: String) = "module/$moduleId"
+    }
+    
+    /** 학생증 상세 화면 */
+    data object StudentCardDetail : AnamNavRoute("student_card")
+    
+    // ========== 인증/온보딩 화면들 ==========
+    // 사용자 인증 및 초기 설정 관련 화면들
+    
+    /** 온보딩 화면 - 첫 실행 시 */
+    data object Onboarding : AnamNavRoute("onboarding")
+    
+    /** 로그인 화면 */
+    data object Login : AnamNavRoute("login")
+}
+
+/**
+ * Bottom Navigation에 표시될 화면들의 목록
+ * 순서대로 하단 탭에 표시됩니다.
+ */
+val bottomNavRoutes = listOf(
+    AnamNavRoute.Main,
+    AnamNavRoute.Hub,
+    AnamNavRoute.Browser,
+    AnamNavRoute.Identity,
+    AnamNavRoute.Settings
+)
