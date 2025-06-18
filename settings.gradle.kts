@@ -21,4 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "AnamWallet"
 include(":app")
+
+// Core modules
+include(":core:ui")
  
