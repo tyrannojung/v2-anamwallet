@@ -1,22 +1,27 @@
 package com.anam145.wallet.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Face
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.anam145.wallet.R
 
 /**
  * Bottom Navigation Bar 아이템 정의
@@ -24,58 +29,24 @@ import androidx.navigation.compose.currentBackStackEntryAsState
  * @property route 네비게이션 경로
  * @property selectedIcon 선택된 상태의 아이콘
  * @property unselectedIcon 선택되지 않은 상태의 아이콘
- * @property label 표시될 라벨 텍스트
+ * @property labelResId 표시될 라벨의 문자열 리소스 ID
  */
 data class BottomNavItem(
     val route: AnamNavRoute,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
-    val label: String
+    val labelResId: Int
 )
 
 /**
- * Bottom Navigation 아이템 목록
- * 기존 anam-android와 동일한 아이콘 사용
+ * Bottom Navigation 아이템 목록을 NavigationConfig에서 가져옴
+ * Single Source of Truth 원칙 적용
  */
-val bottomNavItems = listOf(
-    BottomNavItem(
-        route = AnamNavRoute.Main,
-        selectedIcon = Icons.Filled.Home,
-        unselectedIcon = Icons.Outlined.Home,
-        label = "홈"
-    ),
-    BottomNavItem(
-        route = AnamNavRoute.Hub,
-        selectedIcon = Icons.Filled.Face,
-        unselectedIcon = Icons.Outlined.Face,
-        label = "허브"
-    ),
-    BottomNavItem(
-        route = AnamNavRoute.Browser,
-        selectedIcon = Icons.Filled.Search,
-        unselectedIcon = Icons.Outlined.Search,
-        label = "브라우저"
-    ),
-    BottomNavItem(
-        route = AnamNavRoute.Identity,
-        selectedIcon = Icons.Filled.AccountCircle,
-        unselectedIcon = Icons.Outlined.AccountCircle,
-        label = "신원"
-    ),
-    BottomNavItem(
-        route = AnamNavRoute.Settings,
-        selectedIcon = Icons.Filled.Settings,
-        unselectedIcon = Icons.Outlined.Settings,
-        label = "설정"
-    )
-)
+private val bottomNavItems: List<BottomNavItem>
+    get() = NavigationConfig.getBottomNavItems()
 
 /**
  * ANAM Wallet Bottom Navigation Bar
- * 
- * Material 3 NavigationBar를 사용하여 하단 네비게이션을 구현합니다.
- * 현재 선택된 경로에 따라 아이콘이 filled/outlined로 변경됩니다.
- * 
  * @param navController 네비게이션 컨트롤러
  */
 @Composable
@@ -86,34 +57,127 @@ fun AnamBottomNavigation(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     
-    NavigationBar {
-        bottomNavItems.forEach { item ->
-            val selected = currentRoute == item.route.route
-            
-            NavigationBarItem(
-                selected = selected,
-                onClick = {
-                    // 이미 선택된 탭을 다시 누르면 스택을 초기화
-                    navController.navigate(item.route.route) {
-                        // 시작 화면까지 모든 화면을 팝
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)
+            .shadow(elevation = 8.dp),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            bottomNavItems.forEach { item ->
+                val selected = currentRoute == item.route.route
+                
+                BottomNavItem(
+                    selected = selected,
+                    onClick = {
+                        if (!selected) {
+                            navController.navigate(item.route.route) {
+                                // 시작 화면까지 모든 화면을 팝
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                // 동일한 화면이 여러 번 스택에 쌓이지 않도록 함
+                                launchSingleTop = true
+                                // 이전 상태 복원
+                                restoreState = true
+                            }
                         }
-                        // 동일한 화면이 여러 번 스택에 쌓이지 않도록 함
-                        launchSingleTop = true
-                        // 이전 상태 복원
-                        restoreState = true
-                    }
-                },
-                icon = {
-                    Icon(
-                        imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
-                        contentDescription = item.label
-                    )
-                },
-                label = {
-                    Text(text = item.label)
-                }
+                    },
+                    icon = if (selected) item.selectedIcon else item.unselectedIcon,
+                    label = stringResource(id = item.labelResId)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 개별 Bottom Navigation 아이템
+ * 
+ * @param selected 선택 상태
+ * @param onClick 클릭 이벤트
+ * @param icon 표시할 아이콘
+ * @param label 표시할 라벨
+ */
+@Composable
+private fun RowScope.BottomNavItem(
+    selected: Boolean,
+    onClick: () -> Unit,
+    icon: ImageVector,
+    label: String
+) {
+    // 애니메이션 값들
+    val scale by animateFloatAsState(
+        targetValue = if (selected) 1.1f else 1f,
+        animationSpec = spring(),
+        label = "scale"
+    )
+    
+    val color by animateColorAsState(
+        targetValue = if (selected) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
+        label = "color"
+    )
+    
+    Box(
+        modifier = Modifier
+            .weight(1f)
+            .fillMaxHeight()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null // 리플 효과 제거
+            ) { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // 선택된 아이템 상단 인디케이터
+            if (selected) {
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(3.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(
+                                bottomStart = 2.dp,
+                                bottomEnd = 2.dp
+                            )
+                        )
+                        .offset(y = (-12).dp)
+                )
+            }
+            
+            // 아이콘
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                modifier = Modifier
+                    .size(26.dp)
+                    .scale(scale),
+                tint = color
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            // 라벨
+            Text(
+                text = label,
+                fontSize = 11.sp,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                color = color
             )
         }
     }

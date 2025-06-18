@@ -1,5 +1,8 @@
 package com.anam145.wallet.navigation
 
+import androidx.annotation.StringRes
+import com.anam145.wallet.R
+
 /**
  * ANAM Wallet의 네비게이션 경로 정의
  * 
@@ -29,25 +32,31 @@ package com.anam145.wallet.navigation
  * navController.navigate("mian")  // 오타! 런타임 에러 발생
  * navController.navigate("miniapp/" + appId)  // 수동 문자열 조합
  */
-sealed class AnamNavRoute(val route: String) {
+sealed class AnamNavRoute(
+    val route: String,
+    @StringRes val titleRes: Int = R.string.header_title
+) {
     
     // ========== Bottom Navigation 화면들 ==========
     // 하단 네비게이션 바에 표시되는 주요 화면들
     
-    /** 메인 화면 - 홈 대시보드 */
-    data object Main : AnamNavRoute("main")
+    /** 메인 화면 - 홈 대시보드
+     - "main"은 네비게이션 경로 (URL처럼 사용)
+     - R.string.header_title_main은 화면 제목
+     */
+    data object Main : AnamNavRoute("main", R.string.header_title_main)
     
     /** 허브 화면 - 미니앱 및 서비스 목록 */
-    data object Hub : AnamNavRoute("hub")
+    data object Hub : AnamNavRoute("hub", R.string.header_title_hub)
     
     /** 브라우저 화면 - 웹 브라우징 */
-    data object Browser : AnamNavRoute("browser")
+    data object Browser : AnamNavRoute("browser", R.string.header_title_browser)
     
     /** 신원(Identity) 화면 - DID/VC 관리 */
-    data object Identity : AnamNavRoute("identity")
+    data object Identity : AnamNavRoute("identity", R.string.header_title_identity)
     
     /** 설정 화면 - 앱 설정 및 프로필 */
-    data object Settings : AnamNavRoute("settings")
+    data object Settings : AnamNavRoute("settings", R.string.header_title_settings)
     
     // ========== 상세 화면들 ==========
     // 특정 아이템이나 기능의 상세 화면들
@@ -84,16 +93,33 @@ sealed class AnamNavRoute(val route: String) {
     
     /** 로그인 화면 */
     data object Login : AnamNavRoute("login")
+    
+    companion object {
+        /**
+         * 주어진 route 문자열로 해당하는 AnamNavRoute 객체를 찾습니다.
+         * 
+         * @param route 네비게이션 route 문자열
+         * @return 해당하는 AnamNavRoute 객체, 없으면 null
+         */
+        fun fromRoute(route: String?): AnamNavRoute? {
+            return when (route) {
+                Main.route -> Main
+                Hub.route -> Hub
+                Browser.route -> Browser
+                Identity.route -> Identity
+                Settings.route -> Settings
+                StudentCardDetail.route -> StudentCardDetail
+                Onboarding.route -> Onboarding
+                Login.route -> Login
+                else -> {
+                    // 파라미터가 있는 route 처리
+                    when {
+                        route?.startsWith("miniapp/") == true -> MiniAppDetail
+                        route?.startsWith("module/") == true -> ModuleDetail
+                        else -> null
+                    }
+                }
+            }
+        }
+    }
 }
-
-/**
- * Bottom Navigation에 표시될 화면들의 목록
- * 순서대로 하단 탭에 표시됩니다.
- */
-val bottomNavRoutes = listOf(
-    AnamNavRoute.Main,
-    AnamNavRoute.Hub,
-    AnamNavRoute.Browser,
-    AnamNavRoute.Identity,
-    AnamNavRoute.Settings
-)
