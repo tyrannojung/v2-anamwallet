@@ -10,7 +10,7 @@ import com.anam145.wallet.feature.main.MainScreen
 import com.anam145.wallet.feature.hub.HubScreen
 import com.anam145.wallet.feature.browser.BrowserScreen
 import com.anam145.wallet.feature.identity.IdentityScreen
-import com.anam145.wallet.feature.settings.SettingsScreen
+import com.anam145.wallet.feature.settings.ui.SettingsScreen
 
 /**
  * ANAM Wallet의 메인 Navigation Host

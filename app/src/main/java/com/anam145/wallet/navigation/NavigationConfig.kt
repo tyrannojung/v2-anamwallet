@@ -4,7 +4,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.anam145.wallet.R
 
 /**
  * Navigation 관련 모든 설정을 중앙 관리
@@ -20,7 +19,7 @@ object NavigationConfig {
     data class NavIconInfo(
         val selectedIcon: ImageVector,
         val unselectedIcon: ImageVector,
-        val labelRes: Int
+        val labelKey: String
     )
     
     /**
@@ -30,27 +29,27 @@ object NavigationConfig {
         AnamNavRoute.Main to NavIconInfo(
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
-            labelRes = R.string.nav_main
+            labelKey = "main"
         ),
         AnamNavRoute.Hub to NavIconInfo(
             selectedIcon = Icons.Filled.Hub,
             unselectedIcon = Icons.Outlined.Hub,
-            labelRes = R.string.nav_hub
+            labelKey = "hub"
         ),
         AnamNavRoute.Browser to NavIconInfo(
             selectedIcon = Icons.Filled.Language,
             unselectedIcon = Icons.Outlined.Language,
-            labelRes = R.string.nav_browser
+            labelKey = "browser"
         ),
         AnamNavRoute.Identity to NavIconInfo(
             selectedIcon = Icons.Filled.QrCode,
             unselectedIcon = Icons.Outlined.QrCode,
-            labelRes = R.string.nav_did
+            labelKey = "identity"
         ),
         AnamNavRoute.Settings to NavIconInfo(
             selectedIcon = Icons.Filled.Settings,
             unselectedIcon = Icons.Outlined.Settings,
-            labelRes = R.string.nav_settings
+            labelKey = "settings"
         )
     )
     
@@ -77,7 +76,7 @@ object NavigationConfig {
                     route = route,
                     selectedIcon = iconInfo.selectedIcon,
                     unselectedIcon = iconInfo.unselectedIcon,
-                    labelResId = iconInfo.labelRes
+                    labelKey = iconInfo.labelKey
                 )
             }
         }

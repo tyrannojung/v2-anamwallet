@@ -15,13 +15,12 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.anam145.wallet.R
+import com.anam145.wallet.core.ui.language.LocalStrings
 
 /**
  * Bottom Navigation Bar 아이템 정의
@@ -29,13 +28,13 @@ import com.anam145.wallet.R
  * @property route 네비게이션 경로
  * @property selectedIcon 선택된 상태의 아이콘
  * @property unselectedIcon 선택되지 않은 상태의 아이콘
- * @property labelResId 표시될 라벨의 문자열 리소스 ID
+ * @property labelKey 표시될 라벨의 키
  */
 data class BottomNavItem(
     val route: AnamNavRoute,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
-    val labelResId: Int
+    val labelKey: String
 )
 
 /**
@@ -56,6 +55,7 @@ fun AnamBottomNavigation(
     // 현재 선택된 경로 추적
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val strings = LocalStrings.current
     
     Surface(
         modifier = Modifier
@@ -91,7 +91,14 @@ fun AnamBottomNavigation(
                         }
                     },
                     icon = if (selected) item.selectedIcon else item.unselectedIcon,
-                    label = stringResource(id = item.labelResId)
+                    label = when (item.labelKey) {
+                        "main" -> strings.navMain
+                        "hub" -> strings.navHub
+                        "browser" -> strings.navBrowser
+                        "identity" -> strings.navDid
+                        "settings" -> strings.navSettings
+                        else -> ""
+                    }
                 )
             }
         }

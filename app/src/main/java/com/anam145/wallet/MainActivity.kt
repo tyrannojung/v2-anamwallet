@@ -11,7 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.anam145.wallet.core.ui.theme.AnamWalletTheme
@@ -19,6 +19,12 @@ import com.anam145.wallet.core.ui.components.Header
 import com.anam145.wallet.navigation.AnamBottomNavigation
 import com.anam145.wallet.navigation.AnamNavHost
 import com.anam145.wallet.navigation.AnamNavRoute
+import com.anam145.wallet.ui.theme.ThemeViewModel
+import com.anam145.wallet.ui.language.LanguageViewModel
+import com.anam145.wallet.core.ui.language.LocalLanguage
+import com.anam145.wallet.core.ui.language.LocalStrings
+import com.anam145.wallet.core.ui.language.getStringsForLanguage
+import androidx.compose.runtime.CompositionLocalProvider
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -26,11 +32,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AnamWalletTheme {
-                AnamWalletApp()
-            }
+            AnamWalletApp()
         }
     }
+    
 }
 
 /**
@@ -41,8 +46,23 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 fun AnamWalletApp() {
-    // Navigation Controller 생성
-    val navController = rememberNavController()
+    // 테마 ViewModel 
+    val themeViewModel: ThemeViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val themeMode by themeViewModel.themeMode.collectAsStateWithLifecycle()
+    
+    // 언어 ViewModel
+    val languageViewModel: LanguageViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val language by languageViewModel.language.collectAsStateWithLifecycle()
+    val strings = getStringsForLanguage(language)
+    
+    // CompositionLocal로 언어와 문자열 제공
+    CompositionLocalProvider(
+        LocalLanguage provides language,
+        LocalStrings provides strings
+    ) {
+        AnamWalletTheme(themeMode = themeMode) {
+        // Navigation Controller 생성
+        val navController = rememberNavController()
     
     // 현재 경로 추적
     val navBackStackEntry by navController.currentBackStackEntryAsState() // 현재 화면 상태를 관찰
@@ -54,11 +74,17 @@ fun AnamWalletApp() {
         topBar = {
             // 상단 헤더
             Header(
-                // stringResource : Compose에서 문자열 리소스를 가져오는 함수
-                // ?: 연산자 -> null일때 기본값 제공
-                title = stringResource(currentNavRoute?.titleRes ?: R.string.header_title),
+                // LocalStrings로 언어별 타이틀 제공
+                title = when (currentNavRoute) {
+                    AnamNavRoute.Main -> strings.headerTitleMain
+                    AnamNavRoute.Hub -> strings.headerTitleHub
+                    AnamNavRoute.Browser -> strings.headerTitleBrowser
+                    AnamNavRoute.Identity -> strings.headerTitleIdentity
+                    AnamNavRoute.Settings -> strings.headerTitleSettings
+                    else -> strings.headerTitle
+                },
                 showBlockchainStatus = currentRoute == AnamNavRoute.Main.route,
-                blockchainConnected = false // TODO: 실제 블록체인 상태로 교체
+                blockchainConnected = false
             )
         },
         bottomBar = {
@@ -71,5 +97,7 @@ fun AnamWalletApp() {
             navController = navController,
             modifier = Modifier.padding(innerPadding)
         )
+        }
+        }
     }
 }

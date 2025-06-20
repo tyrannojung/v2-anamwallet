@@ -1,107 +1,227 @@
 # ANAM Wallet V2
 
-A modern Android cryptocurrency wallet with decentralized identity support, built with clean MVVM architecture.
+Modern Android wallet application built with Clean Architecture, MVVM/MVI patterns, and Jetpack Compose.
 
-## Overview
+## 🏗️ Architecture Overview
 
-ANAM Wallet V2 is a complete refactoring of the original ANAM Android wallet, focusing on:
+This project follows **Clean Architecture** principles with a **multi-module** structure, ensuring separation of concerns, testability, and scalability.
 
-- Clean MVVM architecture with proper separation of concerns
-- Modern Android development practices (Jetpack Compose, Kotlin Coroutines, Flow)
-- Enhanced security and performance
-- Improved testability and maintainability
-
-## Features (Planned)
-
-TBD
-
-## Architecture
-
-### MVI-lite Pattern (MVVM with Unidirectional Data Flow)
-
-We use a pragmatic approach combining the best of MVVM and MVI patterns:
+### Module Structure
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                   Compose UI                        │
-│  - Observes single UiState                         │
-│  - Calls ViewModel methods for user actions        │
-└────────────────────┬───────────────────────────────┘
-                     │ collectAsState()
-                     ▼
-┌─────────────────────────────────────────────────────┐
-│                  ViewModel                          │
-│  - Exposes: StateFlow<UiState>                     │
-│  - Methods: onButtonClick(), onTextChanged()       │
-│  - Updates: _state.update { it.copy(...) }         │
-└────────────────────┬───────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────┐
-│              Domain/Data Layer                      │
-└─────────────────────────────────────────────────────┘
+v2-anamwallet/
+├── app/                          # Main application module
+├── core/
+│   └── ui/                       # Shared UI components and theme
+└── feature/                      # Feature modules
+    ├── main/
+    ├── hub/
+    ├── browser/
+    ├── identity/
+    └── settings/
 ```
 
-#### Key Principles
+## 📁 Standard Feature Module Structure
 
-1. **Single State Object**: Each screen has one `UiState` data class
-   ```kotlin
-   data class WalletUiState(
-       val balance: String = "0",
-       val isLoading: Boolean = false,
-       val error: String? = null
-   )
+Each feature module follows a consistent Clean Architecture structure:
+
+```
+feature/{name}/
+├── ui/                              # Presentation Layer
+│   ├── {Name}Screen.kt              # Compose UI
+│   ├── {Name}ViewModel.kt           # State management
+│   ├── {Name}Contract.kt            # MVI Contract (State, Intent, Effect)
+│   └── components/                  # Reusable UI components
+│
+├── domain/                          # Business Layer
+│   ├── model/                       # Business models
+│   ├── repository/                  # Repository interfaces
+│   └── usecase/                     # Business logic
+│
+├── data/                            # Data Layer
+│   └── repository/                  # Repository implementations
+│
+└── di/                              # Dependency Injection
+    └── {Name}Module.kt
+```
+
+## 🔄 Architecture Flow
+
+### Unidirectional Data Flow
+
+```
+┌─────────────────┐
+│   User Action   │
+└────────┬────────┘
+         ▼
+┌─────────────────┐     ┌──────────────┐
+│   UI (Screen)   │────▶│  Contract    │
+└────────┬────────┘     │  - State     │
+         │              │  - Intent    │
+         ▼              │  - Effect    │
+┌─────────────────┐     └──────────────┘
+│   ViewModel    │
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│    UseCase      │ (Business Logic)
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│   Repository    │ (Interface)
+│   (Domain)      │
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│ Repository Impl │ (Implementation)
+│    (Data)       │
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│   Data Source   │ (Local/Remote)
+└─────────────────┘
+```
+
+## 🎯 Key Architectural Patterns
+
+### 1. MVI-lite Pattern
+
+Combines MVVM simplicity with MVI's unidirectional data flow:
+
+- **State**: Single immutable state object per screen
+- **Intent**: User actions as sealed classes/interfaces
+- **Effect**: One-time events (navigation, toasts, etc.)
+
+### 2. Clean Architecture Layers
+
+- **UI Layer**: Compose screens and ViewModels
+- **Domain Layer**: Business logic (UseCases) and repository interfaces
+- **Data Layer**: Repository implementations and data sources
+
+### 3. Multi-Module Benefits
+
+- **Parallel Development**: Teams can work on different features
+- **Faster Builds**: Only changed modules rebuild
+- **Clear Boundaries**: Enforced separation of concerns
+- **Reusability**: Features can be shared across apps
+
+### 4. Dependency Rule
+
+Dependencies only point inward:
+
+- UI → Domain ← Data
+- Domain has no dependencies on UI or Data layers
+
+## Real-time Language System
+
+The app supports instant language switching without Activity restart using CompositionLocal:
+
+```kotlin
+// Define language provider
+val LocalLanguage = compositionLocalOf { Language.KOREAN }
+val LocalStrings = staticCompositionLocalOf { Strings() }
+
+// Use in any Composable
+val strings = LocalStrings.current
+Text(text = strings.welcomeMessage)
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Android Studio Hedgehog or newer
+- Kotlin 2.0+
+- Minimum SDK 24
+
+### Building the Project
+
+```bash
+./gradlew assembleDebug
+```
+
+### Running Tests
+
+```bash
+./gradlew test
+./gradlew connectedAndroidTest
+```
+
+## 📦 Tech Stack
+
+### Core
+
+- **Jetpack Compose**: Modern declarative UI
+- **Hilt**: Compile-time dependency injection
+- **Coroutines & Flow**: Asynchronous programming
+- **DataStore**: Modern data persistence
+
+### Architecture Components
+
+- **ViewModel**: UI state management
+- **Navigation Compose**: Type-safe navigation
+- **StateFlow**: Observable state holder
+
+### UI
+
+- **Material 3**: Latest design system
+- **Compose Animation**: Smooth transitions
+
+## 🔧 Development Guidelines
+
+### Creating a New Feature Module
+
+1. **Module Setup**
+
+   ```
+   feature/{name}/
+   ├── build.gradle.kts
+   └── src/main/java/com/anam145/wallet/feature/{name}/
    ```
 
-2. **Unidirectional Flow**: UI → ViewModel → State → UI
+2. **Define Contract**
+
    ```kotlin
-   // ViewModel
-   private val _uiState = MutableStateFlow(WalletUiState())
-   val uiState = _uiState.asStateFlow()
-   
-   fun onRefreshClick() {
-       _uiState.update { it.copy(isLoading = true) }
-       // ... fetch data ...
-       _uiState.update { it.copy(balance = newBalance, isLoading = false) }
+   interface {Name}Contract {
+       data class State(...)
+       sealed interface Intent { ... }
+       sealed interface Effect { ... }
    }
    ```
 
-3. **Direct Method Calls**: No Intent boilerplate
-   ```kotlin
-   // In Compose UI
-   Button(onClick = { viewModel.onRefreshClick() }) {
-       Text("Refresh")
-   }
-   ```
+3. **Implement Layers**
 
-#### Why MVI-lite?
+   - Create ViewModels with state management
+   - Define UseCases for business logic
+   - Implement repositories with interfaces
 
-- **Less Boilerplate**: No sealed Intent classes or giant reducer functions
-- **Easy to Learn**: Familiar MVVM method calls, but with better state management
-- **Compose-Friendly**: Single state object works perfectly with Compose recomposition
-- **Scalable**: Can evolve to full MVI for complex screens when needed
+4. **Setup DI**
+   - Create Hilt modules
+   - Bind interfaces to implementations
 
-### Clean Architecture Layers
+### Code Conventions
 
-```
-MVVM + Clean Architecture
-├── Presentation Layer (View + ViewModel)
-├── Domain Layer (Use Cases + Repositories)
-└── Data Layer (Local + Remote Data Sources)
-```
+- **Naming**: `{Feature}Screen`, `{Feature}ViewModel`, `{Feature}UseCase`
+- **Package Structure**: Follow the standard module structure
+- **State Management**: Single state object per screen
+- **Error Handling**: Graceful degradation with user feedback
 
-## Tech Stack
+## 🧪 Testing Strategy
 
 TBD
 
-## Development Status
+## 📈 Performance Considerations
 
 TBD
 
-## License
+## 🔐 Security
 
 TBD
 
-## Contact
+## 📄 License
+
+TBD
+
+## 👥 Contributors
 
 TBD

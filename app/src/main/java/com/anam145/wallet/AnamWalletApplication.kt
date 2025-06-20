@@ -15,8 +15,5 @@ class AnamWalletApplication : Application() {
     
     override fun onCreate() {
         super.onCreate()
-        
-        // TODO: 필요한 경우 앱 초기화 로직 추가
-        // 예: Timber 로깅, 크래시 리포팅, 분석 도구 등
     }
 }

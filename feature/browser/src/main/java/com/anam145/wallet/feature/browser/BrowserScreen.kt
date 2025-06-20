@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.anam145.wallet.core.ui.language.LocalStrings
 
 /**
  * 브라우저 화면
@@ -19,6 +20,8 @@ import androidx.compose.ui.unit.dp
 fun BrowserScreen(
     modifier: Modifier = Modifier
 ) {
+    val strings = LocalStrings.current
+    
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -28,17 +31,9 @@ fun BrowserScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Browser Screen",
+                text = strings.browserScreenTitle,
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Text(
-                text = "내장 브라우저",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
