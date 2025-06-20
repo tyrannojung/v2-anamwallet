@@ -1,18 +1,3 @@
 <resources>
     <string name="app_name">AnamWallet</string>
-    
-    <!-- Header -->
-    <string name="header_title">AnamWallet</string>
-    <string name="header_title_main">AnamWallet</string>
-    <string name="header_title_hub">허브</string>
-    <string name="header_title_browser">웹뷰</string>
-    <string name="header_title_identity">디지털 신분증</string>
-    <string name="header_title_settings">설정</string>
-    
-    <!-- Bottom Navigation -->
-    <string name="nav_main">메인</string>
-    <string name="nav_did">신분증</string>
-    <string name="nav_hub">허브</string>
-    <string name="nav_browser">브라우저</string>
-    <string name="nav_settings">설정</string>
 </resources>

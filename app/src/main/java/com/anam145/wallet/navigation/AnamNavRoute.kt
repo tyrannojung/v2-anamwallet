@@ -1,7 +1,5 @@
 package com.anam145.wallet.navigation
 
-import androidx.annotation.StringRes
-import com.anam145.wallet.R
 
 /**
  * ANAM Wallet의 네비게이션 경로 정의
@@ -33,30 +31,26 @@ import com.anam145.wallet.R
  * navController.navigate("miniapp/" + appId)  // 수동 문자열 조합
  */
 sealed class AnamNavRoute(
-    val route: String,
-    @StringRes val titleRes: Int = R.string.header_title
+    val route: String
 ) {
     
     // ========== Bottom Navigation 화면들 ==========
     // 하단 네비게이션 바에 표시되는 주요 화면들
     
-    /** 메인 화면 - 홈 대시보드
-     - "main"은 네비게이션 경로 (URL처럼 사용)
-     - R.string.header_title_main은 화면 제목
-     */
-    data object Main : AnamNavRoute("main", R.string.header_title_main)
+    /** 메인 화면 - 홈 대시보드 */
+    data object Main : AnamNavRoute("main")
     
     /** 허브 화면 - 미니앱 및 서비스 목록 */
-    data object Hub : AnamNavRoute("hub", R.string.header_title_hub)
+    data object Hub : AnamNavRoute("hub")
     
     /** 브라우저 화면 - 웹 브라우징 */
-    data object Browser : AnamNavRoute("browser", R.string.header_title_browser)
+    data object Browser : AnamNavRoute("browser")
     
     /** 신원(Identity) 화면 - DID/VC 관리 */
-    data object Identity : AnamNavRoute("identity", R.string.header_title_identity)
+    data object Identity : AnamNavRoute("identity")
     
     /** 설정 화면 - 앱 설정 및 프로필 */
-    data object Settings : AnamNavRoute("settings", R.string.header_title_settings)
+    data object Settings : AnamNavRoute("settings")
     
     // ========== 상세 화면들 ==========
     // 특정 아이템이나 기능의 상세 화면들
