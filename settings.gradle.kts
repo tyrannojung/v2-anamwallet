@@ -24,4 +24,11 @@ include(":app")
 
 // Core modules
 include(":core:ui")
+
+// Feature modules  
+include(":feature:main")
+include(":feature:hub")
+include(":feature:browser")
+include(":feature:identity")
+include(":feature:settings")
  

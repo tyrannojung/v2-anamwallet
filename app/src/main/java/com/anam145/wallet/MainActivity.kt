@@ -45,9 +45,9 @@ fun AnamWalletApp() {
     val navController = rememberNavController()
     
     // 현재 경로 추적
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-    val currentNavRoute = AnamNavRoute.fromRoute(currentRoute)
+    val navBackStackEntry by navController.currentBackStackEntryAsState() // 현재 화면 상태를 관찰
+    val currentRoute = navBackStackEntry?.destination?.route // "main", "hub" 등 문자열
+    val currentNavRoute = AnamNavRoute.fromRoute(currentRoute) // 문자열 → 객체 변환
     
     Scaffold(
         modifier = Modifier.fillMaxSize(),
