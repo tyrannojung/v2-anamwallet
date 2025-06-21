@@ -2,7 +2,7 @@ package com.anam145.wallet.ui.theme
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.anam145.wallet.feature.settings.domain.repository.SettingsRepository
+import com.anam145.wallet.feature.settings.domain.repository.ThemeRepository
 import com.anam145.wallet.feature.settings.domain.model.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,13 +17,13 @@ import com.anam145.wallet.core.ui.theme.ThemeMode as UiThemeMode
  */
 @HiltViewModel
 class ThemeViewModel @Inject constructor(
-    settingsRepository: SettingsRepository
+    themeRepository: ThemeRepository
 ) : ViewModel() {
     
     /**
      * 현재 테마 모드
      */
-    val themeMode: StateFlow<UiThemeMode> = settingsRepository.themeMode
+    val themeMode: StateFlow<UiThemeMode> = themeRepository.themeMode
         .map { featureThemeMode ->
             when (featureThemeMode) {
                 ThemeMode.LIGHT -> UiThemeMode.LIGHT

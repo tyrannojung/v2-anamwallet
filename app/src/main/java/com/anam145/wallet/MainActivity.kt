@@ -54,8 +54,12 @@ fun AnamWalletApp() {
     val languageViewModel: LanguageViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val language by languageViewModel.language.collectAsStateWithLifecycle()
     val strings = getStringsForLanguage(language)
-    
-    // CompositionLocal로 언어와 문자열 제공
+
+    /**
+     * CompositionLocal로 언어와 문자열 제공
+     * CompositionLocal은 Compose의 "암시적 데이터 전달" 메커니즘.
+     * 모든 하위 컴포저블에서 매개변수로 전달하지 않고도 데이터에 접근할 수 있게 해줌
+     */
     CompositionLocalProvider(
         LocalLanguage provides language,
         LocalStrings provides strings
@@ -65,7 +69,8 @@ fun AnamWalletApp() {
         val navController = rememberNavController()
     
     // 현재 경로 추적
-    val navBackStackEntry by navController.currentBackStackEntryAsState() // 현재 화면 상태를 관찰
+    // Navigation Compose에서 현재 화면의 상태를 관찰하는 함수
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route // "main", "hub" 등 문자열
     val currentNavRoute = AnamNavRoute.fromRoute(currentRoute) // 문자열 → 객체 변환
     

@@ -10,10 +10,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import com.anam145.wallet.feature.settings.domain.repository.SettingsRepository
 import com.anam145.wallet.feature.settings.domain.repository.ThemeRepository
 import com.anam145.wallet.feature.settings.domain.repository.LanguageRepository
-import com.anam145.wallet.feature.settings.data.SettingsRepositoryImpl
 import com.anam145.wallet.feature.settings.data.ThemeRepositoryImpl
 import com.anam145.wallet.feature.settings.data.LanguageRepositoryImpl
 import dagger.Binds
@@ -29,11 +27,6 @@ private val Context.settingsDataStore: DataStore<Preferences> by preferencesData
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class SettingsModule {
-    
-    @Binds
-    abstract fun bindSettingsRepository(
-        settingsRepositoryImpl: SettingsRepositoryImpl
-    ): SettingsRepository
     
     @Binds
     abstract fun bindThemeRepository(
