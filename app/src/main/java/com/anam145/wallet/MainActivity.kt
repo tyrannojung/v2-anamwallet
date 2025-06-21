@@ -15,7 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.anam145.wallet.core.ui.theme.AnamWalletTheme
-import com.anam145.wallet.core.ui.components.Header
+import com.anam145.wallet.ui.components.Header
 import com.anam145.wallet.navigation.AnamBottomNavigation
 import com.anam145.wallet.navigation.AnamNavHost
 import com.anam145.wallet.navigation.AnamNavRoute
@@ -26,6 +26,7 @@ import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.language.getStringsForLanguage
 import androidx.compose.runtime.CompositionLocalProvider
 
+// Hilt가 의존성을 주입하는 시작점
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

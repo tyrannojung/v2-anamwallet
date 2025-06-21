@@ -1,4 +1,4 @@
-package com.anam145.wallet.core.ui.components
+package com.anam145.wallet.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
