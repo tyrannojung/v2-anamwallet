@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
+import java.util.Locale
 
 /**
  * 앱 전체 언어 상태를 관리하는 ViewModel
@@ -25,6 +26,17 @@ class LanguageViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = Language.KOREAN
+            initialValue = getSystemLanguageWithDefault()
         )
+    
+    /**
+     * 시스템 언어를 가져오되, 지원하지 않는 언어면 한국어로 기본 설정
+     */
+    private fun getSystemLanguageWithDefault(): Language {
+        return when (Locale.getDefault().language) {
+            "ko" -> Language.KOREAN
+            "en" -> Language.ENGLISH
+            else -> Language.KOREAN
+        }
+    }
 }

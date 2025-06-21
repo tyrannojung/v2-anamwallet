@@ -1,13 +1,7 @@
 package com.anam145.wallet.core.ui.language
 
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.anam145.wallet.core.common.model.Language
-
-/**
- * 앱 전체에서 사용할 언어 설정을 위한 CompositionLocal
- */
-val LocalLanguage = compositionLocalOf { Language.KOREAN }
 
 /**
  * 언어에 따른 문자열 리소스를 제공하는 Provider

@@ -21,7 +21,6 @@ import com.anam145.wallet.navigation.AnamNavHost
 import com.anam145.wallet.navigation.AnamNavRoute
 import com.anam145.wallet.ui.theme.ThemeViewModel
 import com.anam145.wallet.ui.language.LanguageViewModel
-import com.anam145.wallet.core.ui.language.LocalLanguage
 import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.language.getStringsForLanguage
 import androidx.compose.runtime.CompositionLocalProvider
@@ -56,7 +55,19 @@ fun AnamWalletApp() {
      * 1. 사용자가 앱 사용 중 (수집 중 ✓)
      * 2. 홈 버튼 → 앱이 백그라운드로
      * 3. 하지만 여전히 데이터 수집 중...
-     * 4. 배터리 낭비 + 불필요한 연산
+     * 4. 배터리 낭비 + 불필요한 연산 -> collectAsStateWithLifecycle 사용한 이유!
+     * by 문법 = "대신해줘!"
+     *
+     * ex)
+     * 이 귀찮은 일을
+     * val box = State(10)
+     * println(box.value)
+     * box.value = 20
+     *
+     * by가 대신해줌
+     * var number by State(10)
+     * println(number)  // 알아서 .value
+     * number = 20      // 알아서 .value =
      * */
     val themeMode by themeViewModel.themeMode.collectAsStateWithLifecycle()
     
@@ -71,7 +82,6 @@ fun AnamWalletApp() {
      * 모든 하위 컴포저블에서 매개변수로 전달하지 않고도 데이터에 접근할 수 있게 해줌
      */
     CompositionLocalProvider(
-        LocalLanguage provides language,
         LocalStrings provides strings
     ) {
         AnamWalletTheme(themeMode = themeMode) {

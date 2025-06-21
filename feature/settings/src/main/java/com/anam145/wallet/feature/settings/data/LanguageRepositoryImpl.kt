@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.anam145.wallet.core.common.util.LanguageUtil
+import java.util.Locale
 
 /**
  * LanguageRepository 구현체
@@ -36,11 +36,11 @@ class LanguageRepositoryImpl @Inject constructor(
         when (savedLanguageCode) {
             null -> {
                 // 저장된 값이 없으면 시스템 언어 사용
-                LanguageUtil.getSystemLanguage()
+                getSystemLanguage()
             }
             else -> {
                 // 저장된 언어 코드로 Language enum 찾기
-                Language.entries.find { it.code == savedLanguageCode } ?: LanguageUtil.getSystemLanguage()
+                Language.entries.find { it.code == savedLanguageCode } ?: getSystemLanguage()
             }
         }
     }
@@ -48,6 +48,17 @@ class LanguageRepositoryImpl @Inject constructor(
     override suspend fun setLanguage(language: Language) {
         dataStore.edit { preferences ->
             preferences[LANGUAGE_KEY] = language.code
+        }
+    }
+    
+    /**
+     * 시스템 언어를 지원하는 언어로 변환
+     */
+    private fun getSystemLanguage(): Language {
+        return when (Locale.getDefault().language) {
+            "ko" -> Language.KOREAN
+            "en" -> Language.ENGLISH
+            else -> Language.KOREAN  // 지원하지 않는 언어는 한국어로 기본 설정
         }
     }
 }
