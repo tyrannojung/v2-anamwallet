@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.anam145.wallet.core.common.util.LanguageUtil
 
 /**
  * LanguageRepository 구현체
@@ -29,13 +30,19 @@ class LanguageRepositoryImpl @Inject constructor(
     }
     
     override val language: Flow<Language> = dataStore.data.map { preferences ->
-        // 1. 저장된 언어 코드 읽기 (없으면 한국어)
-        val languageCode = preferences[LANGUAGE_KEY] ?: Language.KOREAN.code
-        // find 동작 과정:
-        // 1. Language.KOREAN.code == "en"? → "ko" == "en" → false
-        // 2. Language.ENGLISH.code == "en"? → "en" == "en" → true! (찾았다!)
-        // 결과: Language.ENGLISH 반환
-        Language.entries.find { it.code == languageCode } ?: Language.KOREAN
+        // 저장된 언어 코드 읽기
+        val savedLanguageCode = preferences[LANGUAGE_KEY]
+        
+        when (savedLanguageCode) {
+            null -> {
+                // 저장된 값이 없으면 시스템 언어 사용
+                LanguageUtil.getSystemLanguage()
+            }
+            else -> {
+                // 저장된 언어 코드로 Language enum 찾기
+                Language.entries.find { it.code == savedLanguageCode } ?: LanguageUtil.getSystemLanguage()
+            }
+        }
     }
     
     override suspend fun setLanguage(language: Language) {

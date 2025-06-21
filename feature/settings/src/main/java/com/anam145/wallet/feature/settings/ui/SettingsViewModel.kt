@@ -26,12 +26,21 @@ class SettingsViewModel @Inject constructor(
     private val getLanguageUseCase: GetLanguageUseCase,
     private val setLanguageUseCase: SetLanguageUseCase
 ) : ViewModel() {
-    
-    // UI 상태
+
+    /**
+     * UI 상태
+     * private - 내부에서만 수정 가능한 MutableStateFlow
+     * public - 외부에서는 읽기만 가능한 StateFlow
+     * _uiState: ViewModel 내부에서만 값을 변경
+     * uiState: UI는 읽기만 가능 (캡슐화)
+     * */
     private val _uiState = MutableStateFlow(SettingsContract.SettingsState())
     val uiState: StateFlow<SettingsContract.SettingsState> = _uiState.asStateFlow()
     
-    // 부수효과
+    /**
+     * State: 지속적인 상태 (현재 테마는 다크모드)
+     * Effect: 일회성 동작 (화면 이동하세요!)
+     * */
     private val _effect = Channel<SettingsContract.SettingsEffect>()
     val effect = _effect.receiveAsFlow()
     
@@ -41,10 +50,27 @@ class SettingsViewModel @Inject constructor(
     
     /**
      * 사용자 Intent 처리
+     * MVI 방식 - 모든 액션을 Intent로 통합!
      */
     fun handleIntent(intent: SettingsContract.SettingsIntent) {
         when (intent) {
-            is SettingsContract.SettingsIntent.ChangeTheme -> changeTheme(intent.themeMode)
+            /**
+             * is는 Kotlin의 타입 체크 연산자
+             * is로 타입 체크하면 자동으로 타입 캐스팅됨!
+             * 여기서 intent는 자동으로 ChangeTheme 타입
+             * data class = 여러 인스턴스 생성 가능
+             * 각각 다른 인스턴스들
+             * val intent1 = ChangeTheme(ThemeMode.DARK)
+             * val intent2 = ChangeTheme(ThemeMode.LIGHT)
+             * val intent3 = ChangeTheme(ThemeMode.SYSTEM)
+             * 모두 ChangeTheme 타입이지만 다른 객체
+             * data object = 단 하나의 싱글톤
+             * 즉 여러 개의 인스턴스가 가능하기 때문에 타입 체크가 필요함
+             * */
+            // "이게 ChangeTheme 타입인가?"
+            is SettingsContract.SettingsIntent.ChangeTheme ->
+                // 맞다! 그럼 themeMode에 접근 가능
+                changeTheme(intent.themeMode)
             is SettingsContract.SettingsIntent.ChangeLanguage -> changeLanguage(intent.language)
             SettingsContract.SettingsIntent.ClickHelp -> navigateToHelp()
             SettingsContract.SettingsIntent.ClickFAQ -> navigateToFAQ()
@@ -54,22 +80,36 @@ class SettingsViewModel @Inject constructor(
     }
     
     /**
-     * 저장된 설정 불러오기
+     *  저장된 설정 불러오기
+     *  collect는 무한 대기 상태!
+     *  Flow가 새 값을 방출할 때마다 실행됨
+     *  사용자가 라이트 모드 선택
+     *  setThemeModeUseCase(LIGHT)
+     *     ↓
+     *  Repository 업데이트
+     *     ↓
+     *  getThemeModeUseCase()의 Flow가 새 값 방출!
+     *     ↓
+     *  collect가 감지하고 combine 다시 실행
+     *     ↓
+     *  State 자동 업데이트
      */
     private fun loadSettings() {
+        // 1. 코루틴 스코프
         viewModelScope.launch {
+            // 2. 두 개의 Flow 합치기
             combine(
-                getThemeModeUseCase(),
-                getLanguageUseCase()
+                getThemeModeUseCase(), // Flow<ThemeMode>
+                getLanguageUseCase()   // Flow<Language>
             ) { theme, language ->
+                // 3. 두 값이 모두 도착하면 실행
                 _uiState.update { currentState ->
                     currentState.copy(
                         themeMode = theme,
-                        language = language,
-                        isLoading = false
+                        language = language
                     )
                 }
-            }.collect()
+            }.collect() // 4. Flow 구독 시작 , collect는 suspend 함수 코루틴 필요.
         }
     }
     

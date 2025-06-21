@@ -22,12 +22,20 @@ private val Context.settingsDataStore: DataStore<Preferences> by preferencesData
 )
 
 /**
+ * 각 feature가 자신만의 DI 설정을 가짐
  * Settings 모듈의 의존성 주입 설정
+ * SettingsModule은 설정 파일
+ * Hilt에게 "이렇게 객체를 만들어라"고 알려주는 곳
  */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class SettingsModule {
-    
+
+    /**
+     * Repository 바인딩
+     * 의미: "누군가 ThemeRepository를 요청하면, ThemeRepositoryImpl을 줘라"
+     * 왜 필요?: ViewModel은 인터페이스(ThemeRepository)만 알고, 구현체는 모름
+     * */
     @Binds
     abstract fun bindThemeRepository(
         themeRepositoryImpl: ThemeRepositoryImpl
@@ -37,7 +45,12 @@ abstract class SettingsModule {
     abstract fun bindLanguageRepository(
         languageRepositoryImpl: LanguageRepositoryImpl
     ): LanguageRepository
-    
+
+    /**
+     * DataStore 제공
+     * DataStore가 필요하면 이렇게 만들어라
+     * @Singleton: 앱 전체에서 하나만 존재
+     * */
     companion object {
         @Provides
         @Singleton

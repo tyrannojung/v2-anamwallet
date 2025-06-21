@@ -53,7 +53,6 @@ fun ThemeSection(
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
-            val isSystemMode = currentTheme == ThemeMode.SYSTEM
             val isDarkMode = when (currentTheme) {
                 ThemeMode.DARK -> true
                 ThemeMode.LIGHT -> false

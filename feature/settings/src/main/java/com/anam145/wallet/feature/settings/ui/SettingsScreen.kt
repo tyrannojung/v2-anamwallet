@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.collectLatest
 /**
  * 설정 화면
  * 
- * 앱 설정, 테마, 언어 등을 관리하는 화면입니다.
+ * 앱 설정, 테마, 언어 등을 관리하는 화면
  */
 @Composable
 fun SettingsScreen(

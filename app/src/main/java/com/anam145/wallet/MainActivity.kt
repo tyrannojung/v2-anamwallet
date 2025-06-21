@@ -25,6 +25,7 @@ import com.anam145.wallet.core.ui.language.LocalLanguage
 import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.language.getStringsForLanguage
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 
 // Hilt가 의존성을 주입하는 시작점
 @AndroidEntryPoint
@@ -47,12 +48,20 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 fun AnamWalletApp() {
-    // 테마 ViewModel 
-    val themeViewModel: ThemeViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    // 테마 ViewModel
+    // hiltViewModel() → ViewModel 인스턴스 생성
+    val themeViewModel: ThemeViewModel = hiltViewModel()
+    // collectAsStateWithLifecycle : 화면이 보일 때만 수집!
+    /**
+     * 1. 사용자가 앱 사용 중 (수집 중 ✓)
+     * 2. 홈 버튼 → 앱이 백그라운드로
+     * 3. 하지만 여전히 데이터 수집 중...
+     * 4. 배터리 낭비 + 불필요한 연산
+     * */
     val themeMode by themeViewModel.themeMode.collectAsStateWithLifecycle()
     
     // 언어 ViewModel
-    val languageViewModel: LanguageViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val languageViewModel: LanguageViewModel = hiltViewModel()
     val language by languageViewModel.language.collectAsStateWithLifecycle()
     val strings = getStringsForLanguage(language)
 

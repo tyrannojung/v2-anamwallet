@@ -6,12 +6,22 @@ import com.anam145.wallet.core.common.model.ThemeMode
 /**
  * Settings 화면의 MVI Contract
  * 
- * 설정 화면의 모든 상태, 의도(Intent), 부수효과를 정의합니다.
+ * 설정 화면의 모든 상태, 의도(Intent), 부수효과를 정의.
  * 
  * Contract 패턴의 장점:
  * - 한 곳에서 화면의 모든 동작을 파악 가능
  * - State, Intent(Event), Effect를 명확히 구분
  * - 테스트와 유지보수가 용이
+ *
+ *  SettingsContract만 보면:
+ *  "아, 이 화면은..."
+ *  - 테마랑 언어를 보여주고 (State)
+ *  - 테마/언어 변경, 도움말 클릭 가능하고 (Intent)
+ *  - 다른 화면으로 이동할 수 있구나 (Effect)
+ *
+ *  신입: "Settings 화면이 뭐하는 곳이에요?"
+ *  선임: "SettingsContract 봐!"
+ *  신입: "아, 다 여기 있네요!"
  */
 interface SettingsContract {
     
@@ -24,12 +34,10 @@ interface SettingsContract {
      * 
      * @property themeMode 현재 선택된 테마 모드 (라이트/다크/시스템)
      * @property language 현재 선택된 언어 설정
-     * @property isLoading 설정 변경 중 로딩 상태 표시 여부
      */
     data class SettingsState(
         val themeMode: ThemeMode = ThemeMode.SYSTEM,
-        val language: Language = Language.KOREAN,
-        val isLoading: Boolean = false
+        val language: Language = Language.KOREAN
     )
     
     /**
