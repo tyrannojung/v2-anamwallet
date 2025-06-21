@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import com.anam145.wallet.core.ui.language.LocalStrings
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.anam145.wallet.core.ui.language.Language
+import com.anam145.wallet.core.common.model.Language
 
 /**
  * 언어 설정 섹션

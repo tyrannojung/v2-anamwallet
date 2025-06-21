@@ -12,6 +12,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.anam145.wallet.core.common.model.ThemeMode
 
 /**
  * ANAM Wallet 테마 정의
@@ -87,22 +88,6 @@ private val AnamLightColorScheme = lightColorScheme(
     error = AnamError,                        // 에러 상태
     onError = AnamWhite                       // 에러 색상 위의 콘텐츠
 )
-
-// ========== 테마 모드 정의 ==========
-/**
- * 테마 모드 열거형
- * 사용자가 선택할 수 있는 테마 옵션들
- */
-enum class ThemeMode {
-    /** 항상 밝은 테마 사용 */
-    LIGHT,
-    
-    /** 항상 어두운 테마 사용 */
-    DARK,
-    
-    /** 시스템 설정 따르기 (기본값) */
-    SYSTEM
-}
 
 /**
  * 현재 테마 모드를 전역적으로 관리하기 위한 CompositionLocal

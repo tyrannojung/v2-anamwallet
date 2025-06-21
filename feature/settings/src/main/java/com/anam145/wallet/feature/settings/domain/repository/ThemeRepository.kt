@@ -1,6 +1,6 @@
 package com.anam145.wallet.feature.settings.domain.repository
 
-import com.anam145.wallet.feature.settings.domain.model.ThemeMode
+import com.anam145.wallet.core.common.model.ThemeMode
 import kotlinx.coroutines.flow.Flow
 
 /**

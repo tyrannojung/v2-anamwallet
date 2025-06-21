@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.settings.domain.model
+package com.anam145.wallet.core.common.model
 
 /**
  * 테마 모드

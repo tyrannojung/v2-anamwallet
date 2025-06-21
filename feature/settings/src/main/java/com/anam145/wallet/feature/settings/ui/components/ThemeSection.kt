@@ -23,7 +23,7 @@ import com.anam145.wallet.core.ui.language.LocalStrings
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.anam145.wallet.feature.settings.domain.model.ThemeMode
+import com.anam145.wallet.core.common.model.ThemeMode
 
 /**
  * 테마 설정 섹션

@@ -1,6 +1,6 @@
 package com.anam145.wallet.feature.settings.domain.repository
 
-import com.anam145.wallet.core.ui.language.Language
+import com.anam145.wallet.core.common.model.Language
 import kotlinx.coroutines.flow.Flow
 
 /**

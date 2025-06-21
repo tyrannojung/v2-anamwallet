@@ -1,6 +1,6 @@
 package com.anam145.wallet.feature.settings.domain.usecase
 
-import com.anam145.wallet.core.ui.language.Language
+import com.anam145.wallet.core.common.model.Language
 import com.anam145.wallet.feature.settings.domain.repository.LanguageRepository
 import javax.inject.Inject
 

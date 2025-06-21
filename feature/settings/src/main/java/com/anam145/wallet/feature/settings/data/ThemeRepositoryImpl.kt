@@ -4,7 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.anam145.wallet.feature.settings.domain.model.ThemeMode
+import com.anam145.wallet.core.common.model.ThemeMode
 import com.anam145.wallet.feature.settings.domain.repository.ThemeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

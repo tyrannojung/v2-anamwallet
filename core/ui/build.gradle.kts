@@ -44,6 +44,9 @@ android {
 }
 
 dependencies {
+    // Core common module
+    implementation(project(":core:common"))
+    
     // Compose BOM - 모든 Compose 라이브러리 버전 통합 관리
     implementation(platform(libs.androidx.compose.bom))
     

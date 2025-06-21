@@ -43,6 +43,7 @@ android {
 
 dependencies {
     // Core modules
+    implementation(project(":core:common"))
     implementation(project(":core:ui"))
     
     // Feature modules

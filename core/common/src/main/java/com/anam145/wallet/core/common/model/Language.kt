@@ -1,4 +1,4 @@
-package com.anam145.wallet.core.ui.language
+package com.anam145.wallet.core.common.model
 
 /**
  * 지원 언어

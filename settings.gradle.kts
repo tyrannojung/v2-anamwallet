@@ -23,6 +23,7 @@ rootProject.name = "AnamWallet"
 include(":app")
 
 // Core modules
+include(":core:common")
 include(":core:ui")
 
 // Feature modules  

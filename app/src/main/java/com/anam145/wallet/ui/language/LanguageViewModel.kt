@@ -3,7 +3,7 @@ package com.anam145.wallet.ui.language
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.anam145.wallet.feature.settings.domain.repository.LanguageRepository
-import com.anam145.wallet.core.ui.language.Language
+import com.anam145.wallet.core.common.model.Language
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
