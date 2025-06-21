@@ -66,44 +66,44 @@ fun AnamWalletApp() {
         LocalStrings provides strings
     ) {
         AnamWalletTheme(themeMode = themeMode) {
-        // Navigation Controller 생성
-        val navController = rememberNavController()
-    
-    // 현재 경로 추적
-    // Navigation Compose에서 현재 화면의 상태를 관찰하는 함수
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route // "main", "hub" 등 문자열
-    val currentNavRoute = AnamNavRoute.fromRoute(currentRoute) // 문자열 → 객체 변환
-    
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            // 상단 헤더
-            Header(
-                // LocalStrings로 언어별 타이틀 제공
-                title = when (currentNavRoute) {
-                    AnamNavRoute.Main -> strings.headerTitleMain
-                    AnamNavRoute.Hub -> strings.headerTitleHub
-                    AnamNavRoute.Browser -> strings.headerTitleBrowser
-                    AnamNavRoute.Identity -> strings.headerTitleIdentity
-                    AnamNavRoute.Settings -> strings.headerTitleSettings
-                    else -> strings.headerTitle
+            // Navigation Controller 생성
+            val navController = rememberNavController()
+            
+            // 현재 경로 추적
+            // Navigation Compose에서 현재 화면의 상태를 관찰하는 함수
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route // "main", "hub" 등 문자열
+            val currentNavRoute = AnamNavRoute.fromRoute(currentRoute) // 문자열 → 객체 변환
+            
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                topBar = {
+                    // 상단 헤더
+                    Header(
+                        // LocalStrings로 언어별 타이틀 제공
+                        title = when (currentNavRoute) {
+                            AnamNavRoute.Main -> strings.headerTitleMain
+                            AnamNavRoute.Hub -> strings.headerTitleHub
+                            AnamNavRoute.Browser -> strings.headerTitleBrowser
+                            AnamNavRoute.Identity -> strings.headerTitleIdentity
+                            AnamNavRoute.Settings -> strings.headerTitleSettings
+                            else -> strings.headerTitle
+                        },
+                        showBlockchainStatus = currentRoute == AnamNavRoute.Main.route,
+                        blockchainConnected = false
+                    )
                 },
-                showBlockchainStatus = currentRoute == AnamNavRoute.Main.route,
-                blockchainConnected = false
-            )
-        },
-        bottomBar = {
-            // Bottom Navigation Bar
-            AnamBottomNavigation(navController = navController)
-        }
-    ) { innerPadding ->
-        // Navigation Host - 모든 화면들을 관리
-        AnamNavHost(
-            navController = navController,
-            modifier = Modifier.padding(innerPadding)
-        )
-        }
+                bottomBar = {
+                    // Bottom Navigation Bar
+                    AnamBottomNavigation(navController = navController)
+                }
+            ) { innerPadding ->
+                // Navigation Host - 모든 화면들을 관리
+                AnamNavHost(
+                    navController = navController,
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
         }
     }
 }
