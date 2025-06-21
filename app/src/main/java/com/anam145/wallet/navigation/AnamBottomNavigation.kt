@@ -40,6 +40,7 @@ data class BottomNavItem(
 /**
  * Bottom Navigation 아이템 목록을 NavigationConfig에서 가져옴
  * Single Source of Truth 원칙 적용
+ * NavigationConfig는 볼 필요도 없이, 상수 개념처럼 5개 list 던져준다고 생각하면 됨
  */
 private val bottomNavItems: List<BottomNavItem>
     get() = NavigationConfig.getBottomNavItems()
@@ -79,13 +80,25 @@ fun AnamBottomNavigation(
                     onClick = {
                         if (!selected) {
                             navController.navigate(item.route.route) {
-                                // 시작 화면까지 모든 화면을 팝
+                                // 시작 지점까지 스택을 비움
+                                // 즉, 홈 → 설정 → 허브 → 브라우저 → [허브] 를 눌렀다면,
+                                // → 설정/허브/브라우저 스택은 모두 제거되고
+                                // → 허브로 이동함
                                 popUpTo(navController.graph.startDestinationId) {
+                                    /**
+                                     * 이건 제거한 화면의 상태를 저장하겠다는 뜻
+                                     * 나중에 restoreState = true가 설정되어 있으면,
+                                     * 해당 화면에 다시 갔을 때 초기화되지 않고 그대로 복원.
+                                     * ex:
+                                     * 사용자가 Settings 화면에서 스크롤을 내린 상태였고
+                                     * 다른 탭으로 이동했다가 다시 Settings를 눌렀을 때,
+                                     * 스크롤 위치나 UI 상태가 복원 됨.*/
                                     saveState = true
+
                                 }
                                 // 동일한 화면이 여러 번 스택에 쌓이지 않도록 함
                                 launchSingleTop = true
-                                // 이전 상태 복원
+                                // 다시 이동 시 상태 복원, saveState = true 이거랑 세트
                                 restoreState = true
                             }
                         }

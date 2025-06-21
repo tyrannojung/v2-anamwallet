@@ -24,6 +24,14 @@ object NavigationConfig {
     
     /**
      * 각 라우트별 아이콘 매핑
+     *   mapOf는 Pair들을 받아서 Map을 만듦
+     *   mapOf(
+     *       key1 to value1,  // Pair(key1, value1)
+     *       key2 to value2   // Pair(key2, value2)
+     *   )
+     *
+     *   결과: Map<K, V>
+     *   navigationIconMap[AnamNavRoute.Main] = NavIconInfo(...)
      */
     private val iconMap = mapOf(
         AnamNavRoute.Main to NavIconInfo(

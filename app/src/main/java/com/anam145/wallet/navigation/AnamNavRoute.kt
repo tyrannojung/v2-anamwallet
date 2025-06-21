@@ -37,7 +37,12 @@ sealed class AnamNavRoute(
     // ========== Bottom Navigation 화면들 ==========
     // 하단 네비게이션 바에 표시되는 주요 화면들
     
-    /** 메인 화면 - 홈 대시보드 */
+    /** 메인 화면 - 홈 대시보드
+     * Kotlin에서 object는 싱글톤(singleton)을 간편하게 만드는 키워드,
+     * 이 객체는 앱 전체에서 단 하나의 인스턴스만 존재
+     * 경로는 상태가 없는 불변 값 이므로, 여러 번 인스턴스를 생성할 필요 없이 하나만 있으면 충분
+     * 아래는 sealed class AnamNavRoute(val route: String)를 상속 받는 하위 클래스들
+     * */
     data object Main : AnamNavRoute("main")
     
     /** 허브 화면 - 미니앱 및 서비스 목록 */
@@ -78,15 +83,7 @@ sealed class AnamNavRoute(
     
     /** 학생증 상세 화면 */
     data object StudentCardDetail : AnamNavRoute("student_card")
-    
-    // ========== 인증/온보딩 화면들 ==========
-    // 사용자 인증 및 초기 설정 관련 화면들
-    
-    /** 온보딩 화면 - 첫 실행 시 */
-    data object Onboarding : AnamNavRoute("onboarding")
-    
-    /** 로그인 화면 */
-    data object Login : AnamNavRoute("login")
+
     
     companion object {
         /**
@@ -103,8 +100,6 @@ sealed class AnamNavRoute(
                 Identity.route -> Identity
                 Settings.route -> Settings
                 StudentCardDetail.route -> StudentCardDetail
-                Onboarding.route -> Onboarding
-                Login.route -> Login
                 else -> {
                     // 파라미터가 있는 route 처리
                     when {
