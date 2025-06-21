@@ -11,14 +11,48 @@ This project follows **Clean Architecture** principles with a **multi-module** s
 ```
 v2-anamwallet/
 ├── app/                          # Main application module
+│   ├── MainActivity              # Entry point with navigation setup
+│   ├── navigation/               # Navigation components
+│   │   ├── AnamNavHost          # Navigation graph
+│   │   ├── AnamNavRoute         # Type-safe routes
+│   │   └── AnamBottomNavigation # Bottom navigation bar
+│   └── ui/                      # App-specific UI
+│       ├── components/          # App-only components (e.g., Header)
+│       ├── theme/               # Theme ViewModel
+│       └── language/            # Language ViewModel
+│
 ├── core/
-│   └── ui/                       # Shared UI components and theme
-└── feature/                      # Feature modules
-    ├── main/
-    ├── hub/
-    ├── browser/
-    ├── identity/
-    └── settings/
+│   ├── common/                  # Pure Kotlin module (no Android deps)
+│   │   └── model/               # Shared domain models
+│   │       ├── Language.kt      # Language enum
+│   │       └── ThemeMode.kt     # Theme enum
+│   │
+│   └── ui/                      # Shared UI resources
+│       ├── theme/               # Material3 theme definitions
+│       └── language/            # Language support
+│           └── LocalLanguage.kt # CompositionLocal & strings
+│
+└── feature/                     # Feature modules
+    ├── main/                    # Home/Dashboard
+    ├── hub/                     # Service hub
+    ├── browser/                 # Web browser
+    ├── identity/                # Digital ID management
+    └── settings/                # App settings
+```
+
+### Module Dependencies
+
+```
+app ─────────┬──→ core:common
+             ├──→ core:ui
+             └──→ all features
+
+features ────┬──→ core:common
+             └──→ core:ui
+
+core:ui ─────→ core:common
+
+core:common  (no dependencies - pure Kotlin)
 ```
 
 ## 📁 Standard Feature Module Structure
@@ -31,18 +65,21 @@ feature/{name}/
 │   ├── {Name}Screen.kt              # Compose UI
 │   ├── {Name}ViewModel.kt           # State management
 │   ├── {Name}Contract.kt            # MVI Contract (State, Intent, Effect)
-│   └── components/                  # Reusable UI components
+│   └── components/                  # Feature-specific UI components
 │
 ├── domain/                          # Business Layer
-│   ├── model/                       # Business models
+│   ├── model/                       # Feature-specific models
 │   ├── repository/                  # Repository interfaces
-│   └── usecase/                     # Business logic
+│   └── usecase/                     # Business logic (one per action)
+│       ├── Get{Name}UseCase.kt      # Query operations
+│       └── Set{Name}UseCase.kt      # Command operations
 │
 ├── data/                            # Data Layer
 │   └── repository/                  # Repository implementations
+│       └── {Name}RepositoryImpl.kt
 │
 └── di/                              # Dependency Injection
-    └── {Name}Module.kt
+    └── {Name}Module.kt              # Hilt module for bindings
 ```
 
 ## 🔄 Architecture Flow
@@ -111,6 +148,34 @@ Dependencies only point inward:
 
 - UI → Domain ← Data
 - Domain has no dependencies on UI or Data layers
+
+## 🧭 Navigation System
+
+The app uses Jetpack Navigation Compose with type-safe routes:
+
+### Navigation Components
+
+- **AnamNavRoute**: Sealed class defining all app destinations
+- **AnamNavHost**: Central navigation graph composable
+- **AnamBottomNavigation**: Bottom navigation bar with 5 main destinations
+
+### Navigation Flow
+
+```
+MainActivity
+    │
+    ├── Header (App bar)
+    ├── AnamNavHost (Content)
+    │   ├── MainScreen
+    │   ├── HubScreen
+    │   ├── BrowserScreen
+    │   ├── IdentityScreen
+    │   └── SettingsScreen
+    │
+    └── AnamBottomNavigation (Bottom bar)
+```
+
+Navigation is handled directly at the UI layer without UseCase/Repository patterns, as it's purely a UI concern.
 
 ## Real-time Language System
 
@@ -201,10 +266,27 @@ Text(text = strings.welcomeMessage)
 
 ### Code Conventions
 
-- **Naming**: `{Feature}Screen`, `{Feature}ViewModel`, `{Feature}UseCase`
-- **Package Structure**: Follow the standard module structure
-- **State Management**: Single state object per screen
-- **Error Handling**: Graceful degradation with user feedback
+#### Naming Conventions
+
+- **Screens**: `{Feature}Screen.kt` (e.g., `SettingsScreen.kt`)
+- **ViewModels**: `{Feature}ViewModel.kt` (e.g., `SettingsViewModel.kt`)
+- **Contracts**: `{Feature}Contract.kt` with State, Intent, Effect
+- **UseCases**: `{Action}{Feature}UseCase.kt` (e.g., `GetThemeModeUseCase.kt`)
+- **Repositories**: `{Feature}Repository.kt` interface, `{Feature}RepositoryImpl.kt` implementation
+
+#### Module Placement Rules
+
+- **core:common**: Domain models shared across multiple features (Language, ThemeMode)
+- **core:ui**: UI components and resources used by multiple features
+- **app**: Components used only in MainActivity (Header, navigation)
+- **feature**: All feature-specific code stays within its module
+
+#### Architecture Rules
+
+- **Single State Object**: One data class per screen containing all UI state
+- **UseCase Pattern**: One UseCase per business action (not CRUD operations)
+- **Repository Pattern**: Specialized repositories over generic ones (ThemeRepository vs SettingsRepository)
+- **Direct Navigation**: Navigation handled at UI layer without abstraction
 
 ## 🧪 Testing Strategy
 
