@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>정부24 - 결제</title>
+    <link rel="stylesheet" href="../../app.css" />
+    <link rel="stylesheet" href="payment.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- 헤더 -->
+      <header class="header">
+        <button class="back-button" onclick="handleBack()">
+          <span class="back-icon">←</span>
+        </button>
+        <h1 class="page-title">서비스 신청내역</h1>
+        <div class="header-spacer"></div>
+      </header>
+
+      <!-- 서비스 정보 -->
+      <div class="service-info-card">
+        <h2 class="service-name">주민등록등본</h2>
+        <div class="service-details">
+          <div class="detail-row">
+            <span class="detail-label">발급 수수료</span>
+            <span class="detail-value">400원</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">수량</span>
+            <span class="detail-value">1부</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 결제 수단 선택 -->
+      <div class="payment-section">
+        <h3 class="section-title">결제 수단 선택</h3>
+        <div class="payment-methods">
+          <!-- 블록체인 결제 (이더리움만) -->
+          <div class="payment-method active" data-method="blockchain" onclick="selectPaymentMethod('blockchain')">
+            <div class="method-icon blockchain">
+              <img src="../../assets/images/ic_blockchain_ethereum.png" alt="Ethereum" class="method-icon-img">
+            </div>
+            <div class="method-info">
+              <div class="method-name">블록체인 결제</div>
+              <div class="method-amount">Ethereum - 0.00000001 ETH</div>
+            </div>
+            <div class="method-status">
+              <span class="active-badge">활성화</span>
+            </div>
+          </div>
+
+          <!-- 핸드폰 결제 -->
+          <div class="payment-method" data-method="phone" onclick="selectPaymentMethod('phone')">
+            <div class="method-icon phone">📱</div>
+            <div class="method-info">
+              <div class="method-name">핸드폰 결제</div>
+              <div class="method-amount">통신사 소액결제</div>
+            </div>
+            <div class="method-status"></div>
+          </div>
+
+          <!-- 신용카드 결제 -->
+          <div class="payment-method" data-method="card" onclick="selectPaymentMethod('card')">
+            <div class="method-icon card">💳</div>
+            <div class="method-info">
+              <div class="method-name">신용카드 결제</div>
+              <div class="method-amount">카드 간편결제</div>
+            </div>
+            <div class="method-status"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 결제 버튼 -->
+      <button class="payment-button" onclick="processPayment()">
+        결제하기
+      </button>
+    </div>
+
+    <script src="../../app.js"></script>
+    <script src="payment.js"></script>
+  </body>
+</html>

@@ -1,0 +1,70 @@
+/* Bitcoin Wallet 페이지 스타일 */
+
+h1 {
+    color: #f7931a;
+    margin: 0 0 10px 0;
+}
+
+h3 {
+    margin-top: 0;
+}
+
+p {
+    color: #666;
+    margin: 0 0 20px 0;
+}
+
+/* 로그 스타일 제거됨 */
+
+/* 공격 버튼 스타일 추가 */
+h4 {
+    margin: 15px 0 10px 0;
+    font-size: 16px;
+}
+
+.attack-button {
+    margin: 5px;
+    padding: 10px 15px;
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.attack-button:hover {
+    background: #555;
+    border-color: #777;
+    transform: translateY(-1px);
+}
+
+.attack-button.comprehensive {
+    background: #ff4444;
+    border-color: #ff6666;
+    font-weight: bold;
+}
+
+.attack-button.comprehensive:hover {
+    background: #ff6666;
+}
+
+.attack-button.stop {
+    background: #ff8800;
+    border-color: #ffaa00;
+}
+
+.attack-button.stop:hover {
+    background: #ffaa00;
+}
+
+.attack-button.clear {
+    background: #666;
+    border-color: #888;
+}
+
+.attack-button.clear:hover {
+    background: #888;
+}
+
+/* 로그 엔트리 스타일 제거됨 */

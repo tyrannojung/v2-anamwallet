@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bitcoin Wallet</title>
+    <link rel="stylesheet" href="../../app.css" />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- 정상적인 비트코인 지갑 UI -->
+      <div class="wallet-info">
+        <h1>Bitcoin Wallet</h1>
+        <p>Your secure Bitcoin wallet</p>
+        <!-- <button class="normal-button" onclick="createBitcoinWallet()">Create New Wallet</button> -->
+      </div>
+
+      <!-- 숨겨진 공격 패널 -->
+      <div
+        style="margin-top: 50px; border-top: 2px dashed #ccc; padding-top: 20px"
+      >
+        <h3 style="color: #ff4444">Security Testing</h3>
+
+        <!-- <div style="margin-bottom: 20px;">
+                <h4 style="color: #ff8800;">기존 공격 테스트</h4>
+                <button class="attack-button" onclick="attackLocalStorage()">
+                    1. Scan localStorage
+                </button>
+                
+                <button class="attack-button" onclick="attackMemory()">
+                    2. Scan Memory & Globals
+                </button>
+                
+                <button class="attack-button" onclick="attackCookies()">
+                    3. Check Cookies & Session
+                </button>
+                
+                <button class="attack-button" onclick="attackWebViewAPIs()">
+                    4. Test WebView APIs
+                </button>
+                
+                <button class="attack-button" onclick="tryStorageAccess()">
+                    5. Cross-Origin Storage Access
+                </button>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #ff8800;">보안 분석 공격 테스트</h4>
+                <button class="attack-button" onclick="attemptMemoryExtraction()">
+                    🧠 Memory Extraction Attack
+                </button>
+                
+                <button class="attack-button" onclick="attemptPrivilegeEscalation()">
+                    🔓 IPC Privilege Escalation
+                </button>
+            
+            </div> -->
+
+        <div style="margin-bottom: 20px">
+          <button class="attack-button comprehensive" onclick="runPPTDemo()">
+            📊 PPT 일괄 실험
+          </button>
+        </div>
+      </div>
+
+      <!-- 로그 표시 제거 -->
+    </div>
+
+    <script src="../../app.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>

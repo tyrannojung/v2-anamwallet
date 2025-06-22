@@ -29,6 +29,7 @@ class SettingsViewModel @Inject constructor(
 
     /**
      * UI 상태
+     * MutableStateFlow : 이 상태를 관찰 가능하게 만드는 도구
      * private - 내부에서만 수정 가능한 MutableStateFlow
      * public - 외부에서는 읽기만 가능한 StateFlow
      * _uiState: ViewModel 내부에서만 값을 변경

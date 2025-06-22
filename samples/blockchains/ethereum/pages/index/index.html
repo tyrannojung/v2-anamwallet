@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>이더리움 지갑</title>
+    <link rel="stylesheet" href="../../app.css" />
+    <link rel="stylesheet" href="index.css" />
+    <script src="../../app.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- 지갑 생성 화면 -->
+      <div id="wallet-creation" class="wallet-screen" style="display: none;">
+        <div class="creation-content">
+          <div class="eth-logo-large">Ξ</div>
+          <h1 class="creation-title">이더리움 지갑</h1>
+          <p class="creation-description">안전한 이더리움 지갑을 생성하세요</p>
+          
+          <button class="create-wallet-btn" onclick="createWallet()">
+            새 지갑 생성하기
+          </button>
+          
+          <div class="divider">
+            <span>또는</span>
+          </div>
+          
+          <div class="mnemonic-import">
+            <h3>니모닉으로 복구</h3>
+            <textarea 
+              id="mnemonic-input" 
+              class="mnemonic-input" 
+              placeholder="12개 단어를 공백으로 구분하여 입력하세요"
+              rows="3"
+            ></textarea>
+            <button class="import-wallet-btn" onclick="importWallet()">
+              지갑 가져오기
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 메인 지갑 화면 -->
+      <div id="wallet-main" class="wallet-screen" style="display: none;">
+      <!-- 헤더 -->
+      <header class="header">
+        <div class="header-content">
+          <div class="logo">
+            <div class="eth-logo">Ξ</div>
+            <span class="logo-text">이더리움</span>
+          </div>
+          <button class="reset-wallet-btn" onclick="resetWallet()" title="지갑 초기화">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.5 10C2.5 14.1421 5.85786 17.5 10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C7.51088 2.5 5.31615 3.76957 4.01111 5.68889L5.55556 5.68889" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- 잔액 카드 -->
+      <div class="card balance-card">
+        <div class="balance-header">
+          <span class="balance-label">이더리움 메인넷</span>
+        </div>
+        <div class="balance-amount">
+          <div class="eth-balance">
+            <span>0.0000</span>
+            <span class="eth-unit">ETH</span>
+          </div>
+        </div>
+        
+        <!-- 주소 표시 -->
+        <div class="address-container">
+          <div class="address-label">Address</div>
+          <div class="address-display">
+            Loading...
+          </div>
+        </div>
+        
+        <!-- 액션 버튼들 -->
+        <div class="action-buttons">
+          <button class="action-btn" onclick="console.log('Send page')">
+            <span>Send</span>
+          </button>
+          <button class="action-btn" onclick="console.log('Receive page')">
+            <span>Receive</span>
+          </button>
+        </div>
+      </div>
+
+      </div>
+    </div>
+
+    <script src="../../app.js"></script>
+    <!-- ethers.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>
