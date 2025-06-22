@@ -184,7 +184,7 @@ The app supports instant language switching without Activity restart using Compo
 ```kotlin
 // Define language provider
 val LocalLanguage = compositionLocalOf { Language.KOREAN }
-val LocalStrings = staticCompositionLocalOf { Strings() }
+val LocalStrings = compositionLocalOf { Strings() }
 
 // Use in any Composable
 val strings = LocalStrings.current

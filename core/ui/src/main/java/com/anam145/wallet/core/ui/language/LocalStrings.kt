@@ -1,12 +1,14 @@
 package com.anam145.wallet.core.ui.language
 
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.compositionLocalOf
 import com.anam145.wallet.core.common.model.Language
 
 /**
  * 언어에 따른 문자열 리소스를 제공하는 Provider
+ * 암시적 데이터 전달 메커니즘
+ * Props drilling 없이 컴포넌트 트리 전체에 데이터를 전달할 수 있음
  */
-val LocalStrings = staticCompositionLocalOf { Strings() }
+val LocalStrings = compositionLocalOf { Strings() }
 
 /**
  * 언어별 문자열 리소스를 담는 data class

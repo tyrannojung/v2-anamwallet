@@ -8,7 +8,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -93,7 +93,7 @@ private val AnamLightColorScheme = lightColorScheme(
  * 현재 테마 모드를 전역적으로 관리하기 위한 CompositionLocal
  * 앱 전체에서 현재 테마 설정에 접근할 수 있게 해줍니다.
  */
-val LocalThemeMode = staticCompositionLocalOf { ThemeMode.SYSTEM }
+val LocalThemeMode = compositionLocalOf { ThemeMode.SYSTEM }
 
 // ========== 메인 테마 컴포저블 ==========
 /**
