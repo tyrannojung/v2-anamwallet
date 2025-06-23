@@ -9,11 +9,8 @@ import dagger.hilt.android.HiltAndroidApp
  * Hilt를 사용하여 의존성 주입을 설정합니다.
  * @HiltAndroidApp 어노테이션은 Hilt의 코드 생성을 트리거하고
  * 애플리케이션 레벨의 의존성 컨테이너를 생성합니다.
+ * 
+ * MiniApp 초기화는 SplashViewModel에서 처리합니다.
  */
 @HiltAndroidApp
-class AnamWalletApplication : Application() {
-    
-    override fun onCreate() {
-        super.onCreate()
-    }
-}
+class AnamWalletApplication : Application()

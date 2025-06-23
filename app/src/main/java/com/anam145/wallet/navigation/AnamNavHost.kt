@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.anam145.wallet.feature.main.MainScreen
+import com.anam145.wallet.feature.main.ui.MainScreen
 import com.anam145.wallet.feature.hub.HubScreen
 import com.anam145.wallet.feature.browser.BrowserScreen
 import com.anam145.wallet.feature.identity.IdentityScreen
@@ -36,7 +36,26 @@ fun AnamNavHost(
         
         // 메인 화면
         composable(route = AnamNavRoute.Main.route) {
-            MainScreen()
+            MainScreen(
+                onNavigateToHub = { 
+                    navController.navigate(AnamNavRoute.Hub.route) {
+                        // Use the same navigation options as bottom navigation
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToMiniApp = { appId ->
+                    // TODO: Navigate to mini app detail
+                    android.util.Log.d("AnamNavHost", "Navigate to mini app: $appId")
+                },
+                onLaunchBlockchain = { blockchainId ->
+                    // TODO: Launch blockchain activity
+                    android.util.Log.d("AnamNavHost", "Launch blockchain: $blockchainId")
+                }
+            )
         }
         
         // 허브 화면

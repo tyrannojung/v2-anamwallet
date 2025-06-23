@@ -23,6 +23,9 @@ val ShapeNormal = RoundedCornerShape(12.dp)
 /** 큰 컴포넌트용 둥근 모서리 (16dp) - 설정 카드, 큰 컨테이너 등 */
 val ShapeLarge = RoundedCornerShape(16.dp)
 
+/** 카드 컴포넌트용 둥근 모서리 (20dp) - 미니앱 카드, 블록체인 카드 등 */
+val ShapeCard = RoundedCornerShape(20.dp)
+
 /** 매우 큰 컴포넌트용 둥근 모서리 (24dp) - 바텀시트, 모달 등 */
 val ShapeExtraLarge = RoundedCornerShape(24.dp)
 

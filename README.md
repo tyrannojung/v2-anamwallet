@@ -1,6 +1,6 @@
 # ANAM Wallet V2
 
-Modern Android wallet application built with Clean Architecture, MVVM/MVI patterns, and Jetpack Compose.
+Modern Android wallet application built with Clean Architecture, MVI pattern, and Jetpack Compose.
 
 ## 🏗️ Architecture Overview
 
@@ -11,11 +11,12 @@ This project follows **Clean Architecture** principles with a **multi-module** s
 ```
 v2-anamwallet/
 ├── app/                          # Main application module
-│   ├── MainActivity              # Entry point with navigation setup
+│   ├── MainActivity              # Entry point with SplashScreen API
 │   ├── navigation/               # Navigation components
 │   │   ├── AnamNavHost          # Navigation graph
 │   │   ├── AnamNavRoute         # Type-safe routes
-│   │   └── AnamBottomNavigation # Bottom navigation bar
+│   │   ├── AnamBottomNavigation # Bottom navigation bar
+│   │   └── NavigationConfig     # Navigation configuration
 │   └── ui/                      # App-specific UI
 │       ├── components/          # App-only components (e.g., Header)
 │       ├── theme/               # Theme ViewModel
@@ -23,21 +24,55 @@ v2-anamwallet/
 │
 ├── core/
 │   ├── common/                  # Pure Kotlin module (no Android deps)
-│   │   └── model/               # Shared domain models
-│   │       ├── Language.kt      # Language enum
-│   │       └── ThemeMode.kt     # Theme enum
+│   │   ├── model/               # Shared domain models
+│   │   │   ├── Language.kt      # Language enum
+│   │   │   ├── ThemeMode.kt     # Theme enum
+│   │   │   ├── MiniApp.kt       # MiniApp domain model
+│   │   │   └── MiniAppType.kt   # MiniApp type enum
+│   │   └── result/              # Custom Result types
+│   │       └── MiniAppResult.kt # Type-safe result handling
+│   │
+│   ├── data/                    # Data layer utilities
+│   │   └── datastore/           # DataStore preferences
 │   │
 │   └── ui/                      # Shared UI resources
 │       ├── theme/               # Material3 theme definitions
+│       │   ├── Color.kt         # Color palette
+│       │   ├── Type.kt          # Typography (16sp titleMedium)
+│       │   └── Shape.kt         # Shape definitions
 │       └── language/            # Language support
-│           └── LocalLanguage.kt # CompositionLocal & strings
+│           └── LocalStrings.kt  # CompositionLocal & strings
 │
 └── feature/                     # Feature modules
     ├── main/                    # Home/Dashboard
+    │   ├── MainScreen.kt        # MiniApp list UI
+    │   ├── MainViewModel.kt     # State management & initialization
+    │   └── MainContract.kt      # MVI contract with sync state
+    │
+    ├── miniapp/                 # MiniApp management
+    │   ├── data/
+    │   │   ├── local/           # Local data sources
+    │   │   │   ├── MiniAppScanner.kt
+    │   │   │   └── MiniAppFileManager.kt
+    │   │   ├── MiniAppConstants.kt
+    │   │   └── repository/
+    │   └── domain/
+    │       ├── repository/
+    │       │   └── MiniAppRepository.kt
+    │       └── usecase/
+    │           ├── InitializeMiniAppsUseCase.kt
+    │           └── GetInstalledMiniAppsUseCase.kt
+    │
     ├── hub/                     # Service hub
     ├── browser/                 # Web browser
     ├── identity/                # Digital ID management
     └── settings/                # App settings
+        ├── ui/
+        │   ├── SettingsScreen.kt
+        │   ├── SettingsViewModel.kt
+        │   └── SettingsContract.kt
+        └── domain/
+            └── usecase/         # Theme & Language UseCases
 ```
 
 ### Module Dependencies
@@ -45,12 +80,15 @@ v2-anamwallet/
 ```
 app ─────────┬──→ core:common
              ├──→ core:ui
+             ├──→ core:data
              └──→ all features
 
 features ────┬──→ core:common
-             └──→ core:ui
+             ├──→ core:ui
+             └──→ core:data
 
 core:ui ─────→ core:common
+core:data ───→ core:common
 
 core:common  (no dependencies - pure Kotlin)
 ```
@@ -75,6 +113,7 @@ feature/{name}/
 │       └── Set{Name}UseCase.kt      # Command operations
 │
 ├── data/                            # Data Layer
+│   ├── local/                       # Local data sources (renamed from 'source')
 │   └── repository/                  # Repository implementations
 │       └── {Name}RepositoryImpl.kt
 │
@@ -84,7 +123,7 @@ feature/{name}/
 
 ## 🔄 Architecture Flow
 
-### Unidirectional Data Flow
+### MVI Pattern with Unidirectional Data Flow
 
 ```
 ┌─────────────────┐
@@ -97,7 +136,9 @@ feature/{name}/
          │              │  - Intent    │
          ▼              │  - Effect    │
 ┌─────────────────┐     └──────────────┘
-│   ViewModel    │
+│   ViewModel     │
+│   _uiState      │ (StateFlow)
+│   _effect       │ (SharedFlow)
 └────────┬────────┘
          ▼
 ┌─────────────────┐
@@ -121,13 +162,26 @@ feature/{name}/
 
 ## 🎯 Key Architectural Patterns
 
-### 1. MVI-lite Pattern
+### 1. MVI Pattern
 
-Combines MVVM simplicity with MVI's unidirectional data flow:
+Full MVI implementation with:
 
 - **State**: Single immutable state object per screen
-- **Intent**: User actions as sealed classes/interfaces
-- **Effect**: One-time events (navigation, toasts, etc.)
+- **Intent**: User actions as sealed interfaces
+- **Effect**: One-time events using SharedFlow (Google recommended)
+
+```kotlin
+// ViewModel pattern
+private val _uiState = MutableStateFlow(Contract.State())
+val uiState: StateFlow<Contract.State> = _uiState.asStateFlow()
+
+private val _effect = MutableSharedFlow<Contract.Effect>(
+    replay = 0,
+    extraBufferCapacity = 1,
+    onBufferOverflow = BufferOverflow.DROP_OLDEST
+)
+val effect: SharedFlow<Contract.Effect> = _effect.asSharedFlow()
+```
 
 ### 2. Clean Architecture Layers
 
@@ -142,12 +196,11 @@ Combines MVVM simplicity with MVI's unidirectional data flow:
 - **Clear Boundaries**: Enforced separation of concerns
 - **Reusability**: Features can be shared across apps
 
-### 4. Dependency Rule
+### 4. Consistent Naming Conventions
 
-Dependencies only point inward:
-
-- UI → Domain ← Data
-- Domain has no dependencies on UI or Data layers
+- **State management**: `_uiState` / `uiState` (not `_state`)
+- **Effect handling**: SharedFlow instead of Channel
+- **Folder structure**: `local` instead of `source` for data sources
 
 ## 🧭 Navigation System
 
@@ -158,35 +211,59 @@ The app uses Jetpack Navigation Compose with type-safe routes:
 - **AnamNavRoute**: Sealed class defining all app destinations
 - **AnamNavHost**: Central navigation graph composable
 - **AnamBottomNavigation**: Bottom navigation bar with 5 main destinations
+- **NavigationConfig**: Centralized navigation configuration
 
 ### Navigation Flow
 
 ```
-MainActivity
+MainActivity (with SplashScreen)
     │
-    ├── Header (App bar)
-    ├── AnamNavHost (Content)
-    │   ├── MainScreen
-    │   ├── HubScreen
-    │   ├── BrowserScreen
-    │   ├── IdentityScreen
-    │   └── SettingsScreen
+    ├── SplashScreen (shows during initialization)
     │
-    └── AnamBottomNavigation (Bottom bar)
+    └── After initialization:
+        ├── Header (App bar)
+        ├── AnamNavHost (Content)
+        │   ├── MainScreen (with MiniApp list)
+        │   ├── HubScreen
+        │   ├── BrowserScreen
+        │   ├── IdentityScreen
+        │   └── SettingsScreen
+        │
+        └── AnamBottomNavigation (Bottom bar)
 ```
 
-Navigation is handled directly at the UI layer without UseCase/Repository patterns, as it's purely a UI concern.
+Navigation handles proper back stack management with `popUpTo`, `saveState`, and `restoreState`.
+
+## 🎨 UI/UX Features
+
+### Material Design 3
+
+- Custom theme with Cocogoose font for headlines
+- Typography: `titleMedium` = 16sp (matching anam-android)
+- Consistent color scheme with `surfaceVariant` for backgrounds
+- Shape system with `ShapeCard` (20dp rounded corners)
+
+### MiniApp System
+
+- Dynamic loading from assets/miniapps folder
+- ZIP file support with manifest.json
+- Icon loading with fallback support (Material Icons)
+- Blockchain apps with activation state
+- Grid layout for regular apps (3 columns)
+
+### Visual Consistency
+
+- `Arrangement.SpaceBetween` for blockchain cards
+- `FontWeight.SemiBold` for titles
+- Consistent spacing and padding
+- Smooth animations with spring() and animateColorAsState
 
 ## Real-time Language System
 
 The app supports instant language switching without Activity restart using CompositionLocal:
 
 ```kotlin
-// Define language provider
-val LocalLanguage = compositionLocalOf { Language.KOREAN }
-val LocalStrings = compositionLocalOf { Strings() }
-
-// Use in any Composable
+// Access strings in any Composable
 val strings = LocalStrings.current
 Text(text = strings.welcomeMessage)
 ```
@@ -195,9 +272,10 @@ Text(text = strings.welcomeMessage)
 
 ### Prerequisites
 
-- Android Studio Hedgehog or newer
+- Android Studio Ladybug or newer
 - Kotlin 2.0+
 - Minimum SDK 24
+- Target SDK 35
 
 ### Building the Project
 
@@ -223,13 +301,14 @@ Text(text = strings.welcomeMessage)
 
 ### Architecture Components
 
-- **ViewModel**: UI state management
-- **Navigation Compose**: Type-safe navigation
-- **StateFlow**: Observable state holder
+- **ViewModel**: UI state management with MVI
+- **Navigation Compose**: Type-safe navigation (2.7.7)
+- **StateFlow & SharedFlow**: Observable state holders
 
 ### UI
 
 - **Material 3**: Latest design system
+- **Material Icons Extended**: Comprehensive icon set
 - **Compose Animation**: Smooth transitions
 
 ## 🔧 Development Guidelines
@@ -254,51 +333,69 @@ Text(text = strings.welcomeMessage)
    }
    ```
 
-3. **Implement Layers**
+3. **Implement ViewModel**
+   ```kotlin
+   @HiltViewModel
+   class {Name}ViewModel @Inject constructor(
+       private val useCase: {Name}UseCase
+   ) : ViewModel() {
+       private val _uiState = MutableStateFlow(Contract.State())
+       val uiState = _uiState.asStateFlow()
 
-   - Create ViewModels with state management
-   - Define UseCases for business logic
-   - Implement repositories with interfaces
+       private val _effect = MutableSharedFlow<Contract.Effect>()
+       val effect = _effect.asSharedFlow()
 
-4. **Setup DI**
-   - Create Hilt modules
-   - Bind interfaces to implementations
+       fun processIntent(intent: Contract.Intent) { ... }
+   }
+   ```
 
 ### Code Conventions
 
 #### Naming Conventions
 
-- **Screens**: `{Feature}Screen.kt` (e.g., `SettingsScreen.kt`)
-- **ViewModels**: `{Feature}ViewModel.kt` (e.g., `SettingsViewModel.kt`)
+- **Screens**: `{Feature}Screen.kt`
+- **ViewModels**: `{Feature}ViewModel.kt` with `_uiState`/`uiState`
 - **Contracts**: `{Feature}Contract.kt` with State, Intent, Effect
-- **UseCases**: `{Action}{Feature}UseCase.kt` (e.g., `GetThemeModeUseCase.kt`)
-- **Repositories**: `{Feature}Repository.kt` interface, `{Feature}RepositoryImpl.kt` implementation
-
-#### Module Placement Rules
-
-- **core:common**: Domain models shared across multiple features (Language, ThemeMode)
-- **core:ui**: UI components and resources used by multiple features
-- **app**: Components used only in MainActivity (Header, navigation)
-- **feature**: All feature-specific code stays within its module
+- **UseCases**: `{Action}{Feature}UseCase.kt`
+- **Data sources**: Place in `local/` folder (not `source/`)
 
 #### Architecture Rules
 
-- **Single State Object**: One data class per screen containing all UI state
-- **UseCase Pattern**: One UseCase per business action (not CRUD operations)
-- **Repository Pattern**: Specialized repositories over generic ones (ThemeRepository vs SettingsRepository)
-- **Direct Navigation**: Navigation handled at UI layer without abstraction
+- **MVI Pattern**: Use Contract pattern for all ViewModels
+- **Effect Handling**: Use SharedFlow (not Channel)
+- **Error Handling**: Use custom MiniAppResult sealed interface
+- **Constants**: Centralize in dedicated files
+- **Result Type**: Use MiniAppResult for type-safe error handling
+- **Initialization**: Handle in MainViewModel with SplashScreen API
 
-## 🧪 Testing Strategy
+## 📱 Current Implementation Status
 
-TBD
+### Completed Features ✅
 
-## 📈 Performance Considerations
+- Main screen with MiniApp list
+- Settings with theme/language switching
+- Navigation system with bottom bar
+- MiniApp loading from assets with initialization
+- Android 12 SplashScreen API integration
+- Custom MiniAppResult for type-safe error handling
+- MVI pattern implementation with Contract
+- Real-time language switching without restart
+- Reactive UI pattern for initialization states
 
-TBD
+### TODO Features 🚧
+
+- MiniApp detail screens
+- Blockchain activity launch
+- WebView implementation for mini-apps
+- Hub screen implementation
+- Browser functionality
+- Identity management
 
 ## 🔐 Security
 
-TBD
+- No hardcoded credentials
+- Secure data storage with DataStore
+- ProGuard rules for release builds
 
 ## 📄 License
 

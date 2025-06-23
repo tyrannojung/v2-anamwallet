@@ -59,7 +59,14 @@ data class Strings(
     val mainScreenTitle: String = "홈 대시보드",
     val hubScreenTitle: String = "허브 화면",
     val browserScreenTitle: String = "브라우저 화면",
-    val identityScreenTitle: String = "디지털 신분증 화면"
+    val identityScreenTitle: String = "디지털 신분증 화면",
+    
+    // Main Screen
+    val mainSectionBlockchain: String = "블록체인",
+    val mainSectionApps: String = "앱",
+    val mainAddMoreServices: String = "더 많은 서비스 보기",
+    val mainNoAppsInstalled: String = "설치된 앱이 없습니다",
+    val syncingApps: String = "앱을 준비 중입니다..."
 )
 
 /**
@@ -109,7 +116,14 @@ val EnglishStrings = Strings(
     mainScreenTitle = "Home Dashboard",
     hubScreenTitle = "Hub Screen",
     browserScreenTitle = "Browser Screen",
-    identityScreenTitle = "Digital ID Screen"
+    identityScreenTitle = "Digital ID Screen",
+    
+    // Main Screen
+    mainSectionBlockchain = "Blockchain",
+    mainSectionApps = "Apps",
+    mainAddMoreServices = "View more services",
+    mainNoAppsInstalled = "No apps installed",
+    syncingApps = "Preparing apps..."
 )
 
 /**

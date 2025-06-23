@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash Screen 테마 -->
+    <style name="Theme.AnamWallet.Starting" parent="Theme.SplashScreen">
+        <!-- 배경색: 흰색 -->
+        <item name="windowSplashScreenBackground">@android:color/white</item>
+        
+        <!-- 중앙 아이콘: anam_logo with inset -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon_inset</item>
+        
+        <!-- 아이콘 배경 제거 (원형 배경 제거) -->
+        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+        
+        <!-- Splash 후 메인 테마 -->
+        <item name="postSplashScreenTheme">@style/Theme.AnamWallet</item>
+    </style>
+</resources>

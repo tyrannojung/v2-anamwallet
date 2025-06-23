@@ -9,7 +9,7 @@ import com.anam145.wallet.feature.settings.domain.usecase.SetThemeModeUseCase
 import com.anam145.wallet.feature.settings.domain.usecase.GetLanguageUseCase
 import com.anam145.wallet.feature.settings.domain.usecase.SetLanguageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -42,11 +42,15 @@ class SettingsViewModel @Inject constructor(
      * State: 지속적인 상태 (현재 테마는 다크모드)
      * Effect: 일회성 동작 (화면 이동하세요!)
      * */
-    private val _effect = Channel<SettingsContract.SettingsEffect>()
-    val effect = _effect.receiveAsFlow()
+    private val _effect = MutableSharedFlow<SettingsContract.SettingsEffect>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val effect: SharedFlow<SettingsContract.SettingsEffect> = _effect.asSharedFlow()
     
     init {
-        loadSettings()
+        handleIntent(SettingsContract.SettingsIntent.LoadSettings)
     }
     
     /**
@@ -73,6 +77,7 @@ class SettingsViewModel @Inject constructor(
                 // 맞다! 그럼 themeMode에 접근 가능
                 changeTheme(intent.themeMode)
             is SettingsContract.SettingsIntent.ChangeLanguage -> changeLanguage(intent.language)
+            SettingsContract.SettingsIntent.LoadSettings -> loadSettings()
             SettingsContract.SettingsIntent.ClickHelp -> navigateToHelp()
             SettingsContract.SettingsIntent.ClickFAQ -> navigateToFAQ()
             SettingsContract.SettingsIntent.ClickAppInfo -> navigateToAppInfo()
@@ -134,25 +139,25 @@ class SettingsViewModel @Inject constructor(
     
     private fun navigateToHelp() {
         viewModelScope.launch {
-            _effect.send(SettingsContract.SettingsEffect.NavigateToHelp)
+            _effect.emit(SettingsContract.SettingsEffect.NavigateToHelp)
         }
     }
     
     private fun navigateToFAQ() {
         viewModelScope.launch {
-            _effect.send(SettingsContract.SettingsEffect.NavigateToFAQ)
+            _effect.emit(SettingsContract.SettingsEffect.NavigateToFAQ)
         }
     }
     
     private fun navigateToAppInfo() {
         viewModelScope.launch {
-            _effect.send(SettingsContract.SettingsEffect.NavigateToAppInfo)
+            _effect.emit(SettingsContract.SettingsEffect.NavigateToAppInfo)
         }
     }
     
     private fun navigateToLicense() {
         viewModelScope.launch {
-            _effect.send(SettingsContract.SettingsEffect.NavigateToLicense)
+            _effect.emit(SettingsContract.SettingsEffect.NavigateToLicense)
         }
     }
 }

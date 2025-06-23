@@ -1,0 +1,448 @@
+package com.anam145.wallet.feature.main.ui
+
+import android.graphics.BitmapFactory
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.anam145.wallet.core.ui.theme.ShapeCard
+import com.anam145.wallet.core.ui.theme.ShapeNormal
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.anam145.wallet.core.common.model.MiniApp
+import com.anam145.wallet.core.common.model.MiniAppType
+import com.anam145.wallet.core.ui.language.LocalStrings
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.withContext
+import java.io.File
+
+/**
+ * 메인 화면
+ * 
+ * ANAM Wallet의 홈 대시보드 화면.
+ * 블록체인 모듈과 앱 모듈을 표시.
+ */
+@Composable
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = hiltViewModel(),
+    onNavigateToHub: () -> Unit = {},
+    onNavigateToMiniApp: (String) -> Unit = {},
+    onLaunchBlockchain: (String) -> Unit = {}
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val strings = LocalStrings.current
+    
+    LaunchedEffect(key1 = viewModel) {
+        viewModel.effect.collectLatest { effect ->
+            when (effect) {
+                is MainContract.MainEffect.NavigateToHub -> onNavigateToHub()
+                is MainContract.MainEffect.NavigateToMiniApp -> onNavigateToMiniApp(effect.appId)
+                is MainContract.MainEffect.LaunchBlockchainActivity -> onLaunchBlockchain(effect.blockchainId)
+            }
+        }
+    }
+    
+    Box(modifier = modifier.fillMaxSize()) {
+        when {
+            uiState.isLoading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+            uiState.isSyncing -> {
+                // 초기화 동기화 중 표시
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = strings.syncingApps,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            uiState.error != null -> {
+                Text(
+                    text = uiState.error ?: "Unknown error",
+                    modifier = Modifier.align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+            else -> {
+                MiniAppList(
+                    blockchainApps = uiState.blockchainApps,
+                    regularApps = uiState.regularApps,
+                    activeBlockchainId = uiState.activeBlockchainId,
+                    onBlockchainClick = { viewModel.processIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
+                    onAppClick = { viewModel.processIntent(MainContract.MainIntent.ClickRegularApp(it)) },
+                    onAddMoreClick = { viewModel.processIntent(MainContract.MainIntent.ClickAddMore) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MiniAppList(
+    blockchainApps: List<MiniApp>,
+    regularApps: List<MiniApp>,
+    activeBlockchainId: String?,
+    onBlockchainClick: (MiniApp) -> Unit,
+    onAppClick: (MiniApp) -> Unit,
+    onAddMoreClick: () -> Unit
+) {
+    val strings = LocalStrings.current
+    
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = 80.dp) // Space for bottom navigation
+    ) {
+        // Blockchain Section
+        if (blockchainApps.isNotEmpty()) {
+            Text(
+                text = strings.mainSectionBlockchain,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+            )
+            
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(blockchainApps) { app ->
+                    BlockchainCard(
+                        miniApp = app,
+                        isActive = app.appId == activeBlockchainId,
+                        onClick = { onBlockchainClick(app) }
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+        
+        // Apps Section
+        Text(
+            text = strings.mainSectionApps,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.SemiBold
+            ),
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+        )
+        
+        if (regularApps.isEmpty()) {
+            // 앱이 없을 때 메시지 표시
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = strings.mainNoAppsInstalled,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            Column(
+                modifier = Modifier.padding(horizontal = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                regularApps.chunked(3).forEach { rowApps ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        rowApps.forEach { app ->
+                            AppCard(
+                                miniApp = app,
+                                onClick = { onAppClick(app) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        
+                        // Fill empty spaces in the row
+                        repeat(3 - rowApps.size) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        // Add More Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .height(80.dp)
+                .clickable { onAddMoreClick() },
+            shape = ShapeCard,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
+        ) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add More",
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = strings.mainAddMoreServices,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BlockchainCard(
+    miniApp: MiniApp,
+    isActive: Boolean,
+    onClick: () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = spring()
+    )
+    val borderColor by animateColorAsState(
+        targetValue = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+        animationSpec = tween(300)
+    )
+    
+    Card(
+        modifier = Modifier
+            .width(160.dp)
+            .height(140.dp)
+            .scale(scale)
+            .border(
+                width = if (isActive) 2.dp else 0.dp,
+                color = borderColor,
+                shape = RoundedCornerShape(20.dp)
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { onClick() },
+        shape = ShapeCard,
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+            pressedElevation = 8.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            // 상단: 아이콘
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = ShapeNormal
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                MiniAppIcon(
+                    miniApp = miniApp,
+                    size = 48.dp,
+                    iconSize = 32.dp,
+                    showBackground = false
+                )
+            }
+            
+            // 중간: 이름과 잔액
+            Column {
+                Text(
+                    text = miniApp.name,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                
+                miniApp.balance?.let { balance ->
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = balance,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppCard(
+    miniApp: MiniApp,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = spring()
+    )
+    
+    Card(
+        modifier = modifier
+            .aspectRatio(1f)
+            .scale(scale)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { onClick() },
+        shape = ShapeCard,
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+            pressedElevation = 8.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            MiniAppIcon(
+                miniApp = miniApp,
+                size = 48.dp,
+                iconSize = 32.dp
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = miniApp.name,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.Medium
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun MiniAppIcon(
+    miniApp: MiniApp,
+    size: Dp,
+    iconSize: Dp,
+    showBackground: Boolean = true
+) {
+    var iconBitmap by remember { mutableStateOf<BitmapPainter?>(null) }
+    
+    LaunchedEffect(miniApp.iconPath) {
+        miniApp.iconPath?.let { path ->
+            withContext(Dispatchers.IO) {
+                try {
+                    val file = File(path)
+                    if (file.exists()) {
+                        val bitmap = BitmapFactory.decodeFile(path)
+                        iconBitmap = BitmapPainter(bitmap.asImageBitmap())
+                    }
+                } catch (e: Exception) {
+                    // Ignore icon loading errors
+                }
+            }
+        }
+    }
+    
+    Box(
+        modifier = Modifier
+            .size(size)
+            .then(
+                if (showBackground) {
+                    Modifier.background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = ShapeNormal
+                    )
+                } else {
+                    Modifier
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        iconBitmap?.let { painter ->
+            Image(
+                painter = painter,
+                contentDescription = miniApp.name,
+                modifier = Modifier.size(iconSize)
+            )
+        } ?: Icon(
+            imageVector = when (miniApp.type) {
+                MiniAppType.BLOCKCHAIN -> Icons.Default.Link
+                MiniAppType.APP -> Icons.Default.Dashboard
+            },
+            contentDescription = miniApp.name,
+            modifier = Modifier.size(iconSize),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+

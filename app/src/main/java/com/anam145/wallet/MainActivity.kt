@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,18 +27,63 @@ import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.language.getStringsForLanguage
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.anam145.wallet.feature.main.ui.MainViewModel
 
 // Hilt가 의존성을 주입하는 시작점
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    
+    // Main 화면의 ViewModel (스플래시 상태도 관리)
+    private val mainViewModel: MainViewModel by viewModels()
+    
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Splash Screen 설치 (super.onCreate 전에 호출!)
+        val splashScreen = installSplashScreen()
+        
         super.onCreate(savedInstanceState)
+        
+        // Splash Screen 유지 조건: MiniApp 초기화 중일 때
+        /**
+         *   1. 앱 시작
+         *     - MainActivity가 시작되면서 mainViewModel 생성
+         *     - mainViewModel의 isInitializing은 초기값이 true
+         *   2. 스플래시 화면 유지
+         *   splashScreen.setKeepOnScreenCondition {
+         *       mainViewModel.isInitializing.value  // true인 동안 스플래시 유지
+         *   }
+         *   3. 백그라운드 작업
+         *     - setContent { AnamWalletApp() }로 UI는 이미 준비됨
+         *     - 하지만 스플래시 오버레이가 화면을 가리고 있음
+         *     - MainViewModel이 초기화 작업 진행
+         *   4. 초기화 완료
+         *   // MainViewModel에서
+         *   _isInitializing.value = false  // 이 순간 스플래시 종료
+         *   5. 스플래시 종료
+         *     - isInitializing이 false가 되면 스플래시 화면 사라짐
+         *     - 이미 준비된 MainScreen이 보임
+         * */
+        splashScreen.setKeepOnScreenCondition {
+            mainViewModel.isInitializing.value
+        }
+        
+        // Splash Screen 종료 애니메이션
+        splashScreen.setOnExitAnimationListener { splashScreenViewProvider ->
+            // 페이드 아웃 애니메이션
+            val splashScreenView = splashScreenViewProvider.view
+            splashScreenView.animate()
+                .alpha(0f)
+                .setDuration(300L)
+                .withEndAction {
+                    splashScreenViewProvider.remove()
+                }
+                .start()
+        }
+        
         enableEdgeToEdge()
         setContent {
             AnamWalletApp()
         }
     }
-    
 }
 
 /**
