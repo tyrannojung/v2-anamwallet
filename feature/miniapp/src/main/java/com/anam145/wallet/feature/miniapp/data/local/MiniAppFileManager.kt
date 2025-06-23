@@ -120,15 +120,21 @@ class MiniAppFileManager @Inject constructor(
     }
     
     suspend fun getInstalledApps(): List<String> = withContext(Dispatchers.IO) {
+        // 미니앱이 설치되는 기본 디렉토리 경로 생성
+        // 예: /data/data/com.anam145.wallet/files/miniapps
         val miniappsDir = File(context.filesDir, MiniAppConstants.MINIAPP_INSTALL_DIR)
+
+        // 미니앱 디렉토리가 아직 생성되지 않은 경우 (앱 최초 실행 등)
         if (!miniappsDir.exists()) {
+            // 빈 리스트 반환 (설치된 앱이 없음)
             return@withContext emptyList()
         }
-        
-        miniappsDir.listFiles()
-            ?.filter { it.isDirectory }
-            ?.map { it.name }
-            ?: emptyList()
+
+        // 디렉토리 내용 스캔 및 필터링
+        miniappsDir.listFiles()                    // 모든 파일/디렉토리 목록 가져오기
+            ?.filter { it.isDirectory }            // 디렉토리만 필터링 (파일 제외)
+            ?.map { it.name }                      // 디렉토리 이름만 추출 (앱 ID)
+            ?: emptyList()                         // null인 경우 빈 리스트 반환
     }
     
     suspend fun loadManifest(appId: String): MiniAppResult<MiniAppManifest> = withContext(Dispatchers.IO) {

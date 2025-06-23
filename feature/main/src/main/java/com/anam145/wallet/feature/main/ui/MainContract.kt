@@ -13,12 +13,12 @@ interface MainContract {
      * UI 상태 - 화면에 표시되는 지속적인 데이터
      */
     data class MainState(
-        val isLoading: Boolean = false,
-        val isSyncing: Boolean = false,  // 초기화 동기화 중
-        val blockchainApps: List<MiniApp> = emptyList(),
-        val regularApps: List<MiniApp> = emptyList(),
-        val activeBlockchainId: String? = null,
-        val error: String? = null
+        val isLoading: Boolean = false,          // 앱 목록을 로드 중일 때 true
+        val isSyncing: Boolean = false,          // 첫 실행 시 MiniApp 초기화 중일 때 true
+        val blockchainApps: List<MiniApp> = emptyList(),     // 블록체인 타입 앱 목록
+        val regularApps: List<MiniApp> = emptyList(),        // 일반 앱 목록
+        val activeBlockchainId: String? = null,              // 현재 활성화된 블록체인 앱 ID
+        val error: String? = null                            // 에러 메시지 (null이면 에러 없음)
     ) {
         // 앱이 없는 상태인지 확인 (로딩/동기화 중이 아닐 때만)
         val isEmpty: Boolean

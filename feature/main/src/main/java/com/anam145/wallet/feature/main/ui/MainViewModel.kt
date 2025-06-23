@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Job
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,8 +37,6 @@ class MainViewModel @Inject constructor(
     )
     val effect: SharedFlow<MainContract.MainEffect> = _effect.asSharedFlow()
     
-    private var loadJob: Job? = null
-    
     // 스플래시 화면용 초기화 상태
     private val _isInitializing = MutableStateFlow(true)
     val isInitializing: StateFlow<Boolean> = _isInitializing.asStateFlow()
@@ -55,7 +52,7 @@ class MainViewModel @Inject constructor(
             val isInitialized = checkInitializationStateUseCase()
             
             if (!isInitialized) {
-                // 초기화 진행
+                // 초기화 진행 true면, 진행상태 ui에 표시 -> false로 바뀌어야 표시 x
                 _uiState.update { it.copy(isSyncing = true) }
                 
                 when (val result = initializeMiniAppsUseCase()) {
@@ -97,10 +94,7 @@ class MainViewModel @Inject constructor(
     }
     
     private fun loadMiniApps() {
-        // 이전 작업 취소하여 중복 호출 방지
-        loadJob?.cancel()
-        
-        loadJob = viewModelScope.launch {
+        viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             
             when (val result = getInstalledMiniAppsUseCase()) {
