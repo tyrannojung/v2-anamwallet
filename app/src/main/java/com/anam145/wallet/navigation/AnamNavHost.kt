@@ -2,15 +2,19 @@ package com.anam145.wallet.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.anam145.wallet.feature.main.ui.MainScreen
+import com.anam145.wallet.feature.main.ui.MainViewModel
 import com.anam145.wallet.feature.hub.HubScreen
 import com.anam145.wallet.feature.browser.BrowserScreen
 import com.anam145.wallet.feature.identity.IdentityScreen
 import com.anam145.wallet.feature.settings.ui.SettingsScreen
+import com.anam145.wallet.feature.miniapp.webapp.ui.WebAppActivity
+import com.anam145.wallet.feature.miniapp.blockchain.ui.BlockchainUIActivity
 
 /**
  * ANAM Wallet의 메인 Navigation Host
@@ -19,11 +23,13 @@ import com.anam145.wallet.feature.settings.ui.SettingsScreen
  * Composable 화면을 연결합니다.
  * 
  * @param navController 네비게이션 컨트롤러
+ * @param mainViewModel 공유되는 MainViewModel
  * @param startDestination 시작 화면 (기본값: Main)
  */
 @Composable
 fun AnamNavHost(
     navController: NavHostController,
+    mainViewModel: MainViewModel,
     modifier: Modifier = Modifier,
     startDestination: String = AnamNavRoute.Main.route
 ) {
@@ -36,7 +42,10 @@ fun AnamNavHost(
         
         // 메인 화면
         composable(route = AnamNavRoute.Main.route) {
+            val context = LocalContext.current
+            
             MainScreen(
+                viewModel = mainViewModel,  // 공유 ViewModel 전달
                 onNavigateToHub = { 
                     navController.navigate(AnamNavRoute.Hub.route) {
                         // Use the same navigation options as bottom navigation
@@ -48,12 +57,14 @@ fun AnamNavHost(
                     }
                 },
                 onNavigateToMiniApp = { appId ->
-                    // TODO: Navigate to mini app detail
-                    android.util.Log.d("AnamNavHost", "Navigate to mini app: $appId")
+                    // MiniApp Activity 실행 (메인 프로세스)
+                    val intent = WebAppActivity.createIntent(context, appId)
+                    context.startActivity(intent)
                 },
                 onLaunchBlockchain = { blockchainId ->
-                    // TODO: Launch blockchain activity
-                    android.util.Log.d("AnamNavHost", "Launch blockchain: $blockchainId")
+                    // 블록체인 UI Activity 실행 (블록체인 프로세스)
+                    val intent = BlockchainUIActivity.createIntent(context, blockchainId)
+                    context.startActivity(intent)
                 }
             )
         }

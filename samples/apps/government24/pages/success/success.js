@@ -58,25 +58,6 @@ function copyTxHash() {
     }
 }
 
-// 익스플로러에서 보기
-function viewOnExplorer() {
-    const txInfo = getTransactionInfo();
-    
-    if (txInfo.txHash) {
-        let explorerUrl = '';
-        
-        if (txInfo.chainId === '11155111') {
-            explorerUrl = `https://sepolia.etherscan.io/tx/${txInfo.txHash}`;
-        } else if (txInfo.chainId === '1') {
-            explorerUrl = `https://etherscan.io/tx/${txInfo.txHash}`;
-        }
-        
-        if (explorerUrl) {
-            // 새 창에서 열기 (모바일에서는 브라우저 앱으로 이동)
-            window.open(explorerUrl, '_blank');
-        }
-    }
-}
 
 // 홈으로 돌아가기
 function handleHome() {

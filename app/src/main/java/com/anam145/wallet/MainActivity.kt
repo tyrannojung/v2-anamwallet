@@ -17,7 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.anam145.wallet.core.ui.theme.AnamWalletTheme
-import com.anam145.wallet.ui.components.Header
+import com.anam145.wallet.core.ui.components.Header
 import com.anam145.wallet.navigation.AnamBottomNavigation
 import com.anam145.wallet.navigation.AnamNavHost
 import com.anam145.wallet.navigation.AnamNavRoute
@@ -28,6 +28,7 @@ import com.anam145.wallet.core.ui.language.getStringsForLanguage
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.anam145.wallet.feature.main.ui.MainViewModel
+import com.anam145.wallet.feature.main.ui.MainContract
 
 // Hilt가 의존성을 주입하는 시작점
 @AndroidEntryPoint
@@ -141,6 +142,13 @@ fun AnamWalletApp() {
             val currentRoute = navBackStackEntry?.destination?.route // "main", "hub" 등 문자열
             val currentNavRoute = AnamNavRoute.fromRoute(currentRoute) // 문자열 → 객체 변환
             
+            // MainViewModel에서 블록체인 정보 가져오기
+            val mainViewModel: MainViewModel = hiltViewModel()
+            val mainUiState by mainViewModel.uiState.collectAsStateWithLifecycle()
+            val activeBlockchain = mainUiState.blockchainApps.find { 
+                it.appId == mainUiState.activeBlockchainId 
+            }
+            
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
@@ -156,7 +164,14 @@ fun AnamWalletApp() {
                             else -> strings.headerTitle
                         },
                         showBlockchainStatus = currentRoute == AnamNavRoute.Main.route,
-                        blockchainConnected = false
+                        activeBlockchainName = activeBlockchain?.name,
+                        onBlockchainClick = if (activeBlockchain != null) {
+                            {
+                                mainViewModel.processIntent(
+                                    MainContract.MainIntent.ClickBlockchainApp(activeBlockchain)
+                                )
+                            }
+                        } else null
                     )
                 },
                 bottomBar = {
@@ -167,6 +182,7 @@ fun AnamWalletApp() {
                 // Navigation Host - 모든 화면들을 관리
                 AnamNavHost(
                     navController = navController,
+                    mainViewModel = mainViewModel,
                     modifier = Modifier.padding(innerPadding)
                 )
             }

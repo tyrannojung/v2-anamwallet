@@ -69,16 +69,17 @@ for blockchain in */; do
         blockchain_name="${blockchain%/}"
         echo "  - Building $blockchain_name..."
         
-        # manifest.json에서 버전 읽기
+        # manifest.json에서 버전과 app_id 읽기
         version="1.0.0"
+        app_id="com.anam.${blockchain_name}"  # 기본값
+        
         if [ -f "$blockchain_name/manifest.json" ]; then
             if command -v jq &> /dev/null; then
                 version=$(jq -r '.version // "1.0.0"' "$blockchain_name/manifest.json")
+                # manifest.json에서 실제 app_id 읽기
+                app_id=$(jq -r '.app_id // .appId // "com.anam.'$blockchain_name'"' "$blockchain_name/manifest.json")
             fi
         fi
-        
-        # 앱 ID 형식으로 변환 (ethereum → com.anam.ethereum)
-        app_id="com.anam.${blockchain_name}"
         
         # test.html과 mock 파일들은 제외하고 압축
         cd "$blockchain_name"

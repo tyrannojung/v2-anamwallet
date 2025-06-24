@@ -62,13 +62,15 @@ function handlePaymentResponse(event) {
     const response = event.detail;
     
     if (response.error) {
-        alert('결제 실패: ' + response.error);
-    } else if (response.txHash) {
+        // Toast로만 표시하므로 alert 제거
+        console.log('결제 실패:', response.error);
+    } else if (response.status === 'success' && (response.transactionId || response.data?.txHash)) {
         // 성공 페이지로 이동
+        const txHash = response.transactionId || response.data.txHash;
         const params = new URLSearchParams({
-            txHash: response.txHash,
-            amount: response.amount || '0.00000001',
-            chainId: response.chainId || '11155111'
+            txHash: txHash,
+            amount: response.data?.amount || '0.00000001',
+            chainId: response.data?.chainId || '11155111'
         });
         
         // navigateTo API 사용 (manifest 검증 포함)

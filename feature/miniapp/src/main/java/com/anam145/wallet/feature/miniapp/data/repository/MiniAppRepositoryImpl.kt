@@ -3,8 +3,8 @@ package com.anam145.wallet.feature.miniapp.data.repository
 import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.core.common.model.MiniAppManifest
 import com.anam145.wallet.core.data.datastore.MiniAppDataStore
-import com.anam145.wallet.feature.miniapp.data.local.MiniAppFileManager
-import com.anam145.wallet.feature.miniapp.data.local.MiniAppScanner
+import com.anam145.wallet.feature.miniapp.data.common.MiniAppFileManager
+import com.anam145.wallet.feature.miniapp.data.common.MiniAppScanner
 import com.anam145.wallet.feature.miniapp.domain.repository.MiniAppRepository
 import com.anam145.wallet.core.common.result.MiniAppResult
 import kotlinx.coroutines.flow.first

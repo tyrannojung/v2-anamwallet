@@ -1,9 +1,9 @@
-package com.anam145.wallet.feature.miniapp.data.local
+package com.anam145.wallet.feature.miniapp.data.common
 
 import android.util.Log
 import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.core.common.model.MiniAppType
-import com.anam145.wallet.feature.miniapp.data.MiniAppConstants
+import com.anam145.wallet.core.common.data.MiniAppConstants
 import com.anam145.wallet.core.common.result.MiniAppResult
 import com.anam145.wallet.core.common.result.onSuccess
 import com.anam145.wallet.core.common.result.onError

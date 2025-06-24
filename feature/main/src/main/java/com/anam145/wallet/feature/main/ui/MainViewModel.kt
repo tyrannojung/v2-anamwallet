@@ -1,5 +1,6 @@
 package com.anam145.wallet.feature.main.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.anam145.wallet.core.common.model.MiniApp
@@ -8,6 +9,8 @@ import com.anam145.wallet.core.common.result.MiniAppResult
 import com.anam145.wallet.feature.miniapp.domain.usecase.GetInstalledMiniAppsUseCase
 import com.anam145.wallet.feature.miniapp.domain.usecase.InitializeMiniAppsUseCase
 import com.anam145.wallet.feature.miniapp.domain.usecase.CheckInitializationStateUseCase
+import com.anam145.wallet.feature.miniapp.domain.usecase.ActivateBlockchainUseCase
+import com.anam145.wallet.core.data.datastore.BlockchainDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,7 +28,9 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val getInstalledMiniAppsUseCase: GetInstalledMiniAppsUseCase,
     private val initializeMiniAppsUseCase: InitializeMiniAppsUseCase,
-    private val checkInitializationStateUseCase: CheckInitializationStateUseCase
+    private val checkInitializationStateUseCase: CheckInitializationStateUseCase,
+    private val activateBlockchainUseCase: ActivateBlockchainUseCase,
+    private val blockchainDataStore: BlockchainDataStore
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(MainContract.MainState())
@@ -41,7 +47,17 @@ class MainViewModel @Inject constructor(
     private val _isInitializing = MutableStateFlow(true)
     val isInitializing: StateFlow<Boolean> = _isInitializing.asStateFlow()
     
+    // 블록체인 서비스 연결 상태
+    private val _isBlockchainConnected = MutableStateFlow(false)
+    val isBlockchainConnected: StateFlow<Boolean> = _isBlockchainConnected.asStateFlow()
+    
+    // 블록체인 서비스 참조
+    private var blockchainService: com.anam145.wallet.feature.miniapp.IBlockchainService? = null
+    
     init {
+        // 블록체인 서비스 상태 관찰 먼저 시작
+        observeBlockchainService()
+        
         // 앱 초기화 및 로드
         initializeAndLoad()
     }
@@ -103,13 +119,28 @@ class MainViewModel @Inject constructor(
                     val blockchainApps = miniApps.filter { it.type == MiniAppType.BLOCKCHAIN }
                     val regularApps = miniApps.filter { it.type == MiniAppType.APP }
                     
+                    // 저장된 활성 블록체인 ID 또는 첫 번째 블록체인 활성화
+                    val savedActiveId = blockchainDataStore.activeBlockchainId.first()
+                    val activeId = when {
+                        savedActiveId != null && blockchainApps.any { it.appId == savedActiveId } -> savedActiveId
+                        blockchainApps.isNotEmpty() -> blockchainApps.first().appId
+                        else -> null
+                    }
+                    
                     _uiState.update {
                         it.copy(
                             isLoading = false,
                             blockchainApps = blockchainApps,
                             regularApps = regularApps,
+                            activeBlockchainId = activeId,
                             error = null
                         )
+                    }
+                    
+                    // 블록체인 활성화 (서비스 연결 후 처리됨)
+                    activeId?.let { id ->
+                        Log.d("MainViewModel", "Active blockchain ID set: $id")
+                        // 서비스 연결은 observeBlockchainService에서 처리
                     }
                 }
                 is MiniAppResult.Error -> {
@@ -143,7 +174,34 @@ class MainViewModel @Inject constructor(
     
     private fun handleBlockchainClick(miniApp: MiniApp) {
         viewModelScope.launch {
+            // 이미 활성화된 블록체인이면 UI만 표시
+            if (_uiState.value.activeBlockchainId == miniApp.appId) {
+                _effect.emit(MainContract.MainEffect.LaunchBlockchainActivity(miniApp.appId))
+                return@launch
+            }
+            
+            // 새로운 블록체인 활성화
             _uiState.update { it.copy(activeBlockchainId = miniApp.appId) }
+            
+            // 활성 블록체인 ID 저장
+            blockchainDataStore.setActiveBlockchainId(miniApp.appId)
+            
+            // 블록체인 서비스에서 전환 (IO 스레드에서 실행)
+            blockchainService?.let { service ->
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    try {
+                        // switchBlockchain은 이제 WebView만 재생성함 (서비스 유지)
+                        service.switchBlockchain(miniApp.appId)
+                    } catch (e: android.os.RemoteException) {
+                        Log.e("MainViewModel", "Blockchain service disconnected", e)
+                    } catch (e: Exception) {
+                        Log.e("MainViewModel", "Error switching blockchain", e)
+                    }
+                }
+            } ?: run {
+                Log.w("MainViewModel", "Blockchain service not connected")
+            }
+            
             _effect.emit(MainContract.MainEffect.LaunchBlockchainActivity(miniApp.appId))
         }
     }
@@ -157,6 +215,35 @@ class MainViewModel @Inject constructor(
     private fun handleAddMoreClick() {
         viewModelScope.launch {
             _effect.emit(MainContract.MainEffect.NavigateToHub)
+        }
+    }
+    
+    /**
+     * 블록체인 서비스 상태 관찰
+     */
+    private fun observeBlockchainService() {
+        viewModelScope.launch {
+            activateBlockchainUseCase.observeServiceState().collect { state ->
+                _isBlockchainConnected.value = state.isConnected
+                blockchainService = state.service
+                
+                // 서비스 연결 시 활성 블록체인 복원
+                if (state.isConnected && state.service != null) {
+                    // 이미 활성화된 블록체인이 있으면 전환
+                    _uiState.value.activeBlockchainId?.let { activeId ->
+                        viewModelScope.launch {
+                            try {
+                                // IO 스레드에서 AIDL 호출
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                                    activateBlockchainUseCase(activeId, state.service)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("MainViewModel", "Error activating blockchain on service connection", e)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

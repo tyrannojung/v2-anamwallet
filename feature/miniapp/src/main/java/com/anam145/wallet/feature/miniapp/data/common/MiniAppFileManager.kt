@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.miniapp.data.local
+package com.anam145.wallet.feature.miniapp.data.common
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -14,7 +14,7 @@ import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.anam145.wallet.feature.miniapp.data.MiniAppConstants
+import com.anam145.wallet.core.common.data.MiniAppConstants
 import com.anam145.wallet.core.common.result.MiniAppResult
 
 @Singleton
@@ -97,6 +97,7 @@ class MiniAppFileManager @Inject constructor(
                         
                         if (entry.isDirectory) {
                             file.mkdirs()
+                            Log.d(TAG, "Created directory: ${file.absolutePath}")
                         } else {
                             file.parentFile?.mkdirs()
                             FileOutputStream(file).use { output ->
@@ -104,6 +105,7 @@ class MiniAppFileManager @Inject constructor(
                                 output.flush()
                                 output.fd.sync() // Force file system sync
                             }
+                            Log.d(TAG, "Extracted file: ${file.absolutePath} (${file.length()} bytes)")
                         }
                         
                         zip.closeEntry()
@@ -112,7 +114,13 @@ class MiniAppFileManager @Inject constructor(
                 }
             }
             
+            // Verify extraction
+            val extractedFiles = appDir.walk().filter { it.isFile }.toList()
             Log.d(TAG, "Successfully installed miniapp: $appId")
+            Log.d(TAG, "Extracted ${extractedFiles.size} files:")
+            extractedFiles.forEach { file ->
+                Log.d(TAG, "  - ${file.relativeTo(appDir).path} (${file.length()} bytes)")
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to install miniapp: $appId", e)
             throw e
@@ -146,7 +154,25 @@ class MiniAppFileManager @Inject constructor(
             }
             
             val manifestContent = manifestFile.readText()
-            val manifest = json.decodeFromString<MiniAppManifest>(manifestContent)
+            
+            // anam-android와 동일한 방식으로 수동 파싱
+            val jsonObject = org.json.JSONObject(manifestContent)
+            val pagesArray = jsonObject.optJSONArray("pages") ?: org.json.JSONArray()
+            val pages = mutableListOf<String>()
+            for (i in 0 until pagesArray.length()) {
+                pages.add(pagesArray.getString(i))
+            }
+            
+            val manifest = MiniAppManifest(
+                appId = jsonObject.getString("app_id"),  // manifest.json에는 app_id로 되어 있음
+                name = jsonObject.getString("name"),
+                version = jsonObject.getString("version"),
+                type = jsonObject.getString("type"),
+                mainPage = jsonObject.optString("main_page").takeIf { it.isNotEmpty() },
+                pages = pages,
+                permissions = emptyList()
+            )
+            
             MiniAppResult.Success(manifest)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load manifest for $appId", e)
@@ -170,6 +196,7 @@ class MiniAppFileManager @Inject constructor(
     }
     
     fun getMiniAppBasePath(appId: String): String {
-        return File(context.filesDir, "${MiniAppConstants.MINIAPP_INSTALL_DIR}/$appId").absolutePath
+        val appDir = File(context.filesDir, "${MiniAppConstants.MINIAPP_INSTALL_DIR}/$appId")
+        return "${appDir.absolutePath}/"  // anam-android와 동일하게 trailing slash 추가
     }
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AnamWallet.Starting" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background to white -->
+        <item name="windowSplashScreenBackground">@android:color/white</item>
+        
+        <!-- Use windowSplashScreenAnimatedIcon to add a drawable or animated drawable -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/anam_logo</item>
+        
+        <!-- Set the theme to be used for the Activity -->
+        <item name="postSplashScreenTheme">@style/Theme.AnamWallet</item>
+        
+        <!-- API 31+ specific: transparent icon background -->
+        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+    </style>
+</resources>

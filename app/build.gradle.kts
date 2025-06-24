@@ -45,6 +45,7 @@ dependencies {
     // Core modules
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
+    implementation(project(":core:data"))
     
     // Feature modules
     implementation(project(":feature:main"))

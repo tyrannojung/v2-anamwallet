@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.miniapp.data
+package com.anam145.wallet.core.common.data
 
 /**
  * MiniApp 모듈에서 사용하는 상수들

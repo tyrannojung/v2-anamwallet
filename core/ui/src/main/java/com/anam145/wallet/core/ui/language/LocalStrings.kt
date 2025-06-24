@@ -66,7 +66,12 @@ data class Strings(
     val mainSectionApps: String = "앱",
     val mainAddMoreServices: String = "더 많은 서비스 보기",
     val mainNoAppsInstalled: String = "설치된 앱이 없습니다",
-    val syncingApps: String = "앱을 준비 중입니다..."
+    val syncingApps: String = "앱을 준비 중입니다...",
+    
+    // Common
+    val back: String = "뒤로가기",
+    val loading: String = "로딩 중...",
+    val activated: String = "활성화됨"
 )
 
 /**
@@ -123,7 +128,12 @@ val EnglishStrings = Strings(
     mainSectionApps = "Apps",
     mainAddMoreServices = "View more services",
     mainNoAppsInstalled = "No apps installed",
-    syncingApps = "Preparing apps..."
+    syncingApps = "Preparing apps...",
+    
+    // Common
+    back = "Back",
+    loading = "Loading...",
+    activated = "Activated"
 )
 
 /**

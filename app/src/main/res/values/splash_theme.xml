@@ -8,8 +8,6 @@
         <!-- 중앙 아이콘: anam_logo with inset -->
         <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon_inset</item>
         
-        <!-- 아이콘 배경 제거 (원형 배경 제거) -->
-        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
         
         <!-- Splash 후 메인 테마 -->
         <item name="postSplashScreenTheme">@style/Theme.AnamWallet</item>

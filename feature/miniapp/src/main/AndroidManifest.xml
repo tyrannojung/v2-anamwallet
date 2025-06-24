@@ -1,4 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
+    
+    <!-- 권한 선언 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    
+    <application>
+        <!-- 블록체인 Service (별도 프로세스) -->
+        <service
+            android:name=".blockchain.service.BlockchainService"
+            android:process=":blockchain"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+            
+        <!-- 웹앱 Service (메인 프로세스) -->
+        <service
+            android:name=".webapp.service.WebAppService"
+            android:enabled="true"
+            android:exported="false" />
+        
+        <!-- 블록체인 UI Activity (블록체인 프로세스) -->
+        <activity
+            android:name=".blockchain.ui.BlockchainUIActivity"
+            android:process=":blockchain"
+            android:exported="false"
+            android:theme="@style/Theme.AnamWallet" />
+            
+        <!-- 일반 WebApp Activity (앱 프로세스) -->
+        <activity
+            android:name=".webapp.ui.WebAppActivity"
+            android:process=":app"
+            android:exported="false"
+            android:theme="@style/Theme.AnamWallet" />
+    </application>
 </manifest>

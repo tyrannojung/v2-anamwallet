@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.anam145.wallet.feature.miniapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -37,6 +37,7 @@ android {
     
     buildFeatures {
         compose = true
+        aidl = true
     }
     
     composeOptions {
@@ -72,6 +73,9 @@ dependencies {
     
     // JSON parsing
     implementation(libs.kotlinx.serialization.json)
+    
+    // WebView
+    implementation("androidx.webkit:webkit:1.11.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

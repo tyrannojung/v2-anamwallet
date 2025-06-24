@@ -1,406 +1,187 @@
-# ANAM Wallet V2
+# ANAM Wallet V2 - Modular Wallet Platform
 
-Modern Android wallet application built with Clean Architecture, MVI pattern, and Jetpack Compose.
+> 🎯 **차세대 모듈러 블록체인 지갑 플랫폼**  
+> 다양한 블록체인과 서비스를 하나의 지갑에서 통합 관리할 수 있는 Android 기반 모듈러 지갑입니다.
 
-## 🏗️ Architecture Overview
+## 🌟 주요 특징
 
-This project follows **Clean Architecture** principles with a **multi-module** structure, ensuring separation of concerns, testability, and scalability.
+### 모듈러 아키텍처
 
-### Module Structure
+- **플러그인 방식의 블록체인 지원**: 새로운 블록체인을 독립적인 모듈로 추가
+- **웹앱 통합**: 정부24, 금융 서비스 등 다양한 웹 서비스를 미니앱으로 통합
+- **멀티 프로세스 설계**: 총 5개 프로세스(Main, WebApp, Blockchain, WebView Renderer x2)로 격리된 실행 환경
 
-```
-v2-anamwallet/
-├── app/                          # Main application module
-│   ├── MainActivity              # Entry point with SplashScreen API
-│   ├── navigation/               # Navigation components
-│   │   ├── AnamNavHost          # Navigation graph
-│   │   ├── AnamNavRoute         # Type-safe routes
-│   │   ├── AnamBottomNavigation # Bottom navigation bar
-│   │   └── NavigationConfig     # Navigation configuration
-│   └── ui/                      # App-specific UI
-│       ├── components/          # App-only components (e.g., Header)
-│       ├── theme/               # Theme ViewModel
-│       └── language/            # Language ViewModel
-│
-├── core/
-│   ├── common/                  # Pure Kotlin module (no Android deps)
-│   │   ├── model/               # Shared domain models
-│   │   │   ├── Language.kt      # Language enum
-│   │   │   ├── ThemeMode.kt     # Theme enum
-│   │   │   ├── MiniApp.kt       # MiniApp domain model
-│   │   │   └── MiniAppType.kt   # MiniApp type enum
-│   │   └── result/              # Custom Result types
-│   │       └── MiniAppResult.kt # Type-safe result handling
-│   │
-│   ├── data/                    # Data layer utilities
-│   │   └── datastore/           # DataStore preferences
-│   │
-│   └── ui/                      # Shared UI resources
-│       ├── theme/               # Material3 theme definitions
-│       │   ├── Color.kt         # Color palette
-│       │   ├── Type.kt          # Typography (16sp titleMedium)
-│       │   └── Shape.kt         # Shape definitions
-│       └── language/            # Language support
-│           └── LocalStrings.kt  # CompositionLocal & strings
-│
-└── feature/                     # Feature modules
-    ├── main/                    # Home/Dashboard
-    │   ├── MainScreen.kt        # MiniApp list UI
-    │   ├── MainViewModel.kt     # State management & initialization
-    │   └── MainContract.kt      # MVI contract with sync state
-    │
-    ├── miniapp/                 # MiniApp management
-    │   ├── data/
-    │   │   ├── local/           # Local data sources
-    │   │   │   ├── MiniAppScanner.kt
-    │   │   │   └── MiniAppFileManager.kt
-    │   │   ├── MiniAppConstants.kt
-    │   │   └── repository/
-    │   └── domain/
-    │       ├── repository/
-    │       │   └── MiniAppRepository.kt
-    │       └── usecase/
-    │           ├── InitializeMiniAppsUseCase.kt
-    │           └── GetInstalledMiniAppsUseCase.kt
-    │
-    ├── hub/                     # Service hub
-    ├── browser/                 # Web browser
-    ├── identity/                # Digital ID management
-    └── settings/                # App settings
-        ├── ui/
-        │   ├── SettingsScreen.kt
-        │   ├── SettingsViewModel.kt
-        │   └── SettingsContract.kt
-        └── domain/
-            └── usecase/         # Theme & Language UseCases
-```
+### 사용자 경험
 
-### Module Dependencies
+- **통합 인터페이스**: 모든 블록체인과 서비스를 하나의 일관된 UI로 관리
+- **원클릭 전환**: 활성 블록체인을 즉시 전환하여 다양한 네트워크 지원
+- **네이티브 성능**: Jetpack Compose 기반의 현대적이고 빠른 UI
 
-```
-app ─────────┬──→ core:common
-             ├──→ core:ui
-             ├──→ core:data
-             └──→ all features
+## 📱 스크린샷
 
-features ────┬──→ core:common
-             ├──→ core:ui
-             └──→ core:data
+<table>
+  <tr>
+    <td><img src="docs/screenshots/main.png" width="200" alt="메인 화면"/></td>
+    <td><img src="docs/screenshots/blockchain.png" width="200" alt="블록체인 앱"/></td>
+    <td><img src="docs/screenshots/webapp.png" width="200" alt="웹앱"/></td>
+    <td><img src="docs/screenshots/settings.png" width="200" alt="설정"/></td>
+  </tr>
+  <tr>
+    <td align="center">메인 대시보드</td>
+    <td align="center">블록체인 관리</td>
+    <td align="center">통합 웹앱</td>
+    <td align="center">설정</td>
+  </tr>
+</table>
 
-core:ui ─────→ core:common
-core:data ───→ core:common
+## 🏗️ 아키텍처
 
-core:common  (no dependencies - pure Kotlin)
-```
-
-## 📁 Standard Feature Module Structure
-
-Each feature module follows a consistent Clean Architecture structure:
-
-```
-feature/{name}/
-├── ui/                              # Presentation Layer
-│   ├── {Name}Screen.kt              # Compose UI
-│   ├── {Name}ViewModel.kt           # State management
-│   ├── {Name}Contract.kt            # MVI Contract (State, Intent, Effect)
-│   └── components/                  # Feature-specific UI components
-│
-├── domain/                          # Business Layer
-│   ├── model/                       # Feature-specific models
-│   ├── repository/                  # Repository interfaces
-│   └── usecase/                     # Business logic (one per action)
-│       ├── Get{Name}UseCase.kt      # Query operations
-│       └── Set{Name}UseCase.kt      # Command operations
-│
-├── data/                            # Data Layer
-│   ├── local/                       # Local data sources (renamed from 'source')
-│   └── repository/                  # Repository implementations
-│       └── {Name}RepositoryImpl.kt
-│
-└── di/                              # Dependency Injection
-    └── {Name}Module.kt              # Hilt module for bindings
-```
-
-## 🔄 Architecture Flow
-
-### MVI Pattern with Unidirectional Data Flow
+### Clean Architecture + MVI
 
 ```
 ┌─────────────────┐
-│   User Action   │
-└────────┬────────┘
-         ▼
-┌─────────────────┐     ┌──────────────┐
-│   UI (Screen)   │────▶│  Contract    │
-└────────┬────────┘     │  - State     │
-         │              │  - Intent    │
-         ▼              │  - Effect    │
-┌─────────────────┐     └──────────────┘
-│   ViewModel     │
-│   _uiState      │ (StateFlow)
-│   _effect       │ (SharedFlow)
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│    UseCase      │ (Business Logic)
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│   Repository    │ (Interface)
-│   (Domain)      │
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│ Repository Impl │ (Implementation)
-│    (Data)       │
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│   Data Source   │ (Local/Remote)
+│   Presentation  │ ← Jetpack Compose + MVI Pattern
+├─────────────────┤
+│     Domain      │ ← Business Logic (Use Cases)
+├─────────────────┤
+│      Data       │ ← Repository Implementation
 └─────────────────┘
 ```
 
-## 🎯 Key Architectural Patterns
-
-### 1. MVI Pattern
-
-Full MVI implementation with:
-
-- **State**: Single immutable state object per screen
-- **Intent**: User actions as sealed interfaces
-- **Effect**: One-time events using SharedFlow (Google recommended)
-
-```kotlin
-// ViewModel pattern
-private val _uiState = MutableStateFlow(Contract.State())
-val uiState: StateFlow<Contract.State> = _uiState.asStateFlow()
-
-private val _effect = MutableSharedFlow<Contract.Effect>(
-    replay = 0,
-    extraBufferCapacity = 1,
-    onBufferOverflow = BufferOverflow.DROP_OLDEST
-)
-val effect: SharedFlow<Contract.Effect> = _effect.asSharedFlow()
-```
-
-### 2. Clean Architecture Layers
-
-- **UI Layer**: Compose screens and ViewModels
-- **Domain Layer**: Business logic (UseCases) and repository interfaces
-- **Data Layer**: Repository implementations and data sources
-
-### 3. Multi-Module Benefits
-
-- **Parallel Development**: Teams can work on different features
-- **Faster Builds**: Only changed modules rebuild
-- **Clear Boundaries**: Enforced separation of concerns
-- **Reusability**: Features can be shared across apps
-
-### 4. Consistent Naming Conventions
-
-- **State management**: `_uiState` / `uiState` (not `_state`)
-- **Effect handling**: SharedFlow instead of Channel
-- **Folder structure**: `local` instead of `source` for data sources
-
-## 🧭 Navigation System
-
-The app uses Jetpack Navigation Compose with type-safe routes:
-
-### Navigation Components
-
-- **AnamNavRoute**: Sealed class defining all app destinations
-- **AnamNavHost**: Central navigation graph composable
-- **AnamBottomNavigation**: Bottom navigation bar with 5 main destinations
-- **NavigationConfig**: Centralized navigation configuration
-
-### Navigation Flow
+### Multi-Process Architecture
 
 ```
-MainActivity (with SplashScreen)
-    │
-    ├── SplashScreen (shows during initialization)
-    │
-    └── After initialization:
-        ├── Header (App bar)
-        ├── AnamNavHost (Content)
-        │   ├── MainScreen (with MiniApp list)
-        │   ├── HubScreen
-        │   ├── BrowserScreen
-        │   ├── IdentityScreen
-        │   └── SettingsScreen
-        │
-        └── AnamBottomNavigation (Bottom bar)
+┌─────────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────────┐
+│ WebView Renderer│    │   WebApp    │    │    Main     │    │   Blockchain    │
+│    Process      │◀──▶│   Process   │◀──▶│   Process   │◀──▶│    Process      │
+│  (JavaScript)   │ JS │    (:app)   │AIDL│   (:main)   │AIDL│  (:blockchain)  │
+└─────────────────┘    └─────────────┘    └─────────────┘    └─────────────────┘
+                                                                        │ JS
+                                                                        ▼
+                                                              ┌─────────────────┐
+                                                              │ WebView Renderer│
+                                                              │    Process      │
+                                                              │ (Blockchain JS) │
+                                                              └─────────────────┘
+
+프로세스 간 통신 흐름:
+
+1. 웹앱 결제 요청 시 (예: 정부24):
+   - WebView Renderer (JavaScript) → WebApp Process (JavaScript Bridge)
+   - WebApp Process → Main Process (WebAppService via AIDL)
+   - Main Process → Blockchain Process (BlockchainService via AIDL)
+   - Blockchain Process → WebView Renderer (블록체인 JavaScript)
+
+2. 각 프로세스의 역할:
+   - **WebView Renderer**: JavaScript 실행 환경 (샌드박스)
+   - **WebApp Process (:app)**: 웹앱 UI 및 JavaScript Bridge 관리
+   - **Main Process**: 서비스 중계 및 앱 전체 상태 관리
+   - **Blockchain Process (:blockchain)**: 블록체인별 독립 실행 환경
 ```
 
-Navigation handles proper back stack management with `popUpTo`, `saveState`, and `restoreState`.
+### 모듈 구조
 
-## 🎨 UI/UX Features
+- **app**: 메인 애플리케이션 진입점
+- **core**: 공통 기능 및 리소스
+  - common: 도메인 모델, 유틸리티
+  - ui: 공통 UI 컴포넌트 및 테마
+  - data: 데이터 저장소
+- **feature**: 각 기능별 모듈
+  - main: 대시보드
+  - miniapp: 미니앱 관리 (webapp/blockchain)
+  - settings: 설정
+  - hub/browser/identity: 추가 기능
 
-### Material Design 3
+## 🚀 시작하기
 
-- Custom theme with Cocogoose font for headlines
-- Typography: `titleMedium` = 16sp (matching anam-android)
-- Consistent color scheme with `surfaceVariant` for backgrounds
-- Shape system with `ShapeCard` (20dp rounded corners)
+### 요구사항
 
-### MiniApp System
-
-- Dynamic loading from assets/miniapps folder
-- ZIP file support with manifest.json
-- Icon loading with fallback support (Material Icons)
-- Blockchain apps with activation state
-- Grid layout for regular apps (3 columns)
-
-### Visual Consistency
-
-- `Arrangement.SpaceBetween` for blockchain cards
-- `FontWeight.SemiBold` for titles
-- Consistent spacing and padding
-- Smooth animations with spring() and animateColorAsState
-
-## Real-time Language System
-
-The app supports instant language switching without Activity restart using CompositionLocal:
-
-```kotlin
-// Access strings in any Composable
-val strings = LocalStrings.current
-Text(text = strings.welcomeMessage)
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Android Studio Ladybug or newer
+- Android Studio Ladybug 이상
+- JDK 17
+- Android SDK 35
 - Kotlin 2.0+
-- Minimum SDK 24
-- Target SDK 35
 
-### Building the Project
+### 빌드 및 실행
 
 ```bash
+# 프로젝트 클론
+git clone https://github.com/anam145/v2-anamwallet.git
+
+# Android Studio에서 열기
+# File > Open > v2-anamwallet 선택
+
+# 빌드 및 실행
 ./gradlew assembleDebug
 ```
 
-### Running Tests
+## 🔧 기술 스택
 
-```bash
-./gradlew test
-./gradlew connectedAndroidTest
-```
+### 핵심 기술
 
-## 📦 Tech Stack
+- **Kotlin**: 100% Kotlin 기반
+- **Jetpack Compose**: 선언형 UI
+- **Coroutines & Flow**: 비동기 프로그래밍
+- **Hilt**: 의존성 주입
 
-### Core
+### 아키텍처 컴포넌트
 
-- **Jetpack Compose**: Modern declarative UI
-- **Hilt**: Compile-time dependency injection
-- **Coroutines & Flow**: Asynchronous programming
-- **DataStore**: Modern data persistence
+- **Navigation Compose**: 타입 안전 네비게이션
+- **ViewModel + MVI**: 상태 관리
+- **DataStore**: 데이터 영속성
+- **AIDL**: 프로세스 간 통신
 
-### Architecture Components
+### UI/UX
 
-- **ViewModel**: UI state management with MVI
-- **Navigation Compose**: Type-safe navigation (2.7.7)
-- **StateFlow & SharedFlow**: Observable state holders
+- **Material Design 3**: 최신 디자인 시스템
+- **Dark Mode**: 다크 모드 완벽 지원
+- **다국어**: 한국어/영어 실시간 전환
 
-### UI
+## 📦 지원 기능
 
-- **Material 3**: Latest design system
-- **Material Icons Extended**: Comprehensive icon set
-- **Compose Animation**: Smooth transitions
+### 현재 지원
 
-## 🔧 Development Guidelines
+- ✅ 이더리움 블록체인
+- ✅ 메타마스크 호환
+- ✅ 정부24 통합
+- ✅ 다크 모드
+- ✅ 다국어 (한국어/영어)
 
-### Creating a New Feature Module
+### 개발 중
 
-1. **Module Setup**
+- 🚧 비트코인 지원
+- 🚧 솔라나 지원
+- 🚧 DID (분산 신원)
 
-   ```
-   feature/{name}/
-   ├── build.gradle.kts
-   └── src/main/java/com/anam145/wallet/feature/{name}/
-   ```
+## 🤝 기여하기
 
-2. **Define Contract**
+기여를 환영합니다! 다음 가이드라인을 따라주세요:
 
-   ```kotlin
-   interface {Name}Contract {
-       data class State(...)
-       sealed interface Intent { ... }
-       sealed interface Effect { ... }
-   }
-   ```
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-3. **Implement ViewModel**
-   ```kotlin
-   @HiltViewModel
-   class {Name}ViewModel @Inject constructor(
-       private val useCase: {Name}UseCase
-   ) : ViewModel() {
-       private val _uiState = MutableStateFlow(Contract.State())
-       val uiState = _uiState.asStateFlow()
+자세한 내용은 [CODE_CONVENTIONS.md](CODE_CONVENTIONS.md)를 참고하세요.
 
-       private val _effect = MutableSharedFlow<Contract.Effect>()
-       val effect = _effect.asSharedFlow()
+## 📄 라이선스
 
-       fun processIntent(intent: Contract.Intent) { ... }
-   }
-   ```
+TBD - 라이선스 정보는 추후 결정됩니다.
 
-### Code Conventions
+## 👥 팀
 
-#### Naming Conventions
+- **Project Lead**: TBD
+- **Android Developer**: TBD
+- **Blockchain Engineer**: TBD
+- **UI/UX Designer**: TBD
 
-- **Screens**: `{Feature}Screen.kt`
-- **ViewModels**: `{Feature}ViewModel.kt` with `_uiState`/`uiState`
-- **Contracts**: `{Feature}Contract.kt` with State, Intent, Effect
-- **UseCases**: `{Action}{Feature}UseCase.kt`
-- **Data sources**: Place in `local/` folder (not `source/`)
+## 📞 문의
 
-#### Architecture Rules
+- **Email**: contact@anam145.com
+- **Issue Tracker**: [GitHub Issues](https://github.com/anam145/v2-anamwallet/issues)
 
-- **MVI Pattern**: Use Contract pattern for all ViewModels
-- **Effect Handling**: Use SharedFlow (not Channel)
-- **Error Handling**: Use custom MiniAppResult sealed interface
-- **Constants**: Centralize in dedicated files
-- **Result Type**: Use MiniAppResult for type-safe error handling
-- **Initialization**: Handle in MainViewModel with SplashScreen API
+---
 
-## 📱 Current Implementation Status
-
-### Completed Features ✅
-
-- Main screen with MiniApp list
-- Settings with theme/language switching
-- Navigation system with bottom bar
-- MiniApp loading from assets with initialization
-- Android 12 SplashScreen API integration
-- Custom MiniAppResult for type-safe error handling
-- MVI pattern implementation with Contract
-- Real-time language switching without restart
-- Reactive UI pattern for initialization states
-
-### TODO Features 🚧
-
-- MiniApp detail screens
-- Blockchain activity launch
-- WebView implementation for mini-apps
-- Hub screen implementation
-- Browser functionality
-- Identity management
-
-## 🔐 Security
-
-- No hardcoded credentials
-- Secure data storage with DataStore
-- ProGuard rules for release builds
-
-## 📄 License
-
-TBD
-
-## 👥 Contributors
-
-TBD
+<p align="center">
+Made with ❤️ by ANAM Team
+</p>
