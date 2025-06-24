@@ -46,20 +46,6 @@
                                                               │    Process      │
                                                               │ (Blockchain JS) │
                                                               └─────────────────┘
-
-프로세스 간 통신 흐름:
-
-1. 웹앱 결제 요청 시 (예: 정부24):
-   - WebView Renderer (JavaScript) → WebApp Process (JavaScript Bridge)
-   - WebApp Process → Main Process (WebAppService via AIDL)
-   - Main Process → Blockchain Process (BlockchainService via AIDL)
-   - Blockchain Process → WebView Renderer (블록체인 JavaScript)
-
-2. 각 프로세스의 역할:
-   - **WebView Renderer**: JavaScript 실행 환경 (샌드박스)
-   - **WebApp Process (:app)**: 웹앱 UI 및 JavaScript Bridge 관리
-   - **Main Process**: 서비스 중계 및 앱 전체 상태 관리
-   - **Blockchain Process (:blockchain)**: 블록체인별 독립 실행 환경
 ```
 
 ### 모듈 구조
