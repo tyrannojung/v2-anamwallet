@@ -28,15 +28,29 @@ class AnamWalletApplication : Application() {
     
     override fun onCreate() {
         // WebView 데이터 디렉토리 설정이 가장 먼저 실행되어야 함
+        /**
+         * 기본 상태:
+         * - 메인 프로세스: /data/data/com.anam145.wallet/app_webview/
+         * - :blockchain 프로세스: /data/data/com.anam145.wallet/app_webview/ (동일!)
+         * - :app 프로세스: /data/data/com.anam145.wallet/app_webview/ (동일!)
+         *
+         * 문제: 3개 프로세스가 같은 폴더를 사용 → 데이터 충돌!
+         *
+         * WebView.setDataDirectorySuffix("blockchain")
+         * // 결과: /data/data/com.anam145.wallet/app_webview_blockchain/
+         *
+         * WebView.setDataDirectorySuffix("webapp")
+         * // 결과: /data/data/com.anam145.wallet/app_webview_webapp/
+         *
+         * 이부분을 진행해줘야함
+         * */
         setupWebViewDataDirectory()
         
         super.onCreate()
+
+        // 만약 여기서 WebView를 생성하면?
+        // val webView = WebView(this)  // 에러! "Already initialized"
         Log.d(TAG, "Application onCreate - Process: ${ProcessUtil.currentProcessName(this)}")
-        
-        // 메인 프로세스에서만 BlockchainService 시작
-        if (ProcessUtil.isMainProcess(this)) {
-            startBlockchainServiceIfNeeded()
-        }
     }
     
     /**
@@ -72,25 +86,6 @@ class AnamWalletApplication : Application() {
                     Log.w(TAG, "Unknown process type - no WebView suffix set")
                 }
             }
-        }
-    }
-    
-    /**
-     * BlockchainService를 시작합니다.
-     * 
-     * 주의: 현재는 Application에서 서비스를 시작하고 있지만,
-     * BIND_AUTO_CREATE를 사용하는 경우 자동으로 서비스가 시작되므로
-     * 향후 이 메서드는 제거될 수 있습니다.
-     * 
-     * @deprecated 향후 bind 시점에 자동 시작으로 변경 예정
-     */
-    private fun startBlockchainServiceIfNeeded() {
-        try {
-            val serviceIntent = Intent(this, BlockchainService::class.java)
-            startService(serviceIntent)
-            Log.d(TAG, "BlockchainService started from Application")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to start BlockchainService", e)
         }
     }
 }

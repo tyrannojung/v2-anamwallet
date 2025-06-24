@@ -32,27 +32,6 @@ object ProcessUtil {
         }
     }
     
-    /**
-     * 현재 프로세스가 메인 프로세스인지 확인합니다.
-     * 
-     * @param context Application context
-     * @return 메인 프로세스이면 true
-     */
-    fun isMainProcess(context: Context): Boolean {
-        return currentProcessName(context) == context.packageName
-    }
-    
-    /**
-     * 현재 프로세스가 특정 이름의 프로세스인지 확인합니다.
-     * 
-     * @param context Application context
-     * @param processNameSuffix 프로세스 이름 접미사 (예: ":blockchain", ":app")
-     * @return 해당 프로세스이면 true
-     */
-    fun isProcess(context: Context, processNameSuffix: String): Boolean {
-        val currentProcess = currentProcessName(context)
-        return currentProcess.endsWith(processNameSuffix)
-    }
     
     /**
      * 현재 프로세스의 타입을 반환합니다.

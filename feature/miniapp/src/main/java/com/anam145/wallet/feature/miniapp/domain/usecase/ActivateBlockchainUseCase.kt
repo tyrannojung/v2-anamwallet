@@ -61,6 +61,16 @@ class ActivateBlockchainUseCase @Inject constructor(
         }
         
         // 서비스 시작 및 바인딩
+        // startService()와 bindService()를 모두 사용하는 이유:
+        // 1. startService(): 서비스를 독립적으로 실행시켜 모든 클라이언트가 unbind해도 계속 실행되도록 함
+        //                   BlockchainService는 Foreground Service로 앱의 핵심 기능이므로 항상 실행되어야 함
+        // 2. bindService(): 서비스와 통신할 수 있는 IBinder(IBlockchainService) 연결을 설정
+        // 3. BIND_AUTO_CREATE: 서비스가 아직 생성되지 않았다면 자동으로 생성하고 시작
+        // 
+        // 이 조합으로 서비스는 다음을 보장합니다:
+        // - 서비스가 없으면 자동 생성 (BIND_AUTO_CREATE)
+        // - 모든 바인딩이 해제되어도 서비스는 계속 실행 (startService 덕분)
+        // - 명시적으로 stopService()를 호출하거나 서비스 내부에서 stopSelf()를 호출할 때까지 유지
         val serviceIntent = Intent(context, BlockchainService::class.java)
         context.startService(serviceIntent)
         context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
