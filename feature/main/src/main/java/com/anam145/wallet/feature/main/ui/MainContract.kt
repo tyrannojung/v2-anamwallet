@@ -54,5 +54,8 @@ interface MainContract {
         
         /** Hub 화면으로 이동 */
         data object NavigateToHub : MainEffect
+        
+        /** 에러 메시지 표시 */
+        data class ShowError(val message: String) : MainEffect
     }
 }

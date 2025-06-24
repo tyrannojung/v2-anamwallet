@@ -67,6 +67,10 @@ fun MainScreen(
                 is MainContract.MainEffect.NavigateToHub -> onNavigateToHub()
                 is MainContract.MainEffect.NavigateToMiniApp -> onNavigateToMiniApp(effect.appId)
                 is MainContract.MainEffect.LaunchBlockchainActivity -> onLaunchBlockchain(effect.blockchainId)
+                is MainContract.MainEffect.ShowError -> {
+                    // TODO: Show error message (e.g., using SnackBar)
+                    android.util.Log.e("MainScreen", "Error: ${effect.message}")
+                }
             }
         }
     }

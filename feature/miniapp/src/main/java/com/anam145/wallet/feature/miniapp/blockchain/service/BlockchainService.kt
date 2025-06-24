@@ -172,9 +172,6 @@ class BlockchainService : Service() {
         
         // WebView 데이터 디렉토리 설정은 이제 Application.onCreate()에서 처리됨
         // ProcessUtil을 통해 프로세스를 식별하고 적절한 suffix를 설정
-        
-        // 기본 블록체인 활성화
-        activateDefaultBlockchain()
     }
     
     override fun onBind(intent: Intent?): IBinder {
@@ -454,37 +451,4 @@ class BlockchainService : Service() {
         }
     }
     
-    /**
-     * 기본 블록체인 활성화
-     * 서비스 시작 시 설치된 첫 번째 블록체인을 자동으로 활성화
-     */
-    private fun activateDefaultBlockchain() {
-        serviceScope.launch {
-            try {
-                val installedApps = fileManager.getInstalledApps()
-                val blockchainApps = installedApps.filter { appId ->
-                    // manifest를 읽어서 blockchain 타입인지 확인
-                    val manifestResult = runCatching {
-                        fileManager.loadManifest(appId)
-                    }
-                    manifestResult.getOrNull()?.let { result ->
-                        when (result) {
-                            is com.anam145.wallet.core.common.result.MiniAppResult.Success -> {
-                                result.data.type == "blockchain"
-                            }
-                            else -> false
-                        }
-                    } ?: false
-                }
-                
-                // 첫 번째 블록체인 앱을 기본으로 활성화
-                blockchainApps.firstOrNull()?.let { blockchainId ->
-                    Log.d(TAG, "Activating default blockchain: $blockchainId")
-                    createBlockchainWebView(blockchainId)
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error activating default blockchain", e)
-            }
-        }
-    }
 }
