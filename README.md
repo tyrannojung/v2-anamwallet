@@ -1,9 +1,9 @@
 # ANAM Wallet V2 - Modular Wallet Platform
 
-> 🎯 **차세대 모듈러 블록체인 지갑 플랫폼**  
+> **차세대 모듈러 블록체인 지갑 플랫폼**  
 > 다양한 블록체인과 서비스를 하나의 지갑에서 통합 관리할 수 있는 Android 기반 모듈러 지갑입니다.
 
-## 🌟 주요 특징
+## 주요 특징
 
 ### 모듈러 아키텍처
 
@@ -17,24 +17,7 @@
 - **원클릭 전환**: 활성 블록체인을 즉시 전환하여 다양한 네트워크 지원
 - **네이티브 성능**: Jetpack Compose 기반의 현대적이고 빠른 UI
 
-## 📱 스크린샷
-
-<table>
-  <tr>
-    <td><img src="docs/screenshots/main.png" width="200" alt="메인 화면"/></td>
-    <td><img src="docs/screenshots/blockchain.png" width="200" alt="블록체인 앱"/></td>
-    <td><img src="docs/screenshots/webapp.png" width="200" alt="웹앱"/></td>
-    <td><img src="docs/screenshots/settings.png" width="200" alt="설정"/></td>
-  </tr>
-  <tr>
-    <td align="center">메인 대시보드</td>
-    <td align="center">블록체인 관리</td>
-    <td align="center">통합 웹앱</td>
-    <td align="center">설정</td>
-  </tr>
-</table>
-
-## 🏗️ 아키텍처
+## 아키텍처
 
 ### Clean Architecture + MVI
 
@@ -92,7 +75,7 @@
   - settings: 설정
   - hub/browser/identity: 추가 기능
 
-## 🚀 시작하기
+## 시작하기
 
 ### 요구사항
 
@@ -136,23 +119,22 @@ git clone https://github.com/anam145/v2-anamwallet.git
 - **Dark Mode**: 다크 모드 완벽 지원
 - **다국어**: 한국어/영어 실시간 전환
 
-## 📦 지원 기능
+## 지원 기능
 
 ### 현재 지원
 
-- ✅ 이더리움 블록체인
-- ✅ 메타마스크 호환
-- ✅ 정부24 통합
-- ✅ 다크 모드
-- ✅ 다국어 (한국어/영어)
+- 이더리움 블록체인
+- 정부24 통합
+- 다크 모드
+- 다국어 (한국어/영어)
 
 ### 개발 중
 
-- 🚧 비트코인 지원
-- 🚧 솔라나 지원
-- 🚧 DID (분산 신원)
+- 비트코인 지원
+- 솔라나 지원
+- DID (분산 신원)
 
-## 🤝 기여하기
+## 기여하기
 
 기여를 환영합니다! 다음 가이드라인을 따라주세요:
 
@@ -163,25 +145,3 @@ git clone https://github.com/anam145/v2-anamwallet.git
 5. Open a Pull Request
 
 자세한 내용은 [CODE_CONVENTIONS.md](CODE_CONVENTIONS.md)를 참고하세요.
-
-## 📄 라이선스
-
-TBD - 라이선스 정보는 추후 결정됩니다.
-
-## 👥 팀
-
-- **Project Lead**: TBD
-- **Android Developer**: TBD
-- **Blockchain Engineer**: TBD
-- **UI/UX Designer**: TBD
-
-## 📞 문의
-
-- **Email**: contact@anam145.com
-- **Issue Tracker**: [GitHub Issues](https://github.com/anam145/v2-anamwallet/issues)
-
----
-
-<p align="center">
-Made with ❤️ by ANAM Team
-</p>
