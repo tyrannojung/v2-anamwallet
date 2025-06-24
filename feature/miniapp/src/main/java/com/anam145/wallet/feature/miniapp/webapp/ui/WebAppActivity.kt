@@ -21,6 +21,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import android.webkit.WebView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.Lifecycle
 import com.anam145.wallet.core.ui.theme.AnamWalletTheme
 import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.components.Header
@@ -30,6 +32,7 @@ import com.anam145.wallet.feature.miniapp.webview.common.WebViewFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
@@ -66,26 +69,28 @@ class WebAppActivity : ComponentActivity() {
         val appId = intent.getStringExtra(EXTRA_APP_ID) ?: ""
         
         // Effect 처리
-        lifecycleScope.launchWhenStarted {
-            viewModel.effect
-                .onEach { effect ->
-                    when (effect) {
-                        is WebAppContract.Effect.NavigateBack -> {
-                            finish()
-                        }
-                        is WebAppContract.Effect.ShowError -> {
-                            runOnUiThread {
-                                Toast.makeText(this@WebAppActivity, effect.message, Toast.LENGTH_LONG).show()
-                                Log.d(TAG, "Showing toast: ${effect.message}")
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.effect
+                    .onEach { effect ->
+                        when (effect) {
+                            is WebAppContract.Effect.NavigateBack -> {
+                                finish()
+                            }
+                            is WebAppContract.Effect.ShowError -> {
+                                runOnUiThread {
+                                    Toast.makeText(this@WebAppActivity, effect.message, Toast.LENGTH_LONG).show()
+                                    Log.d(TAG, "Showing toast: ${effect.message}")
+                                }
+                            }
+                            is WebAppContract.Effect.SendPaymentResponse,
+                            is WebAppContract.Effect.LoadUrl -> {
+                                // WebView에서 처리
                             }
                         }
-                        is WebAppContract.Effect.SendPaymentResponse,
-                        is WebAppContract.Effect.LoadUrl -> {
-                            // WebView에서 처리
-                        }
                     }
-                }
-                .launchIn(this)
+                    .launchIn(this)
+            }
         }
         
         setContent {

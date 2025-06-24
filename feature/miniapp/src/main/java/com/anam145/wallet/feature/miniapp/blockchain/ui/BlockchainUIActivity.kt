@@ -22,6 +22,8 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.Lifecycle
 import com.anam145.wallet.core.ui.theme.AnamWalletTheme
 import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.components.Header
@@ -30,6 +32,7 @@ import com.anam145.wallet.feature.miniapp.webview.common.WebViewFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 
@@ -83,23 +86,25 @@ class BlockchainUIActivity : ComponentActivity() {
         val blockchainId = intent.getStringExtra(EXTRA_BLOCKCHAIN_ID) ?: ""
         
         // Effect 처리
-        lifecycleScope.launchWhenStarted {
-            viewModel.effect
-                .onEach { effect ->
-                    when (effect) {
-                        is BlockchainContract.Effect.NavigateBack -> {
-                            Log.d(TAG, "onBack - finishing activity")
-                            finish()
-                        }
-                        is BlockchainContract.Effect.ShowError -> {
-                            Toast.makeText(this@BlockchainUIActivity, effect.message, Toast.LENGTH_SHORT).show()
-                        }
-                        is BlockchainContract.Effect.LoadUrl -> {
-                            // WebView에서 처리
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.effect
+                    .onEach { effect ->
+                        when (effect) {
+                            is BlockchainContract.Effect.NavigateBack -> {
+                                Log.d(TAG, "onBack - finishing activity")
+                                finish()
+                            }
+                            is BlockchainContract.Effect.ShowError -> {
+                                Toast.makeText(this@BlockchainUIActivity, effect.message, Toast.LENGTH_SHORT).show()
+                            }
+                            is BlockchainContract.Effect.LoadUrl -> {
+                                // WebView에서 처리
+                            }
                         }
                     }
-                }
-                .launchIn(this)
+                    .launchIn(this)
+            }
         }
         
         setContent {
