@@ -16,7 +16,7 @@ import org.json.JSONObject
 class WebAppJavaScriptBridge(
     private val context: Context,
     private val manifest: MiniAppManifest?,
-    private val onPaymentRequest: ((JSONObject) -> Unit)? = null
+    private val onTransactionRequest: ((JSONObject) -> Unit)? = null
 ) {
     
     // WebView 인스턴스 참조
@@ -27,22 +27,22 @@ class WebAppJavaScriptBridge(
     }
     
     /**
-     * 결제 요청
-     * JavaScript: window.anam.requestPayment(jsonString)
+     * 트랜잭션 요청
+     * JavaScript: window.anam.requestTransaction(jsonString)
      */
     @JavascriptInterface
-    fun requestPayment(paymentDataJson: String) {
-        Log.d(TAG, "requestPayment called with: $paymentDataJson")
+    fun requestTransaction(transactionDataJson: String) {
+        Log.d(TAG, "requestTransaction called with: $transactionDataJson")
         
         try {
-            val paymentData = JSONObject(paymentDataJson)
+            val transactionData = JSONObject(transactionDataJson)
             
             // UI 스레드에서 콜백 실행
             (context as? ComponentActivity)?.runOnUiThread {
-                onPaymentRequest?.invoke(paymentData)
+                onTransactionRequest?.invoke(transactionData)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error parsing payment data", e)
+            Log.e(TAG, "Error parsing transaction data", e)
         }
     }
     

@@ -114,7 +114,7 @@ class BlockchainService : Service() {
                 handler.post {
                     val script = """
                         (function() {
-                            const event = new CustomEvent('paymentRequest', {
+                            const event = new CustomEvent('transactionRequest', {
                                 detail: $requestJson
                             });
                             window.dispatchEvent(event);
@@ -405,22 +405,16 @@ class BlockchainService : Service() {
                         )
                     )
                 } else {
-                    // PaymentResponse 형식으로 래핑
-                    val paymentResponse = JSONObject().apply {
+                    // TransactionResponse 형식으로 래핑
+                    val transactionResponse = JSONObject().apply {
                         put("requestId", requestId)
                         put("status", "success")
-                        
-                        // txHash가 있으면 transactionId로 매핑
-                        if (response.has("txHash")) {
-                            put("transactionId", response.getString("txHash"))
-                        }
-                        
-                        // 원본 블록체인 응답을 data 필드에 저장
-                        put("data", response)
+                        // 원본 응답을 그대로 문자열로 저장
+                        put("responseData", responseJson)
                     }.toString()
                     
                     callbackChannel.send(
-                        CallbackAction.Complete(requestId, paymentResponse)
+                        CallbackAction.Complete(requestId, transactionResponse)
                     )
                 }
             } catch (e: Exception) {
@@ -438,8 +432,8 @@ class BlockchainService : Service() {
         private val onResponse: (String, String) -> Unit
     ) {
         @android.webkit.JavascriptInterface
-        fun sendPaymentResponse(requestId: String, responseJson: String) {
-            Log.d(TAG, "sendPaymentResponse from blockchain: $requestId")
+        fun sendTransactionResponse(requestId: String, responseJson: String) {
+            Log.d(TAG, "sendTransactionResponse from blockchain: $requestId")
             handler.post {
                 onResponse(requestId, responseJson)
             }

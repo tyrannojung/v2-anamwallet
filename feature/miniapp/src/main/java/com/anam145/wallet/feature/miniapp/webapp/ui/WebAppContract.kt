@@ -39,7 +39,7 @@ interface WebAppContract {
      */
     sealed interface Intent {
         /** 결제 요청 */
-        data class RequestPayment(val paymentData: JSONObject) : Intent
+        data class RequestTransaction(val transactionData: JSONObject) : Intent
         
         /** 서비스 재연결 시도 */
         object RetryServiceConnection : Intent
@@ -56,7 +56,7 @@ interface WebAppContract {
      */
     sealed interface Effect {
         /** JavaScript 실행하여 결제 응답 전달 */
-        data class SendPaymentResponse(val responseJson: String) : Effect
+        data class SendTransactionResponse(val responseJson: String) : Effect
         
         /** 에러 토스트 표시 */
         data class ShowError(val message: String) : Effect

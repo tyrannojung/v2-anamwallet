@@ -67,7 +67,7 @@ class WebAppActivity : ComponentActivity() {
                                     Log.d(TAG, "Showing toast: ${effect.message}")
                                 }
                             }
-                            is WebAppContract.Effect.SendPaymentResponse -> {
+                            is WebAppContract.Effect.SendTransactionResponse -> {
                                 // WebAppScreen의 WebView에서 처리됨
                             }
                         }

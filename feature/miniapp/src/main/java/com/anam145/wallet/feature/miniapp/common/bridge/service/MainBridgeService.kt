@@ -49,8 +49,8 @@ class MainBridgeService : Service() {
     // AIDL 인터페이스 구현
     private val binder = object : IMainBridgeService.Stub() {
         
-        override fun requestPayment(requestJson: String, callback: IBlockchainCallback) {
-            Log.d(TAG, "Payment request received: $requestJson")
+        override fun requestTransaction(requestJson: String, callback: IBlockchainCallback) {
+            Log.d(TAG, "Transaction request received: $requestJson")
             
             try {
                 // 블록체인 서비스가 연결되어 있지 않으면 에러 반환
@@ -63,9 +63,11 @@ class MainBridgeService : Service() {
                     return
                 }
                 
-                // 요청을 블록체인 서비스로 전달
+                // 요청을 파싱하여 필요한 정보 추출
                 val request = JSONObject(requestJson)
+                val requestId = request.optString("requestId")
                 val blockchainId = request.optString("blockchainId")
+                val transactionData = request.optString("transactionData")
                 
                 // 현재 활성화된 블록체인과 다르면 전환
                 val activeBlockchainId = blockchainService?.getActiveBlockchainId()
@@ -85,11 +87,30 @@ class MainBridgeService : Service() {
                     blockchainService?.switchBlockchain(blockchainId)
                 }
                 
-                // 결제 요청 처리
-                blockchainService?.processRequest(requestJson, callback)
+                // 블록체인 서비스로 전달할 데이터 준비
+                val blockchainRequest = if (transactionData.isNotEmpty()) {
+                    // transactionData를 파싱하여 requestId 추가
+                    try {
+                        val txJson = JSONObject(transactionData)
+                        txJson.put("requestId", requestId)
+                        txJson.toString()
+                    } catch (e: Exception) {
+                        // 파싱 실패 시 새로운 JSON 생성
+                        JSONObject().apply {
+                            put("requestId", requestId)
+                            put("data", transactionData)
+                        }.toString()
+                    }
+                } else {
+                    // transactionData가 없으면 원본 그대로
+                    requestJson
+                }
+                
+                // 결제 요청 처리 - 원본 트랜잭션 데이터만 전달
+                blockchainService?.processRequest(blockchainRequest, callback)
                 
             } catch (e: RemoteException) {
-                Log.e(TAG, "RemoteException in requestPayment", e)
+                Log.e(TAG, "RemoteException in requestTransaction", e)
                 try {
                     callback.onError(JSONObject().apply {
                         put("error", "Remote exception: ${e.message}")
@@ -99,7 +120,7 @@ class MainBridgeService : Service() {
                     Log.e(TAG, "Failed to send error callback", callbackError)
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error processing payment request", e)
+                Log.e(TAG, "Error processing transaction request", e)
                 try {
                     callback.onError(JSONObject().apply {
                         put("error", e.message ?: "Unknown error")

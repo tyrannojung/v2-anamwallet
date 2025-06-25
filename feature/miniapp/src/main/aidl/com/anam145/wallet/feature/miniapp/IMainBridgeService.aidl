@@ -11,16 +11,15 @@ import com.anam145.wallet.feature.miniapp.IBlockchainCallback;
  */
 interface IMainBridgeService {
     /**
-     * 웹앱에서 블록체인 결제 요청
+     * 웹앱에서 블록체인 트랜잭션 요청
      * 
-     * @param requestJson 결제 요청 정보 (JSON 형식)
+     * @param requestJson 트랜잭션 요청 정보 (JSON 형식)
+     *                    - requestId: 요청 ID
      *                    - blockchainId: 사용할 블록체인 ID
-     *                    - amount: 결제 금액
-     *                    - recipient: 수신자 주소
-     *                    - memo: 메모 (선택)
+     *                    - transactionData: 트랜잭션 데이터
      * @param callback 결과 콜백
      */
-    void requestPayment(String requestJson, IBlockchainCallback callback);
+    void requestTransaction(String requestJson, IBlockchainCallback callback);
     
     /**
      * 활성화된 블록체인 ID 조회

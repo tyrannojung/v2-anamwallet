@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.anam145.wallet.core.common.result.MiniAppResult
-import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentRequest
+import com.anam145.wallet.feature.miniapp.common.domain.model.TransactionRequest
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.ConnectToServiceUseCase
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.LoadMiniAppManifestUseCase
-import com.anam145.wallet.feature.miniapp.common.domain.usecase.RequestPaymentUseCase
+import com.anam145.wallet.feature.miniapp.common.domain.usecase.RequestTransactionUseCase
 import com.anam145.wallet.feature.miniapp.webapp.domain.usecase.GetActiveBlockchainIdFromWebAppServiceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -26,7 +26,7 @@ import com.anam145.wallet.core.common.extension.resolveEntryPoint
 class WebAppViewModel @Inject constructor(
     private val loadMiniAppManifestUseCase: LoadMiniAppManifestUseCase,
     private val connectToServiceUseCase: ConnectToServiceUseCase,
-    private val requestPaymentUseCase: RequestPaymentUseCase,
+    private val requestTransactionUseCase: RequestTransactionUseCase,
     private val getActiveBlockchainIdUseCase: GetActiveBlockchainIdFromWebAppServiceUseCase
 ) : ViewModel() {
     
@@ -90,7 +90,7 @@ class WebAppViewModel @Inject constructor(
     
     fun handleIntent(intent: WebAppContract.Intent) {
         when (intent) {
-            is WebAppContract.Intent.RequestPayment -> requestPayment(intent.paymentData)
+            is WebAppContract.Intent.RequestTransaction -> requestTransaction(intent.transactionData)
             is WebAppContract.Intent.RetryServiceConnection -> retryServiceConnection()
             is WebAppContract.Intent.DismissError -> dismissError()
             is WebAppContract.Intent.NavigateBack -> navigateBack()
@@ -223,20 +223,20 @@ class WebAppViewModel @Inject constructor(
 
     
     /**
-     * 결제 요청을 처리합니다.
+     * 트랜잭션 요청을 처리합니다.
      * 
      * 역할:
-     * - WebView의 JavaScript에서 전달된 결제 요청 처리
-     * - 활성 블록체인으로 결제 요청 전달
+     * - WebView의 JavaScript에서 전달된 트랜잭션 요청 처리
+     * - 활성 블록체인으로 트랜잭션 요청 전달
      * - 결과를 다시 JavaScript로 전달
      * 
      * 동작:
      * 1. 서비스 연결 상태 확인
      * 2. 활성 블록체인 ID 조회
-     * 3. PaymentRequest 생성 및 전송
+     * 3. TransactionRequest 생성 및 전송
      * 4. 응답을 WebView로 전달
      */
-    private fun requestPayment(paymentData: JSONObject) {
+    private fun requestTransaction(transactionData: JSONObject) {
         viewModelScope.launch {
             // 서비스 연결 확인
             if (!_uiState.value.isServiceConnected) {
@@ -254,23 +254,29 @@ class WebAppViewModel @Inject constructor(
                     }
                 }
                 
-                // PaymentRequest 생성
-                val request = PaymentRequest(
-                    requestId = paymentData.optString("requestId", "req_${System.currentTimeMillis()}"),
+                // TransactionRequest 생성 - 원본 데이터를 그대로 전달
+                val request = TransactionRequest(
+                    requestId = transactionData.optString("requestId", "req_${System.currentTimeMillis()}"),
                     blockchainId = activeBlockchainId,
-                    amount = paymentData.getString("amount"),
-                    description = paymentData.optString("description"),
-                    metadata = paymentData.optJSONObject("metadata")?.let { metadata ->
-                        metadata.keys().asSequence().associateWith { key -> metadata.get(key) }
-                    } ?: emptyMap()
+                    transactionData = transactionData.toString()  // 원본 JSON 문자열 그대로
                 )
                 
-                // 결제 요청
-                when (val result = requestPaymentUseCase(request)) {
+                // 트랜잭션 요청
+                when (val result = requestTransactionUseCase(request)) {
                     is MiniAppResult.Success -> {
                         val response = result.data
+                        // responseData를 파싱하여 requestId와 status를 추가한 형태로 전달
+                        val responseToWebApp = try {
+                            val responseDataJson = JSONObject(response.responseData)
+                            responseDataJson.put("requestId", response.requestId)
+                            responseDataJson.put("status", response.status)
+                            responseDataJson.toString()
+                        } catch (e: Exception) {
+                            // 파싱 실패 시 기본 형태로 전달
+                            response.toJson()
+                        }
                         _effect.emit(
-                            WebAppContract.Effect.SendPaymentResponse(response.toJson())
+                            WebAppContract.Effect.SendTransactionResponse(responseToWebApp)
                         )
                     }
                     is MiniAppResult.Error -> {
@@ -285,13 +291,13 @@ class WebAppViewModel @Inject constructor(
                         // JavaScript로도 에러 전달
                         val errorResponse = """{"requestId": "${request.requestId}", "error": "$errorMessage"}"""
                         _effect.emit(
-                            WebAppContract.Effect.SendPaymentResponse(errorResponse)
+                            WebAppContract.Effect.SendTransactionResponse(errorResponse)
                         )
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error processing payment request", e)
-                _effect.emit(WebAppContract.Effect.ShowError("결제 요청 처리 중 오류 발생"))
+                Log.e(TAG, "Error processing transaction request", e)
+                _effect.emit(WebAppContract.Effect.ShowError("트랜잭션 요청 처리 중 오류 발생"))
             }
         }
     }

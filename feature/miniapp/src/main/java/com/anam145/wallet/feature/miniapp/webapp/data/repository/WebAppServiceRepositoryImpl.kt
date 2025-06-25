@@ -10,8 +10,8 @@ import android.util.Log
 import com.anam145.wallet.core.common.result.MiniAppResult
 import com.anam145.wallet.feature.miniapp.IBlockchainCallback
 import com.anam145.wallet.feature.miniapp.IMainBridgeService
-import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentRequest
-import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentResponse
+import com.anam145.wallet.feature.miniapp.common.domain.model.TransactionRequest
+import com.anam145.wallet.feature.miniapp.common.domain.model.TransactionResponse
 import com.anam145.wallet.feature.miniapp.webapp.domain.repository.WebAppServiceRepository
 import com.anam145.wallet.feature.miniapp.common.bridge.service.MainBridgeService
 import org.json.JSONObject
@@ -105,28 +105,28 @@ class WebAppServiceRepositoryImpl @Inject constructor(
         }
     }
     
-    override suspend fun requestPayment(request: PaymentRequest): MiniAppResult<PaymentResponse> {
+    override suspend fun requestTransaction(request: TransactionRequest): MiniAppResult<TransactionResponse> {
         val service = _serviceConnection.value 
             ?: return MiniAppResult.Error.Unknown(Exception("Service not connected"))
             
         return suspendCancellableCoroutine { continuation ->
             try {
-                service.requestPayment(
+                service.requestTransaction(
                     request.toJson(),
                     object : IBlockchainCallback.Stub() {
                         override fun onSuccess(responseJson: String?) {
-                            Log.d(TAG, "Payment success: $responseJson")
+                            Log.d(TAG, "Transaction success: $responseJson")
                             try {
-                                val response = PaymentResponse.fromJson(responseJson ?: "{}")
+                                val response = TransactionResponse.fromJson(responseJson ?: "{}")
                                 continuation.resume(MiniAppResult.Success(response))
                             } catch (e: Exception) {
-                                Log.e(TAG, "Error parsing payment response", e)
+                                Log.e(TAG, "Error parsing transaction response", e)
                                 continuation.resume(MiniAppResult.Error.Unknown(e))
                             }
                         }
                         
                         override fun onError(errorJson: String?) {
-                            Log.e(TAG, "Payment error: $errorJson")
+                            Log.e(TAG, "Transaction error: $errorJson")
                             
                             // 에러 메시지 파싱하여 더 구체적인 안내 제공
                             val errorMessage = try {
@@ -144,7 +144,7 @@ class WebAppServiceRepositoryImpl @Inject constructor(
                                     else -> error
                                 }
                             } catch (e: Exception) {
-                                errorJson ?: "결제 처리 중 오류가 발생했습니다"
+                                errorJson ?: "트랜잭션 처리 중 오류가 발생했습니다"
                             }
                             
                             continuation.resume(
@@ -154,13 +154,13 @@ class WebAppServiceRepositoryImpl @Inject constructor(
                     }
                 )
             } catch (e: RemoteException) {
-                Log.e(TAG, "Remote exception during payment request", e)
+                Log.e(TAG, "Remote exception during transaction request", e)
                 continuation.resume(MiniAppResult.Error.Unknown(e))
             }
             
             // 취소 시 처리
             continuation.invokeOnCancellation {
-                Log.d(TAG, "Payment request cancelled")
+                Log.d(TAG, "Transaction request cancelled")
             }
         }
     }

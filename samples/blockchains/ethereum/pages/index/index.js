@@ -289,9 +289,9 @@ function resetWallet() {
   }
 }
 
-// 결제 요청 수신 리스너
-window.addEventListener('paymentRequest', async (event) => {
-  console.log('Payment request received:', JSON.stringify(event.detail, null, 2));
+// 트랜잭션 요청 수신 리스너
+window.addEventListener('transactionRequest', async (event) => {
+  console.log('Transaction request received:', JSON.stringify(event.detail, null, 2));
   
   try {
     const { to, amount, data, requestId } = event.detail;
@@ -328,7 +328,7 @@ window.addEventListener('paymentRequest', async (event) => {
       throw new Error('Insufficient balance');
     }
     
-    showToast(`결제 처리 중: ${amount} ETH`);
+    showToast(`트랜잭션 처리 중: ${amount} ETH`);
     
     // 트랜잭션 생성 및 전송
     const tx = await wallet.sendTransaction({
@@ -350,15 +350,15 @@ window.addEventListener('paymentRequest', async (event) => {
     };
     
     // Bridge API를 통해 응답 전송
-    if (window.anam && window.anam.sendPaymentResponse) {
-      window.anam.sendPaymentResponse(requestId, JSON.stringify(responseData));
+    if (window.anam && window.anam.sendTransactionResponse) {
+      window.anam.sendTransactionResponse(requestId, JSON.stringify(responseData));
     }
     
-    console.log('Payment success response:', JSON.stringify(responseData, null, 2));
+    console.log('Transaction success response:', JSON.stringify(responseData, null, 2));
     
   } catch (error) {
-    console.error('Payment failed:', error);
-    showToast(`결제 실패: ${error.message}`);
+    console.error('Transaction failed:', error);
+    showToast(`트랜잭션 실패: ${error.message}`);
     
     // 에러 응답
     const errorResponse = {
@@ -366,11 +366,11 @@ window.addEventListener('paymentRequest', async (event) => {
     };
     
     // Bridge API를 통해 에러 응답 전송
-    if (window.anam && window.anam.sendPaymentResponse) {
-      window.anam.sendPaymentResponse(event.detail.requestId, JSON.stringify(errorResponse));
+    if (window.anam && window.anam.sendTransactionResponse) {
+      window.anam.sendTransactionResponse(event.detail.requestId, JSON.stringify(errorResponse));
     }
     
-    console.log('Payment error response:', JSON.stringify(errorResponse, null, 2));
+    console.log('Transaction error response:', JSON.stringify(errorResponse, null, 2));
   }
 });
 

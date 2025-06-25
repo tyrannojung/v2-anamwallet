@@ -1,8 +1,8 @@
 package com.anam145.wallet.feature.miniapp.webapp.domain.repository
 
 import com.anam145.wallet.core.common.result.MiniAppResult
-import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentRequest
-import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentResponse
+import com.anam145.wallet.feature.miniapp.common.domain.model.TransactionRequest
+import com.anam145.wallet.feature.miniapp.common.domain.model.TransactionResponse
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -39,10 +39,10 @@ interface WebAppServiceRepository {
     suspend fun getActiveBlockchainId(): MiniAppResult<String>
     
     /**
-     * 결제를 요청합니다.
+     * 트랜잭션을 요청합니다.
      * 
-     * @param request 결제 요청 정보
-     * @return 결제 응답
+     * @param request 트랜잭션 요청 정보
+     * @return 트랜잭션 응답
      */
-    suspend fun requestPayment(request: PaymentRequest): MiniAppResult<PaymentResponse>
+    suspend fun requestTransaction(request: TransactionRequest): MiniAppResult<TransactionResponse>
 }

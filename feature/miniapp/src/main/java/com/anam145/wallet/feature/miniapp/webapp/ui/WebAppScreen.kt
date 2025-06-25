@@ -39,11 +39,11 @@ fun WebAppScreen(
     LaunchedEffect(key1 = viewModel) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is WebAppContract.Effect.SendPaymentResponse -> {
+                is WebAppContract.Effect.SendTransactionResponse -> {
                     // WebView에 JavaScript 실행
                     val script = """
                         (function() {
-                            const event = new CustomEvent('paymentResponse', {
+                            const event = new CustomEvent('transactionResponse', {
                                 detail: ${effect.responseJson}
                             });
                             window.dispatchEvent(event);
@@ -97,9 +97,9 @@ fun WebAppScreen(
                             appId = appId,
                             manifest = manifest,
                             fileManager = fileManager,
-                            onPaymentRequest = { paymentData ->
+                            onTransactionRequest = { transactionData ->
                                 viewModel.handleIntent(
-                                    WebAppContract.Intent.RequestPayment(paymentData)
+                                    WebAppContract.Intent.RequestTransaction(transactionData)
                                 )
                             },
                             onWebViewCreated = { 
