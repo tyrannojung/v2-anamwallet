@@ -50,7 +50,7 @@ class SettingsViewModel @Inject constructor(
     val effect: SharedFlow<SettingsContract.SettingsEffect> = _effect.asSharedFlow()
     
     init {
-        handleIntent(SettingsContract.SettingsIntent.LoadSettings)
+        loadSettings()
     }
     
     /**
@@ -77,7 +77,6 @@ class SettingsViewModel @Inject constructor(
                 // 맞다! 그럼 themeMode에 접근 가능
                 changeTheme(intent.themeMode)
             is SettingsContract.SettingsIntent.ChangeLanguage -> changeLanguage(intent.language)
-            SettingsContract.SettingsIntent.LoadSettings -> loadSettings()
             SettingsContract.SettingsIntent.ClickHelp -> navigateToHelp()
             SettingsContract.SettingsIntent.ClickFAQ -> navigateToFAQ()
             SettingsContract.SettingsIntent.ClickAppInfo -> navigateToAppInfo()

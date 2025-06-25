@@ -53,7 +53,6 @@ interface SettingsContract {
      * - when 문에서 else 브랜치 불필요
      */
     sealed interface SettingsIntent {
-        data object LoadSettings : SettingsIntent
         data class ChangeTheme(val themeMode: ThemeMode) : SettingsIntent
         data class ChangeLanguage(val language: Language) : SettingsIntent
         data object ClickHelp : SettingsIntent

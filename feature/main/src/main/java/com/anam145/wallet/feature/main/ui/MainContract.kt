@@ -25,9 +25,6 @@ interface MainContract {
      * 사용자 의도 - 사용자의 액션
      */
     sealed interface MainIntent {
-        /** 미니앱 목록 로드 */
-        data object LoadMiniApps : MainIntent
-        
         /** 블록체인 앱 클릭 */
         data class ClickBlockchainApp(val miniApp: MiniApp) : MainIntent
         

@@ -12,32 +12,35 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * 블록체인 서비스를 활성화하고 관리하는 UseCase
+ * 블록체인 서비스의 연결 상태를 관찰하는 UseCase
+ * 
+ * Main 프로세스에서 Blockchain 프로세스의 서비스와 연결을 관리합니다.
+ * 서비스 연결 상태와 서비스 인스턴스를 Flow로 제공합니다.
  */
 @Singleton
-class ActivateBlockchainUseCase @Inject constructor(
+class ObserveBlockchainServiceUseCase @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     companion object {
-        private const val TAG = "ActivateBlockchainUseCase"
+        private const val TAG = "ObserveBlockchainServiceUseCase"
     }
     
-    data class BlockchainServiceState(
+    data class ServiceState(
         val isConnected: Boolean = false,
-        val service: IBlockchainService? = null,
-        val activeBlockchainId: String? = null
+        val service: IBlockchainService? = null
     )
     
     /**
      * 블록체인 서비스 상태를 관찰합니다.
+     * 
+     * 이 메서드는 서비스를 시작하고 바인딩한 후,
+     * 연결 상태를 Flow로 반환합니다.
      */
-    fun observeServiceState(): Flow<BlockchainServiceState> = callbackFlow {
+    fun invoke(): Flow<ServiceState> = callbackFlow {
         var currentService: IBlockchainService? = null
         
         val serviceConnection = object : ServiceConnection {
@@ -45,18 +48,16 @@ class ActivateBlockchainUseCase @Inject constructor(
                 Log.d(TAG, "Blockchain service connected")
                 currentService = IBlockchainService.Stub.asInterface(service)
                 
-                // 즉시 연결 상태만 전송 (AIDL 호출 없이)
-                trySend(BlockchainServiceState(
+                trySend(ServiceState(
                     isConnected = true,
-                    service = currentService,
-                    activeBlockchainId = null // 나중에 필요할 때 가져옴
+                    service = currentService
                 ))
             }
             
             override fun onServiceDisconnected(name: ComponentName?) {
                 Log.d(TAG, "Blockchain service disconnected")
                 currentService = null
-                trySend(BlockchainServiceState(isConnected = false))
+                trySend(ServiceState(isConnected = false))
             }
         }
         
@@ -76,27 +77,11 @@ class ActivateBlockchainUseCase @Inject constructor(
         context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
         
         // 초기 상태 전송
-        trySend(BlockchainServiceState(isConnected = false))
+        trySend(ServiceState(isConnected = false))
         
         // Flow가 취소될 때 정리
         awaitClose {
             context.unbindService(serviceConnection)
-        }
-    }
-    
-    /**
-     * 블록체인을 전환합니다.
-     */
-    suspend operator fun invoke(blockchainId: String, service: IBlockchainService?) {
-        try {
-            service?.switchBlockchain(blockchainId)
-            Log.d(TAG, "Switched to blockchain: $blockchainId")
-        } catch (e: android.os.DeadObjectException) {
-            Log.e(TAG, "Service died while switching blockchain", e)
-            throw e // Propagate to caller for handling
-        } catch (e: Exception) {
-            Log.e(TAG, "Error switching blockchain", e)
-            throw e
         }
     }
 }
