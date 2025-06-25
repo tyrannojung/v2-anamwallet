@@ -10,8 +10,8 @@ import android.util.Log
 import com.anam145.wallet.core.common.result.MiniAppResult
 import com.anam145.wallet.feature.miniapp.IBlockchainCallback
 import com.anam145.wallet.feature.miniapp.IWebAppService
-import com.anam145.wallet.feature.miniapp.domain.model.PaymentRequest
-import com.anam145.wallet.feature.miniapp.domain.model.PaymentResponse
+import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentRequest
+import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentResponse
 import com.anam145.wallet.feature.miniapp.webapp.domain.repository.WebAppServiceRepository
 import com.anam145.wallet.feature.miniapp.webapp.service.WebAppService
 import org.json.JSONObject

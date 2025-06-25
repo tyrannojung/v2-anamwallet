@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anam145.wallet.core.ui.components.Header
-import com.anam145.wallet.feature.miniapp.data.common.MiniAppFileManager
+import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
 import com.anam145.wallet.feature.miniapp.webapp.ui.components.WebAppWebView
 import com.anam145.wallet.feature.miniapp.webapp.ui.components.ErrorContent
 import com.anam145.wallet.feature.miniapp.webapp.ui.components.ServiceConnectionCard
@@ -26,6 +26,13 @@ fun WebAppScreen(
     // 초기화
     LaunchedEffect(key1 = appId) {
         viewModel.initialize(appId)
+    }
+
+    // URL 로드 처리
+    LaunchedEffect(key1 = uiState.webUrl) {
+        uiState.webUrl?.let { url ->
+            webView?.loadUrl(url)
+        }
     }
     
     // Effect 처리
@@ -49,13 +56,6 @@ fun WebAppScreen(
                     // Activity에서 처리
                 }
             }
-        }
-    }
-    
-    // URL 로드 처리
-    LaunchedEffect(key1 = uiState.webUrl) {
-        uiState.webUrl?.let { url ->
-            webView?.loadUrl(url)
         }
     }
     

@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.anam145.wallet.core.common.result.MiniAppResult
-import com.anam145.wallet.feature.miniapp.domain.model.PaymentRequest
-import com.anam145.wallet.feature.miniapp.domain.usecase.ConnectToServiceUseCase
-import com.anam145.wallet.feature.miniapp.domain.usecase.LoadMiniAppManifestUseCase
-import com.anam145.wallet.feature.miniapp.domain.usecase.RequestPaymentUseCase
+import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentRequest
+import com.anam145.wallet.feature.miniapp.common.domain.usecase.ConnectToServiceUseCase
+import com.anam145.wallet.feature.miniapp.common.domain.usecase.LoadMiniAppManifestUseCase
+import com.anam145.wallet.feature.miniapp.common.domain.usecase.RequestPaymentUseCase
 import com.anam145.wallet.feature.miniapp.webapp.domain.repository.WebAppServiceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow

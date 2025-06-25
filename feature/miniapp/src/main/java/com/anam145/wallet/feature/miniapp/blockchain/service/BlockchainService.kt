@@ -12,9 +12,9 @@ import androidx.core.app.NotificationCompat
 import androidx.webkit.WebViewAssetLoader
 import com.anam145.wallet.feature.miniapp.IBlockchainCallback
 import com.anam145.wallet.feature.miniapp.IBlockchainService
-import com.anam145.wallet.feature.miniapp.webview.common.WebViewFactory
+import com.anam145.wallet.feature.miniapp.common.webview.WebViewFactory
 import com.anam145.wallet.core.common.extension.resolveEntryPoint
-import com.anam145.wallet.feature.miniapp.data.common.MiniAppFileManager
+import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
 import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONObject
 import java.io.File

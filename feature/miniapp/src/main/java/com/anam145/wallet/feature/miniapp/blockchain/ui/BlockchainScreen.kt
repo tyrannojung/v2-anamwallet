@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anam145.wallet.core.ui.components.Header
-import com.anam145.wallet.feature.miniapp.data.common.MiniAppFileManager
+import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
 import com.anam145.wallet.feature.miniapp.blockchain.ui.components.BlockchainWebView
 import com.anam145.wallet.feature.miniapp.blockchain.ui.components.ErrorContent
 import com.anam145.wallet.feature.miniapp.blockchain.ui.components.ServiceConnectionCard
@@ -26,13 +26,6 @@ fun BlockchainScreen(
     // 초기화
     LaunchedEffect(key1 = blockchainId) {
         viewModel.initialize(blockchainId)
-    }
-    
-    // Effect 처리
-    LaunchedEffect(key1 = viewModel) {
-        viewModel.effect.collect { effect ->
-            // 모든 Effect는 Activity에서 처리됨
-        }
     }
     
     // URL 로드 처리

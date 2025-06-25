@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.anam145.wallet.core.common.model.MiniAppManifest
-import com.anam145.wallet.feature.miniapp.data.common.MiniAppFileManager
-import com.anam145.wallet.feature.miniapp.webview.common.WebViewFactory
+import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
+import com.anam145.wallet.feature.miniapp.common.webview.WebViewFactory
 import java.io.File
 
 @Composable

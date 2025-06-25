@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.Lifecycle
 import com.anam145.wallet.core.ui.theme.AnamWalletTheme
-import com.anam145.wallet.feature.miniapp.data.common.MiniAppFileManager
+import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
 import com.anam145.wallet.feature.miniapp.blockchain.ui.BlockchainContract
 import com.anam145.wallet.feature.miniapp.blockchain.ui.BlockchainScreen
 import com.anam145.wallet.feature.miniapp.blockchain.ui.BlockchainViewModel

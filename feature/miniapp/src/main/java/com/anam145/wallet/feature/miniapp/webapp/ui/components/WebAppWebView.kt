@@ -8,9 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.anam145.wallet.core.common.model.MiniAppManifest
-import com.anam145.wallet.feature.miniapp.data.common.MiniAppFileManager
+import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
 import com.anam145.wallet.feature.miniapp.webapp.bridge.WebAppJavaScriptBridge
-import com.anam145.wallet.feature.miniapp.webview.common.WebViewFactory
+import com.anam145.wallet.feature.miniapp.common.webview.WebViewFactory
 import org.json.JSONObject
 import java.io.File
 

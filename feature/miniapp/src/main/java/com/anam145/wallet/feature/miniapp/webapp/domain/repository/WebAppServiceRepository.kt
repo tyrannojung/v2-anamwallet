@@ -1,8 +1,8 @@
 package com.anam145.wallet.feature.miniapp.webapp.domain.repository
 
 import com.anam145.wallet.core.common.result.MiniAppResult
-import com.anam145.wallet.feature.miniapp.domain.model.PaymentRequest
-import com.anam145.wallet.feature.miniapp.domain.model.PaymentResponse
+import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentRequest
+import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentResponse
 import kotlinx.coroutines.flow.Flow
 
 /**
