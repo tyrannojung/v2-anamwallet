@@ -30,16 +30,14 @@ interface WebAppContract {
         val error: String? = null,
         val webViewReady: Boolean = false,
         val activeBlockchainId: String? = null,
-        val activeBlockchainName: String? = null
+        val activeBlockchainName: String? = null,
+        val webUrl: String? = null
     )
     
     /**
      * 사용자 의도
      */
     sealed interface Intent {
-        /** 웹앱 로드 */
-        data class LoadWebApp(val appId: String) : Intent
-        
         /** 결제 요청 */
         data class RequestPayment(val paymentData: JSONObject) : Intent
         
@@ -51,9 +49,6 @@ interface WebAppContract {
         
         /** 뒤로가기 */
         object NavigateBack : Intent
-        
-        /** WebView 준비 완료 */
-        object WebViewReady : Intent
     }
     
     /**
@@ -68,8 +63,5 @@ interface WebAppContract {
         
         /** 뒤로가기 네비게이션 */
         object NavigateBack : Effect
-        
-        /** WebView에 URL 로드 */
-        data class LoadUrl(val url: String) : Effect
     }
 }

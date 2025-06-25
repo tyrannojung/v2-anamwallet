@@ -23,13 +23,13 @@ fun WebAppScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var webView by remember { mutableStateOf<WebView?>(null) }
     
-    // 초기 로드
-    LaunchedEffect(appId) {
-        viewModel.processIntent(WebAppContract.Intent.LoadWebApp(appId))
+    // 초기화
+    LaunchedEffect(key1 = appId) {
+        viewModel.initialize(appId)
     }
     
     // Effect 처리
-    LaunchedEffect(viewModel) {
+    LaunchedEffect(key1 = viewModel) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is WebAppContract.Effect.SendPaymentResponse -> {
@@ -45,13 +45,17 @@ fun WebAppScreen(
                     
                     webView?.evaluateJavascript(script, null)
                 }
-                is WebAppContract.Effect.LoadUrl -> {
-                    webView?.loadUrl(effect.url)
-                }
                 else -> {
                     // Activity에서 처리
                 }
             }
+        }
+    }
+    
+    // URL 로드 처리
+    LaunchedEffect(key1 = uiState.webUrl) {
+        uiState.webUrl?.let { url ->
+            webView?.loadUrl(url)
         }
     }
     
@@ -61,7 +65,7 @@ fun WebAppScreen(
                 title = "AnamWallet",
                 showBackButton = true,
                 onBackClick = {
-                    viewModel.processIntent(WebAppContract.Intent.NavigateBack)
+                    viewModel.handleIntent(WebAppContract.Intent.NavigateBack)
                 },
                 showBlockchainStatus = !uiState.activeBlockchainName.isNullOrEmpty(),
                 activeBlockchainName = uiState.activeBlockchainName
@@ -82,8 +86,8 @@ fun WebAppScreen(
                     ErrorContent(
                         error = uiState.error ?: "오류가 발생했습니다",
                         onRetry = {
-                            viewModel.processIntent(WebAppContract.Intent.DismissError)
-                            viewModel.processIntent(WebAppContract.Intent.LoadWebApp(appId))
+                            viewModel.handleIntent(WebAppContract.Intent.DismissError)
+                            viewModel.initialize(appId)
                         }
                     )
                 }
@@ -94,13 +98,13 @@ fun WebAppScreen(
                             manifest = manifest,
                             fileManager = fileManager,
                             onPaymentRequest = { paymentData ->
-                                viewModel.processIntent(
+                                viewModel.handleIntent(
                                     WebAppContract.Intent.RequestPayment(paymentData)
                                 )
                             },
                             onWebViewCreated = { 
                                 webView = it
-                                viewModel.processIntent(WebAppContract.Intent.WebViewReady)
+                                viewModel.onWebViewReady()
                             }
                         )
                     }
@@ -111,7 +115,7 @@ fun WebAppScreen(
             if (!uiState.isServiceConnected && !uiState.isLoading) {
                 ServiceConnectionCard(
                     onRetry = {
-                        viewModel.processIntent(WebAppContract.Intent.RetryServiceConnection)
+                        viewModel.handleIntent(WebAppContract.Intent.RetryServiceConnection)
                     }
                 )
             }

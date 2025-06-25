@@ -60,7 +60,8 @@ fun MainScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val strings = LocalStrings.current
-    
+
+    // key = 이 작업을 다시 실행할 조건
     LaunchedEffect(key1 = viewModel) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {

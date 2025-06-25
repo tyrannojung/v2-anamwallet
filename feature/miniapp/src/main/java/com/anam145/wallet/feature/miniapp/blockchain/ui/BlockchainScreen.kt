@@ -23,22 +23,22 @@ fun BlockchainScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var webView by remember { mutableStateOf<WebView?>(null) }
     
-    // 초기 로드
-    LaunchedEffect(blockchainId) {
-        viewModel.processIntent(BlockchainContract.Intent.LoadBlockchain(blockchainId))
+    // 초기화
+    LaunchedEffect(key1 = blockchainId) {
+        viewModel.initialize(blockchainId)
     }
     
     // Effect 처리
-    LaunchedEffect(viewModel) {
+    LaunchedEffect(key1 = viewModel) {
         viewModel.effect.collect { effect ->
-            when (effect) {
-                is BlockchainContract.Effect.LoadUrl -> {
-                    webView?.loadUrl(effect.url)
-                }
-                else -> {
-                    // Activity에서 처리
-                }
-            }
+            // 모든 Effect는 Activity에서 처리됨
+        }
+    }
+    
+    // URL 로드 처리
+    LaunchedEffect(key1 = uiState.webUrl) {
+        uiState.webUrl?.let { url ->
+            webView?.loadUrl(url)
         }
     }
     
@@ -48,7 +48,7 @@ fun BlockchainScreen(
                 title = "AnamWallet",
                 showBackButton = true,
                 onBackClick = {
-                    viewModel.processIntent(BlockchainContract.Intent.NavigateBack)
+                    viewModel.handleIntent(BlockchainContract.Intent.NavigateBack)
                 },
                 showBlockchainStatus = uiState.isActivated,
                 activeBlockchainName = if (uiState.isActivated) {
@@ -71,23 +71,20 @@ fun BlockchainScreen(
                     ErrorContent(
                         error = uiState.error ?: "오류가 발생했습니다",
                         onRetry = {
-                            viewModel.processIntent(BlockchainContract.Intent.DismissError)
-                            viewModel.processIntent(BlockchainContract.Intent.LoadBlockchain(blockchainId))
+                            viewModel.handleIntent(BlockchainContract.Intent.DismissError)
+                            viewModel.initialize(blockchainId)
                         }
                     )
                 }
                 uiState.manifest != null -> {
-                    uiState.manifest?.let { manifest ->
-                        BlockchainWebView(
-                            blockchainId = blockchainId,
-                            manifest = manifest,
-                            fileManager = fileManager,
-                            onWebViewCreated = { 
-                                webView = it
-                                viewModel.processIntent(BlockchainContract.Intent.WebViewReady)
-                            }
-                        )
-                    }
+                    BlockchainWebView(
+                        blockchainId = blockchainId,
+                        fileManager = fileManager,
+                        onWebViewCreated = { 
+                            webView = it
+                            viewModel.onWebViewReady()
+                        }
+                    )
                 }
             }
             
@@ -95,7 +92,7 @@ fun BlockchainScreen(
             if (!uiState.isServiceConnected && !uiState.isLoading) {
                 ServiceConnectionCard(
                     onRetry = {
-                        viewModel.processIntent(BlockchainContract.Intent.RetryServiceConnection)
+                        viewModel.handleIntent(BlockchainContract.Intent.RetryServiceConnection)
                     }
                 )
             }

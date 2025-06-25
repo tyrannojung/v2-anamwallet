@@ -49,15 +49,31 @@ class WebAppViewModel @Inject constructor(
         observeServiceConnection()
     }
     
-    fun processIntent(intent: WebAppContract.Intent) {
+    /**
+     * WebApp 초기화
+     * Screen에서 호출되며, appId를 받아 WebApp을 로드합니다.
+     */
+    fun initialize(appId: String) {
+        if (_uiState.value.appId.isEmpty()) {
+            loadWebApp(appId)
+        }
+    }
+    
+    fun handleIntent(intent: WebAppContract.Intent) {
         when (intent) {
-            is WebAppContract.Intent.LoadWebApp -> loadWebApp(intent.appId)
             is WebAppContract.Intent.RequestPayment -> requestPayment(intent.paymentData)
             is WebAppContract.Intent.RetryServiceConnection -> retryServiceConnection()
             is WebAppContract.Intent.DismissError -> dismissError()
             is WebAppContract.Intent.NavigateBack -> navigateBack()
-            is WebAppContract.Intent.WebViewReady -> webViewReady()
         }
+    }
+    
+    /**
+     * WebView가 준비되었을 때 호출
+     * Intent가 아닌 직접 메서드로 처리
+     */
+    fun onWebViewReady() {
+        webViewReady()
     }
     
     private fun loadWebApp(appId: String) {
@@ -211,14 +227,12 @@ class WebAppViewModel @Inject constructor(
     }
     
     private fun loadUrlInWebView() {
-        viewModelScope.launch {
-            _uiState.value.manifest?.let { manifest ->
-                val appId = _uiState.value.appId
-                val mainPage = manifest.resolveEntryPoint()
-                val url = "https://$appId.miniapp.local/$mainPage"
-                
-                _effect.emit(WebAppContract.Effect.LoadUrl(url))
-            }
+        _uiState.value.manifest?.let { manifest ->
+            val appId = _uiState.value.appId
+            val mainPage = manifest.resolveEntryPoint()
+            val url = "https://$appId.miniapp.local/$mainPage"
+            
+            _uiState.update { it.copy(webUrl = url) }
         }
     }
     

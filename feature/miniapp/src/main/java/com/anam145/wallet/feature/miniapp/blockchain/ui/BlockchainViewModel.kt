@@ -43,14 +43,30 @@ class BlockchainViewModel @Inject constructor(
         observeServiceConnection()
     }
     
-    fun processIntent(intent: BlockchainContract.Intent) {
+    /**
+     * 블록체인 UI 초기화
+     * Screen에서 호출되며, blockchainId를 받아 블록체인을 로드합니다.
+     */
+    fun initialize(blockchainId: String) {
+        if (_uiState.value.blockchainId.isEmpty()) {
+            loadBlockchain(blockchainId)
+        }
+    }
+    
+    fun handleIntent(intent: BlockchainContract.Intent) {
         when (intent) {
-            is BlockchainContract.Intent.LoadBlockchain -> loadBlockchain(intent.blockchainId)
             is BlockchainContract.Intent.RetryServiceConnection -> retryServiceConnection()
             is BlockchainContract.Intent.DismissError -> dismissError()
             is BlockchainContract.Intent.NavigateBack -> navigateBack()
-            is BlockchainContract.Intent.WebViewReady -> webViewReady()
         }
+    }
+    
+    /**
+     * WebView가 준비되었을 때 호출
+     * Intent가 아닌 직접 메서드로 처리
+     */
+    fun onWebViewReady() {
+        webViewReady()
     }
     
     private fun loadBlockchain(blockchainId: String) {
@@ -158,16 +174,14 @@ class BlockchainViewModel @Inject constructor(
     }
     
     private fun loadUrlInWebView() {
-        viewModelScope.launch {
-            _uiState.value.manifest?.let { manifest ->
-                val blockchainId = _uiState.value.blockchainId
-                val mainPage = manifest.resolveEntryPoint()
-                val url = "https://$blockchainId.miniapp.local/$mainPage"
-                
-                Log.d(TAG, "loadUrlInWebView: mainPage=$mainPage, resolvedFrom=${manifest.mainPage ?: manifest.pages}, url=$url")
-                
-                _effect.emit(BlockchainContract.Effect.LoadUrl(url))
-            }
+        _uiState.value.manifest?.let { manifest ->
+            val blockchainId = _uiState.value.blockchainId
+            val mainPage = manifest.resolveEntryPoint()
+            val url = "https://$blockchainId.miniapp.local/$mainPage"
+            
+            Log.d(TAG, "loadUrlInWebView: mainPage=$mainPage, resolvedFrom=${manifest.mainPage ?: manifest.pages}, url=$url")
+            
+            _uiState.update { it.copy(webUrl = url) }
         }
     }
     

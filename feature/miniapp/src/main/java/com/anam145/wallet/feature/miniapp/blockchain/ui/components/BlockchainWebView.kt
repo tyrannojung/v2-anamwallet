@@ -17,7 +17,6 @@ import java.io.File
 @Composable
 fun BlockchainWebView(
     blockchainId: String,
-    manifest: MiniAppManifest,
     fileManager: MiniAppFileManager,
     onWebViewCreated: (WebView) -> Unit
 ) {
