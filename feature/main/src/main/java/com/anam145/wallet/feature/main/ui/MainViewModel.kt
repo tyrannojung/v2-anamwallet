@@ -228,7 +228,7 @@ class MainViewModel @Inject constructor(
     
     private fun handleAppClick(miniApp: MiniApp) {
         viewModelScope.launch {
-            _effect.emit(MainContract.MainEffect.NavigateToMiniApp(miniApp.appId))
+            _effect.emit(MainContract.MainEffect.LaunchWebAppActivity(miniApp.appId))
         }
     }
     

@@ -19,11 +19,7 @@ interface MainContract {
         val regularApps: List<MiniApp> = emptyList(),        // 일반 앱 목록
         val activeBlockchainId: String? = null,              // 현재 활성화된 블록체인 앱 ID
         val error: String? = null                            // 에러 메시지 (null이면 에러 없음)
-    ) {
-        // 앱이 없는 상태인지 확인 (로딩/동기화 중이 아닐 때만)
-        val isEmpty: Boolean
-            get() = !isLoading && !isSyncing && blockchainApps.isEmpty() && regularApps.isEmpty()
-    }
+    )
     
     /**
      * 사용자 의도 - 사용자의 액션
@@ -46,13 +42,13 @@ interface MainContract {
      * 부수 효과 - 시스템 레벨의 일회성 동작
      */
     sealed interface MainEffect {
-        /** 블록체인 액티비티 실행 */
+        /** 블록체인 액티비티 실행 (blockchain 프로세스) */
         data class LaunchBlockchainActivity(val blockchainId: String) : MainEffect
         
-        /** 미니앱 화면으로 이동 */
-        data class NavigateToMiniApp(val appId: String) : MainEffect
+        /** 웹앱 액티비티 실행 (app 프로세스) */
+        data class LaunchWebAppActivity(val appId: String) : MainEffect
         
-        /** Hub 화면으로 이동 */
+        /** Hub 화면으로 이동 (Navigation Component) */
         data object NavigateToHub : MainEffect
         
         /** 에러 메시지 표시 */

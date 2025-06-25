@@ -65,7 +65,7 @@ fun MainScreen(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is MainContract.MainEffect.NavigateToHub -> onNavigateToHub()
-                is MainContract.MainEffect.NavigateToMiniApp -> onNavigateToMiniApp(effect.appId)
+                is MainContract.MainEffect.LaunchWebAppActivity -> onNavigateToMiniApp(effect.appId)
                 is MainContract.MainEffect.LaunchBlockchainActivity -> onLaunchBlockchain(effect.blockchainId)
                 is MainContract.MainEffect.ShowError -> {
                     // TODO: Show error message (e.g., using SnackBar)
