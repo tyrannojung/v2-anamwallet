@@ -11,7 +11,8 @@ import com.anam145.wallet.feature.miniapp.domain.usecase.InitializeMiniAppsUseCa
 import com.anam145.wallet.feature.miniapp.domain.usecase.CheckInitializationStateUseCase
 import com.anam145.wallet.feature.miniapp.domain.usecase.ObserveBlockchainServiceUseCase
 import com.anam145.wallet.feature.miniapp.domain.usecase.SwitchBlockchainUseCase
-import com.anam145.wallet.core.data.datastore.BlockchainDataStore
+import com.anam145.wallet.feature.miniapp.domain.usecase.GetActiveBlockchainUseCase
+import com.anam145.wallet.feature.miniapp.domain.usecase.SetActiveBlockchainUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +38,8 @@ class MainViewModel @Inject constructor(
     private val checkInitializationStateUseCase: CheckInitializationStateUseCase,
     private val observeBlockchainServiceUseCase: ObserveBlockchainServiceUseCase,
     private val switchBlockchainUseCase: SwitchBlockchainUseCase,
-    private val blockchainDataStore: BlockchainDataStore
+    private val getActiveBlockchainUseCase: GetActiveBlockchainUseCase,
+    private val setActiveBlockchainUseCase: SetActiveBlockchainUseCase
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(MainContract.MainState())
@@ -69,7 +71,7 @@ class MainViewModel @Inject constructor(
         initializeAndLoad()
     }
 
-    fun processIntent(intent: MainContract.MainIntent) {
+    fun handleIntent(intent: MainContract.MainIntent) {
         when (intent) {
             is MainContract.MainIntent.ClickBlockchainApp -> handleBlockchainClick(intent.miniApp)
             is MainContract.MainIntent.ClickRegularApp -> handleAppClick(intent.miniApp)
@@ -128,7 +130,7 @@ class MainViewModel @Inject constructor(
                     // 저장된 활성 블록체인 ID 복원 또는 첫 번째 블록체인 선택
                     // 이 시점에서는 UI 상태만 설정하고, 실제 블록체인 활성화는
                     // observeBlockchainService()에서 서비스 연결 후 자동으로 처리됨
-                    val savedActiveId = blockchainDataStore.activeBlockchainId.first()
+                    val savedActiveId = getActiveBlockchainUseCase().first()
                     val activeId = when {
                         savedActiveId != null && blockchainApps.any { it.appId == savedActiveId } -> savedActiveId
                         blockchainApps.isNotEmpty() -> blockchainApps.first().appId
@@ -198,7 +200,7 @@ class MainViewModel @Inject constructor(
             _uiState.update { it.copy(activeBlockchainId = miniApp.appId) }
             
             // 2. 영구 저장소에 활성 블록체인 ID 저장
-            blockchainDataStore.setActiveBlockchainId(miniApp.appId)
+            setActiveBlockchainUseCase(miniApp.appId)
             
             // 3. 블록체인 서비스에서 실제 전환 수행
             // observeBlockchainService()도 이 변경을 감지하지만,

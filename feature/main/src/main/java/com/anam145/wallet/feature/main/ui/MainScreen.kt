@@ -109,9 +109,9 @@ fun MainScreen(
                     blockchainApps = uiState.blockchainApps,
                     regularApps = uiState.regularApps,
                     activeBlockchainId = uiState.activeBlockchainId,
-                    onBlockchainClick = { viewModel.processIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
-                    onAppClick = { viewModel.processIntent(MainContract.MainIntent.ClickRegularApp(it)) },
-                    onAddMoreClick = { viewModel.processIntent(MainContract.MainIntent.ClickAddMore) }
+                    onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
+                    onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) },
+                    onAddMoreClick = { viewModel.handleIntent(MainContract.MainIntent.ClickAddMore) }
                 )
             }
         }

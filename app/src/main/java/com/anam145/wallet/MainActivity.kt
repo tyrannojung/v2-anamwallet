@@ -167,7 +167,7 @@ fun AnamWalletApp() {
                         activeBlockchainName = activeBlockchain?.name,
                         onBlockchainClick = if (activeBlockchain != null) {
                             {
-                                mainViewModel.processIntent(
+                                mainViewModel.handleIntent(
                                     MainContract.MainIntent.ClickBlockchainApp(activeBlockchain)
                                 )
                             }
