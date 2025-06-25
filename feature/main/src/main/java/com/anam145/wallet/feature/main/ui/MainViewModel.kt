@@ -226,19 +226,7 @@ class MainViewModel @Inject constructor(
             _effect.emit(MainContract.MainEffect.LaunchBlockchainActivity(miniApp.appId))
         }
     }
-    
-    private fun handleAppClick(miniApp: MiniApp) {
-        viewModelScope.launch {
-            _effect.emit(MainContract.MainEffect.LaunchWebAppActivity(miniApp.appId))
-        }
-    }
-    
-    private fun handleAddMoreClick() {
-        viewModelScope.launch {
-            _effect.emit(MainContract.MainEffect.NavigateToHub)
-        }
-    }
-    
+
     /**
      * 블록체인 서비스 상태 관찰 및 자동 활성화
      * 
@@ -292,6 +280,19 @@ class MainViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+
+    private fun handleAppClick(miniApp: MiniApp) {
+        viewModelScope.launch {
+            _effect.emit(MainContract.MainEffect.LaunchWebAppActivity(miniApp.appId))
+        }
+    }
+
+    private fun handleAddMoreClick() {
+        viewModelScope.launch {
+            _effect.emit(MainContract.MainEffect.NavigateToHub)
         }
     }
 }

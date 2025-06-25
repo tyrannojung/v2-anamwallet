@@ -21,16 +21,16 @@
             android:enabled="true"
             android:exported="false" />
         
-        <!-- 블록체인 UI Activity (블록체인 프로세스) -->
+        <!-- 블록체인 Activity (블록체인 프로세스) -->
         <activity
-            android:name=".blockchain.ui.BlockchainUIActivity"
+            android:name=".blockchain.BlockchainActivity"
             android:process=":blockchain"
             android:exported="false"
             android:theme="@style/Theme.AnamWallet" />
             
         <!-- 일반 WebApp Activity (앱 프로세스) -->
         <activity
-            android:name=".webapp.ui.WebAppActivity"
+            android:name=".webapp.WebAppActivity"
             android:process=":app"
             android:exported="false"
             android:theme="@style/Theme.AnamWallet" />

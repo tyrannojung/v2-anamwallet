@@ -13,8 +13,8 @@ import com.anam145.wallet.feature.hub.HubScreen
 import com.anam145.wallet.feature.browser.BrowserScreen
 import com.anam145.wallet.feature.identity.IdentityScreen
 import com.anam145.wallet.feature.settings.ui.SettingsScreen
-import com.anam145.wallet.feature.miniapp.webapp.ui.WebAppActivity
-import com.anam145.wallet.feature.miniapp.blockchain.ui.BlockchainUIActivity
+import com.anam145.wallet.feature.miniapp.webapp.WebAppActivity
+import com.anam145.wallet.feature.miniapp.blockchain.BlockchainActivity
 
 /**
  * ANAM Wallet의 메인 Navigation Host
@@ -62,8 +62,8 @@ fun AnamNavHost(
                     context.startActivity(intent)
                 },
                 onLaunchBlockchain = { blockchainId ->
-                    // 블록체인 UI Activity 실행 (블록체인 프로세스)
-                    val intent = BlockchainUIActivity.createIntent(context, blockchainId)
+                    // 블록체인 Activity 실행 (블록체인 프로세스)
+                    val intent = BlockchainActivity.createIntent(context, blockchainId)
                     context.startActivity(intent)
                 }
             )
