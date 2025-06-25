@@ -202,30 +202,10 @@ class MainViewModel @Inject constructor(
             // 2. 영구 저장소에 활성 블록체인 ID 저장
             setActiveBlockchainUseCase(miniApp.appId)
             
-            // 3. 블록체인 서비스에서 실제 전환 수행
-            // observeBlockchainService()도 이 변경을 감지하지만,
-            // 사용자 액션에 대한 즉각적인 반응을 위해 여기서도 직접 호출
-            currentServiceState?.service?.let { service ->
-                when (val result = switchBlockchainUseCase(miniApp.appId, service)) {
-                    is MiniAppResult.Success -> {
-                        Log.d("MainViewModel", "Blockchain switched to: ${miniApp.appId}")
-                    }
-                    is MiniAppResult.Error -> {
-                        Log.e("MainViewModel", "Error switching blockchain: $result")
-                        _effect.emit(MainContract.MainEffect.ShowError(
-                            when (result) {
-                                is MiniAppResult.Error.Unknown -> 
-                                    result.cause.message ?: "블록체인 전환 실패"
-                                else -> "블록체인 전환 실패"
-                            }
-                        ))
-                    }
-                }
-            } ?: run {
-                // 서비스가 아직 연결되지 않은 경우
-                // observeBlockchainService()가 연결되면 자동으로 활성화할 것임
-                Log.w("MainViewModel", "Blockchain service not connected yet, will activate when connected")
-            }
+            // 3. observeBlockchainService()가 activeBlockchainId 변경을 감지하여
+            //    자동으로 블록체인을 전환할 것임 (중복 호출 방지)
+            //    서비스가 연결되지 않은 경우에도 observeBlockchainService()가
+            //    연결 후 자동으로 활성화를 처리함
             
             // 4. 블록체인 UI 액티비티 실행
             _effect.emit(MainContract.MainEffect.LaunchBlockchainActivity(miniApp.appId))
