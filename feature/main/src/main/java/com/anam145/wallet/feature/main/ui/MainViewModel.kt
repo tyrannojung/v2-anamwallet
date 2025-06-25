@@ -68,13 +68,16 @@ class MainViewModel @Inject constructor(
     private val _isInitializing = MutableStateFlow(true)
     val isInitializing: StateFlow<Boolean> = _isInitializing.asStateFlow()
     
-    // 블록체인 서비스 연결 상태
-    private val _isBlockchainConnected = MutableStateFlow(false)
-    val isBlockchainConnected: StateFlow<Boolean> = _isBlockchainConnected.asStateFlow()
     
-    // 블록체인 서비스 상태 (Clean Architecture를 위해 UseCase를 통해서만 접근)
-    private var currentServiceState: ObserveBlockchainServiceUseCase.ServiceState? = null
-    
+    /**
+     * ViewModel 초기화
+     * 
+     * 1. observeBlockchainService() - 서비스 상태 관찰 시작 (아직 앱이 없어도 서비스 연결 준비)
+     * 2. initializeAndLoad() - 앱이 없으면 zip에서 설치, 있으면 로드
+     * 
+     * combine 연산자로 서비스 연결과 activeBlockchainId를 모두 관찰하므로,
+     * 둘 다 준비되면 자동으로 블록체인이 활성화됨
+     */
     init {
         // 블록체인 서비스 상태 관찰 먼저 시작
         observeBlockchainService()
@@ -265,12 +268,6 @@ class MainViewModel @Inject constructor(
             }.collect { (serviceState, activeId) ->
                 // collect: Flow를 구독하고 각 값에 대해 처리
                 // 구조 분해 선언으로 Pair를 풀어서 받음
-                
-                // 서비스 연결 상태를 외부에서 관찰 가능한 StateFlow에 업데이트
-                _isBlockchainConnected.value = serviceState.isConnected
-                
-                // 현재 서비스 상태를 캐싱 (나중에 다른 메서드에서 사용)
-                currentServiceState = serviceState
                 
                 // 서비스가 연결되고 activeBlockchainId가 있으면 자동 활성화
                 // nullable 타입 체크를 위해 로컬 변수로 추출 (스마트 캐스트)
