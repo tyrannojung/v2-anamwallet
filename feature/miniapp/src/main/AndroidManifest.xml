@@ -15,9 +15,9 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
             
-        <!-- 웹앱 Service (메인 프로세스) -->
+        <!-- 메인 브릿지 Service (메인 프로세스) -->
         <service
-            android:name=".webapp.service.WebAppService"
+            android:name=".common.bridge.service.MainBridgeService"
             android:enabled="true"
             android:exported="false" />
         

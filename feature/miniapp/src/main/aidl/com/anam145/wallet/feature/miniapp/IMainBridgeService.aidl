@@ -1,15 +1,15 @@
-// IWebAppService.aidl
+// IMainBridgeService.aidl
 package com.anam145.wallet.feature.miniapp;
 
 import com.anam145.wallet.feature.miniapp.IBlockchainCallback;
 
 /**
- * WebApp 프로세스와 메인 프로세스 간 통신을 위한 AIDL 인터페이스
+ * 메인 브릿지 서비스와 통신하기 위한 AIDL 인터페이스
  * 
- * 이 인터페이스는 일반 웹앱(정부24 등)이 블록체인 서비스에 접근하거나
- * 결제 요청을 할 때 사용됩니다.
+ * 웹앱 프로세스(:app)와 블록체인 프로세스(:blockchain) 간의
+ * 통신을 중개하는 메인 프로세스의 브릿지 서비스 인터페이스입니다.
  */
-interface IWebAppService {
+interface IMainBridgeService {
     /**
      * 웹앱에서 블록체인 결제 요청
      * 
@@ -30,7 +30,7 @@ interface IWebAppService {
     String getActiveBlockchainId();
     
     /**
-     * 웹앱 서비스가 준비되었는지 확인
+     * 메인 브릿지 서비스가 준비되었는지 확인
      * 
      * @return 준비 상태
      */

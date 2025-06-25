@@ -5,6 +5,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.webkit.WebViewAssetLoader
 import java.io.File
+import androidx.core.net.toUri
 
 /**
  * WebView 생성을 위한 Factory 클래스
@@ -78,7 +79,7 @@ object WebViewFactory {
                 view: WebView,
                 url: String
             ): android.webkit.WebResourceResponse? {
-                return assetLoader.shouldInterceptRequest(android.net.Uri.parse(url))
+                return assetLoader.shouldInterceptRequest(url.toUri())
             }
         }
     }

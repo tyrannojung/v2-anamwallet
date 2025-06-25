@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.miniapp.webapp.service
+package com.anam145.wallet.feature.miniapp.common.bridge.service
 
 import android.app.Service
 import android.content.ComponentName
@@ -10,22 +10,22 @@ import android.os.RemoteException
 import android.util.Log
 import com.anam145.wallet.feature.miniapp.IBlockchainCallback
 import com.anam145.wallet.feature.miniapp.IBlockchainService
-import com.anam145.wallet.feature.miniapp.IWebAppService
+import com.anam145.wallet.feature.miniapp.IMainBridgeService
 import com.anam145.wallet.feature.miniapp.blockchain.service.BlockchainService
 import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONObject
 
 /**
- * 웹앱 서비스 - 메인 프로세스에서 실행
+ * 메인 브릿지 서비스 - 메인 프로세스에서 실행
  * 
  * 일반 웹앱(정부24 등)과 블록체인 서비스 간의 브릿지 역할을 합니다.
  * 웹앱 프로세스(:app)에서의 요청을 받아 블록체인 프로세스(:blockchain)로 전달합니다.
  */
 @AndroidEntryPoint
-class WebAppService : Service() {
+class MainBridgeService : Service() {
     
     companion object {
-        private const val TAG = "WebAppService"
+        private const val TAG = "MainBridgeService"
     }
     
     private var blockchainService: IBlockchainService? = null
@@ -47,7 +47,7 @@ class WebAppService : Service() {
     }
     
     // AIDL 인터페이스 구현
-    private val binder = object : IWebAppService.Stub() {
+    private val binder = object : IMainBridgeService.Stub() {
         
         override fun requestPayment(requestJson: String, callback: IBlockchainCallback) {
             Log.d(TAG, "Payment request received: $requestJson")
@@ -127,20 +127,20 @@ class WebAppService : Service() {
     
     override fun onCreate() {
         super.onCreate()
-        Log.d(TAG, "MiniAppService created")
+        Log.d(TAG, "MainBridgeService created")
         
         // 블록체인 서비스에 연결
         connectToBlockchainService()
     }
     
     override fun onBind(intent: Intent?): IBinder {
-        Log.d(TAG, "MiniAppService bound")
+        Log.d(TAG, "MainBridgeService bound")
         return binder
     }
     
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "MiniAppService destroyed")
+        Log.d(TAG, "MainBridgeService destroyed")
         
         // 블록체인 서비스 연결 해제
         if (isBlockchainServiceBound) {

@@ -9,11 +9,11 @@ import android.os.RemoteException
 import android.util.Log
 import com.anam145.wallet.core.common.result.MiniAppResult
 import com.anam145.wallet.feature.miniapp.IBlockchainCallback
-import com.anam145.wallet.feature.miniapp.IWebAppService
+import com.anam145.wallet.feature.miniapp.IMainBridgeService
 import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentRequest
 import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentResponse
 import com.anam145.wallet.feature.miniapp.webapp.domain.repository.WebAppServiceRepository
-import com.anam145.wallet.feature.miniapp.webapp.service.WebAppService
+import com.anam145.wallet.feature.miniapp.common.bridge.service.MainBridgeService
 import org.json.JSONObject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -38,14 +38,14 @@ class WebAppServiceRepositoryImpl @Inject constructor(
         private const val TAG = "WebAppServiceRepository"
     }
     
-    private val _serviceConnection = MutableStateFlow<IWebAppService?>(null)
+    private val _serviceConnection = MutableStateFlow<IMainBridgeService?>(null)
     private val _isConnected = MutableStateFlow(false)
     
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Log.d(TAG, "Service connected")
-            val webAppService = IWebAppService.Stub.asInterface(service)
-            _serviceConnection.value = webAppService
+            val mainBridgeService = IMainBridgeService.Stub.asInterface(service)
+            _serviceConnection.value = mainBridgeService
             _isConnected.value = true
         }
         
@@ -60,7 +60,7 @@ class WebAppServiceRepositoryImpl @Inject constructor(
     
     override suspend fun connectToService(): MiniAppResult<Unit> {
         return try {
-            val serviceIntent = Intent(context, WebAppService::class.java)
+            val serviceIntent = Intent(context, MainBridgeService::class.java)
             val bound = context.bindService(
                 serviceIntent, 
                 serviceConnection, 
