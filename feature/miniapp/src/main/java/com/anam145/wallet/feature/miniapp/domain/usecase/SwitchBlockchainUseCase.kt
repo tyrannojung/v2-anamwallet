@@ -1,6 +1,5 @@
 package com.anam145.wallet.feature.miniapp.domain.usecase
 
-import android.util.Log
 import com.anam145.wallet.feature.miniapp.IBlockchainService
 import com.anam145.wallet.core.common.result.MiniAppResult
 import kotlinx.coroutines.Dispatchers
@@ -18,10 +17,6 @@ import javax.inject.Singleton
 @Singleton
 class SwitchBlockchainUseCase @Inject constructor() {
     
-    companion object {
-        private const val TAG = "SwitchBlockchainUseCase"
-    }
-    
     /**
      * 블록체인을 전환합니다.
      * 
@@ -35,16 +30,15 @@ class SwitchBlockchainUseCase @Inject constructor() {
     ): MiniAppResult<Unit> = withContext(Dispatchers.IO) {
         try {
             service.switchBlockchain(blockchainId)
-            Log.d(TAG, "Successfully switched to blockchain: $blockchainId")
             MiniAppResult.Success(Unit)
         } catch (e: android.os.DeadObjectException) {
-            Log.e(TAG, "Service died while switching blockchain", e)
-            MiniAppResult.Error.Unknown(Exception("블록체인 서비스 연결이 끊어졌습니다"))
+            // 서비스가 죽었을 때 - 원본 예외도 포함
+            MiniAppResult.Error.Unknown(Exception("블록체인 서비스 연결이 끊어졌습니다", e))
         } catch (e: android.os.RemoteException) {
-            Log.e(TAG, "Remote exception switching blockchain", e)
-            MiniAppResult.Error.Unknown(Exception("블록체인 전환 중 오류가 발생했습니다"))
+            // IPC 통신 에러 - 원본 예외도 포함
+            MiniAppResult.Error.Unknown(Exception("블록체인 전환 중 오류가 발생했습니다", e))
         } catch (e: Exception) {
-            Log.e(TAG, "Error switching blockchain", e)
+            // 기타 예외는 그대로 전달
             MiniAppResult.Error.Unknown(e)
         }
     }

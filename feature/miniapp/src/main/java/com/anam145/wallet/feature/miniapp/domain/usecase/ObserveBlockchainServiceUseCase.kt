@@ -72,12 +72,13 @@ class ObserveBlockchainServiceUseCase @Inject constructor(
         // - 서비스가 없으면 자동 생성 (BIND_AUTO_CREATE)
         // - 모든 바인딩이 해제되어도 서비스는 계속 실행 (startService 덕분)
         // - 명시적으로 stopService()를 호출하거나 서비스 내부에서 stopSelf()를 호출할 때까지 유지
+        // 초기 상태 먼저 전송 (서비스 연결 전 상태)
+        trySend(ServiceState(isConnected = false))
+        
+        // 서비스 시작 및 바인딩 (비동기로 진행됨)
         val serviceIntent = Intent(context, BlockchainService::class.java)
         context.startService(serviceIntent)
         context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
-        
-        // 초기 상태 전송
-        trySend(ServiceState(isConnected = false))
         
         // Flow가 취소될 때 정리
         awaitClose {

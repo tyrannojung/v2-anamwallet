@@ -18,6 +18,12 @@ import javax.inject.Inject
  * Settings 화면의 ViewModel
  * 
  * MVI 패턴을 사용하여 설정 화면의 상태를 관리합니다.
+ * 
+ * UseCase 설명:
+ * - GetThemeModeUseCase: 현재 설정된 테마 모드(라이트/다크/시스템)를 가져옴
+ * - SetThemeModeUseCase: 테마 모드를 변경하고 저장
+ * - GetLanguageUseCase: 현재 설정된 언어를 가져옴
+ * - SetLanguageUseCase: 언어를 변경하고 저장
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(

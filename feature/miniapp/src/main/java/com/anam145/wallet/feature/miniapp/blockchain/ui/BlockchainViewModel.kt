@@ -93,12 +93,10 @@ class BlockchainViewModel @Inject constructor(
             when (val result = repository.connectToService()) {
                 is MiniAppResult.Success -> {
                     Log.d(TAG, "Service connected successfully")
-                    // 서비스 연결 후 활성화 상태 확인 및 블록체인 전환
+                    // 서비스 연결 후 현재 활성화 상태만 확인
+                    // 블록체인 전환은 MainViewModel에서 이미 처리됨
                     _uiState.value.blockchainId?.let { blockchainId ->
-                        // 먼저 현재 활성화 상태 확인
                         checkIfActivated(blockchainId)
-                        // 그 다음 블록체인 전환
-                        switchBlockchain(blockchainId)
                     }
                 }
                 is MiniAppResult.Error -> {
@@ -111,20 +109,8 @@ class BlockchainViewModel @Inject constructor(
         }
     }
     
-    private fun switchBlockchain(blockchainId: String) {
-        viewModelScope.launch {
-            when (val result = repository.switchBlockchain(blockchainId)) {
-                is MiniAppResult.Success -> {
-                    Log.d(TAG, "Blockchain switched to: $blockchainId")
-                    // 활성화 후 상태 업데이트
-                    _uiState.update { it.copy(isActivated = true) }
-                }
-                is MiniAppResult.Error -> {
-                    Log.e(TAG, "Failed to switch blockchain: $result")
-                }
-            }
-        }
-    }
+    // 블록체인 전환은 MainViewModel에서 처리하므로 제거
+    // BlockchainViewModel은 이미 활성화된 블록체인의 UI만 담당
     
     private fun observeServiceConnection() {
         viewModelScope.launch {

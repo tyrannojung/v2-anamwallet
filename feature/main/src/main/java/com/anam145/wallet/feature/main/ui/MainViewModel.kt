@@ -31,6 +31,18 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
+/**
+ * Main 화면의 ViewModel
+ * 
+ * UseCase 설명:
+ * - GetInstalledMiniAppsUseCase: 설치된 모든 미니앱 목록을 가져옴
+ * - InitializeMiniAppsUseCase: 미니앱 초기 설치 및 설정을 수행
+ * - CheckInitializationStateUseCase: 미니앱 초기화 완료 여부를 확인
+ * - ObserveBlockchainServiceUseCase: 블록체인 서비스 연결 상태를 실시간으로 관찰
+ * - SwitchBlockchainUseCase: 활성 블록체인을 다른 블록체인으로 전환
+ * - GetActiveBlockchainUseCase: 저장된 활성 블록체인 ID를 조회
+ * - SetActiveBlockchainUseCase: 선택한 블록체인 ID를 영구 저장
+ */
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val getInstalledMiniAppsUseCase: GetInstalledMiniAppsUseCase,
@@ -232,28 +244,53 @@ class MainViewModel @Inject constructor(
      * 두 조건이 모두 충족되면 자동으로 블록체인을 활성화합니다.
      */
     private fun observeBlockchainService() {
+        // viewModelScope: ViewModel의 생명주기에 바인딩된 코루틴 스코프
+        // ViewModel이 clear될 때 자동으로 취소됨
         viewModelScope.launch {
-            // 서비스 상태와 activeBlockchainId를 함께 관찰
+            // combine: 두 개의 Flow를 합쳐서 하나의 Flow로 만듦
+            // 둘 중 하나라도 새 값을 방출하면 최신 값들로 조합하여 방출
             combine(
-                observeBlockchainServiceUseCase.invoke(),
+                // 첫 번째 Flow: 블록체인 서비스 연결 상태를 관찰
+                // invoke()는 operator fun invoke()의 호출 (UseCase 패턴)
+                observeBlockchainServiceUseCase.invoke(), // → Flow<ServiceState>
+                
+                // 두 번째 Flow: UI 상태에서 activeBlockchainId만 추출
+                // map: Flow의 각 값을 변환 (State 전체 → activeBlockchainId만)
+                // distinctUntilChanged: 같은 값이 연속으로 오면 무시 (중복 제거)
                 _uiState.map { it.activeBlockchainId }.distinctUntilChanged()
             ) { serviceState, activeId ->
+                // combine의 transform 람다: 두 Flow의 최신 값을 받아 결합
+                // Pair로 묶어서 반환 (to는 infix 함수로 Pair 생성)
                 serviceState to activeId
             }.collect { (serviceState, activeId) ->
-                // 서비스 연결 상태 업데이트
+                // collect: Flow를 구독하고 각 값에 대해 처리
+                // 구조 분해 선언으로 Pair를 풀어서 받음
+                
+                // 서비스 연결 상태를 외부에서 관찰 가능한 StateFlow에 업데이트
                 _isBlockchainConnected.value = serviceState.isConnected
+                
+                // 현재 서비스 상태를 캐싱 (나중에 다른 메서드에서 사용)
                 currentServiceState = serviceState
                 
                 // 서비스가 연결되고 activeBlockchainId가 있으면 자동 활성화
+                // nullable 타입 체크를 위해 로컬 변수로 추출 (스마트 캐스트)
                 val service = serviceState.service
+                
+                // 3가지 조건 모두 만족해야 블록체인 활성화:
+                // 1. 서비스 연결됨 2. service 객체 존재 3. 활성화할 ID 존재
                 if (serviceState.isConnected && service != null && activeId != null) {
+                    // 블록체인 전환 시도 (결과값이 Unit이므로 성공/실패만 체크)
                     when (val result = switchBlockchainUseCase(activeId, service)) {
                         is MiniAppResult.Success -> {
                             Log.d("MainViewModel", "Auto-activated blockchain: $activeId")
                         }
+                        is MiniAppResult.Error.Unknown -> {
+                            // 이제 result.cause를 사용해서 구체적인 에러 정보 로깅
+                            Log.e("MainViewModel", "Failed to auto-activate blockchain: $activeId - ${result.cause.message}")
+                        }
                         is MiniAppResult.Error -> {
-                            Log.e("MainViewModel", "Error auto-activating blockchain: $activeId")
-                            // 자동 활성화 실패는 조용히 처리 (사용자가 명시적으로 클릭한 것이 아니므로)
+                            // 다른 에러 타입들 (현재는 Unknown만 사용중)
+                            Log.e("MainViewModel", "Error auto-activating blockchain: $activeId - $result")
                         }
                     }
                 }
