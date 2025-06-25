@@ -74,10 +74,14 @@ class BlockchainActivity : ComponentActivity() {
         
         // Intent에서 블록체인 ID 추출
         val blockchainId = intent.getStringExtra(EXTRA_BLOCKCHAIN_ID) ?: ""
-        
-        // Effect(부수효과) 처리를 위한 코루틴 설정
-        // Effect는 UI에 직접적으로 영향을 주지 않는 일회성 이벤트
-        // 예: 네비게이션, 토스트 메시지, 외부 앱 실행 등
+
+        /**
+         * lifecycleScope는 Activity나 Fragment의 생명주기와 연동된 코루틴 스코프
+         * Activity가 destroy되면 실행 중인 코루틴이 자동으로 취소됨
+         * Effect(부수효과) 처리를 위한 코루틴 설정
+         * Effect는 UI에 직접적으로 영향을 주지 않는 일회성 이벤트
+         * 예: 네비게이션, 토스트 메시지, 외부 앱 실행 등
+         * */
         lifecycleScope.launch {
             // repeatOnLifecycle: 생명주기에 맞춰 코루틴을 자동으로 시작/중지
             // STARTED 상태: Activity가 사용자에게 보이는 상태

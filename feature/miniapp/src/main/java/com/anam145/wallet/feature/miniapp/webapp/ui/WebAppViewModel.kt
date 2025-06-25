@@ -8,7 +8,7 @@ import com.anam145.wallet.feature.miniapp.common.domain.model.PaymentRequest
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.ConnectToServiceUseCase
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.LoadMiniAppManifestUseCase
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.RequestPaymentUseCase
-import com.anam145.wallet.feature.miniapp.webapp.domain.repository.WebAppServiceRepository
+import com.anam145.wallet.feature.miniapp.webapp.domain.usecase.GetActiveBlockchainIdFromWebAppServiceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -27,7 +27,7 @@ class WebAppViewModel @Inject constructor(
     private val loadMiniAppManifestUseCase: LoadMiniAppManifestUseCase,
     private val connectToServiceUseCase: ConnectToServiceUseCase,
     private val requestPaymentUseCase: RequestPaymentUseCase,
-    private val repository: WebAppServiceRepository
+    private val getActiveBlockchainIdUseCase: GetActiveBlockchainIdFromWebAppServiceUseCase
 ) : ViewModel() {
     
     companion object {
@@ -48,14 +48,43 @@ class WebAppViewModel @Inject constructor(
         // 서비스 연결 상태 관찰
         observeServiceConnection()
     }
-    
+
     /**
      * WebApp 초기화
      * Screen에서 호출되며, appId를 받아 WebApp을 로드합니다.
      */
     fun initialize(appId: String) {
         if (_uiState.value.appId.isEmpty()) {
-            loadWebApp(appId)
+            viewModelScope.launch {
+                _uiState.update { it.copy(appId = appId, isLoading = true) }
+                
+                // 매니페스트 로드
+                when (val result = loadMiniAppManifestUseCase(appId)) {
+                    is MiniAppResult.Success -> {
+                        _uiState.update { 
+                            it.copy(
+                                manifest = result.data,
+                                isLoading = false
+                            )
+                        }
+                        
+                        // manifest와 WebView가 모두 준비되면 URL 로드
+                        checkAndLoadUrl()
+                    }
+                    is MiniAppResult.Error -> {
+                        _uiState.update { 
+                            it.copy(
+                                isLoading = false,
+                                error = "매니페스트 로드 실패"
+                            )
+                        }
+                        Log.e(TAG, "Failed to load manifest for $appId: $result")
+                    }
+                }
+                
+                // 서비스 연결
+                connectToService()
+            }
         }
     }
     
@@ -67,7 +96,7 @@ class WebAppViewModel @Inject constructor(
             is WebAppContract.Intent.NavigateBack -> navigateBack()
         }
     }
-    
+
     /**
      * WebView가 준비되었을 때 호출
      * Intent가 아닌 직접 메서드로 처리
@@ -75,42 +104,105 @@ class WebAppViewModel @Inject constructor(
     fun onWebViewReady() {
         webViewReady()
     }
-    
-    private fun loadWebApp(appId: String) {
+
+    /**
+     * WebView에 로드할 URL을 생성하고 State에 설정합니다.
+     * 
+     * 역할:
+     * - manifest의 entryPoint를 기반으로 미니앱 URL 생성
+     * - 생성된 URL을 State의 webUrl에 설정
+     * - Screen의 LaunchedEffect가 이를 감지하여 WebView에 로드
+     * 
+     * URL 형식: https://appId.miniapp.local/entryPoint
+     */
+    private fun loadUrlInWebView() {
+        _uiState.value.manifest?.let { manifest ->
+            val appId = _uiState.value.appId
+            val mainPage = manifest.resolveEntryPoint()
+            val url = "https://$appId.miniapp.local/$mainPage"
+
+            _uiState.update { it.copy(webUrl = url) }
+        }
+    }
+
+    /**
+     * 서비스 연결 상태를 지속적으로 관찰합니다.
+     * 
+     * 역할:
+     * - WebAppService와의 연결 상태를 실시간 모니터링
+     * - Service가 메모리 부족이나 시스템에 의해 종료될 수 있으므로,
+     *   연결 상태를 추적하여 UI를 업데이트합니다.
+     * 
+     * 동작 방식:
+     * 1. connectToServiceUseCase를 통해 서비스 연결 상태 Flow를 구독
+     * 2. 연결 상태가 변경될 때마다 UI State 업데이트
+     * 3. 서비스가 재연결된 경우(false → true), 활성 블록체인 정보 재확인
+     * 4. UI에서는 isServiceConnected가 false일 때 ServiceConnectionCard를 표시
+     */
+    private fun observeServiceConnection() {
         viewModelScope.launch {
-            _uiState.update { it.copy(appId = appId, isLoading = true) }
-            
-            // 매니페스트 로드
-            when (val result = loadMiniAppManifestUseCase(appId)) {
-                is MiniAppResult.Success -> {
-                    _uiState.update { 
-                        it.copy(
-                            manifest = result.data,
-                            isLoading = false
-                        )
-                    }
-                    
-                    // 매니페스트 로드 후 URL 로드
-                    if (_uiState.value.webViewReady) {
-                        loadUrlInWebView()
-                    }
-                }
-                is MiniAppResult.Error -> {
-                    _uiState.update { 
-                        it.copy(
-                            isLoading = false,
-                            error = "매니페스트 로드 실패"
-                        )
-                    }
-                    Log.e(TAG, "Failed to load manifest for $appId: $result")
+            connectToServiceUseCase.observeConnectionState().collect { isConnected ->
+                val previousState = _uiState.value.isServiceConnected
+                _uiState.update { it.copy(isServiceConnected = isConnected) }
+                
+                // 서비스가 새로 연결되었을 때 활성화된 블록체인 정보 가져오기
+                if (!previousState && isConnected) {
+                    checkActiveBlockchain()
                 }
             }
-            
-            // 서비스 연결
-            connectToService()
         }
     }
     
+    /**
+     * 서비스 재연결을 시도합니다.
+     * 
+     * 사용 시점:
+     * - 사용자가 ServiceConnectionCard의 "재시도" 버튼 클릭 시
+     * - RetryServiceConnection Intent를 통해 호출됨
+     */
+    private fun retryServiceConnection() {
+        connectToService()
+    }
+    
+    private fun dismissError() {
+        _uiState.update { it.copy(error = null) }
+    }
+    
+    private fun navigateBack() {
+        viewModelScope.launch {
+            _effect.emit(WebAppContract.Effect.NavigateBack)
+        }
+    }
+    
+    /**
+     * WebView가 생성되고 준비되었음을 기록합니다.
+     * 
+     * 호출 시점:
+     * - WebAppScreen에서 WebAppWebView가 생성된 후
+     * - onWebViewCreated 콜백을 통해 호출됨
+     * 
+     * 동작:
+     * - webViewReady 플래그를 true로 설정
+     * - manifest도 준비되었다면 URL 로드 시작
+     */
+    private fun webViewReady() {
+        _uiState.update { it.copy(webViewReady = true) }
+        
+        // manifest와 WebView가 모두 준비되면 URL 로드
+        checkAndLoadUrl()
+    }
+
+    /**
+     * 웹앱 서비스에 연결(바인딩)합니다.
+     * 
+     * 역할:
+     * - WebAppService에 바인딩하여 블록체인 서비스와 통신
+     * - 연결 성공 시 현재 활성화된 블록체인 정보 확인
+     * 
+     * 주의:
+     * - WebAppService는 Main 프로세스의 블록체인 서비스와 통신하는 중개자
+     * - 결제 요청 시 활성 블록체인 정보가 필요하므로 연결 필수
+     */
     private fun connectToService() {
         viewModelScope.launch {
             when (val result = connectToServiceUseCase.connect()) {
@@ -128,21 +220,22 @@ class WebAppViewModel @Inject constructor(
             }
         }
     }
+
     
-    private fun observeServiceConnection() {
-        viewModelScope.launch {
-            connectToServiceUseCase.observeConnectionState().collect { isConnected ->
-                val previousState = _uiState.value.isServiceConnected
-                _uiState.update { it.copy(isServiceConnected = isConnected) }
-                
-                // 서비스가 새로 연결되었을 때 활성화된 블록체인 정보 가져오기
-                if (!previousState && isConnected) {
-                    checkActiveBlockchain()
-                }
-            }
-        }
-    }
-    
+    /**
+     * 결제 요청을 처리합니다.
+     * 
+     * 역할:
+     * - WebView의 JavaScript에서 전달된 결제 요청 처리
+     * - 활성 블록체인으로 결제 요청 전달
+     * - 결과를 다시 JavaScript로 전달
+     * 
+     * 동작:
+     * 1. 서비스 연결 상태 확인
+     * 2. 활성 블록체인 ID 조회
+     * 3. PaymentRequest 생성 및 전송
+     * 4. 응답을 WebView로 전달
+     */
     private fun requestPayment(paymentData: JSONObject) {
         viewModelScope.launch {
             // 서비스 연결 확인
@@ -153,7 +246,7 @@ class WebAppViewModel @Inject constructor(
             
             try {
                 // 활성 블록체인 ID 가져오기
-                val activeBlockchainId = when (val result = repository.getActiveBlockchainId()) {
+                val activeBlockchainId = when (val result = getActiveBlockchainIdUseCase()) {
                     is MiniAppResult.Success -> result.data
                     is MiniAppResult.Error -> {
                         _effect.emit(WebAppContract.Effect.ShowError("활성화된 블록체인이 없습니다"))
@@ -203,42 +296,39 @@ class WebAppViewModel @Inject constructor(
         }
     }
     
-    private fun retryServiceConnection() {
-        connectToService()
-    }
-    
-    private fun dismissError() {
-        _uiState.update { it.copy(error = null) }
-    }
-    
-    private fun navigateBack() {
-        viewModelScope.launch {
-            _effect.emit(WebAppContract.Effect.NavigateBack)
-        }
-    }
-    
-    private fun webViewReady() {
-        _uiState.update { it.copy(webViewReady = true) }
-        
-        // WebView가 준비되고 manifest가 있으면 URL 로드
-        if (_uiState.value.manifest != null) {
+    /**
+     * manifest와 WebView가 모두 준비되었는지 확인하고 URL을 로드합니다.
+     * 
+     * 이 메서드는 두 가지 경우에 호출됩니다:
+     * 1. manifest 로드 완료 시 (initialize에서)
+     * 2. WebView 준비 완료 시 (webViewReady에서)
+     * 
+     * 두 조건이 모두 충족되었을 때만 실제 URL 로드가 실행됩니다.
+     */
+    private fun checkAndLoadUrl() {
+        if (_uiState.value.manifest != null && _uiState.value.webViewReady) {
             loadUrlInWebView()
         }
     }
     
-    private fun loadUrlInWebView() {
-        _uiState.value.manifest?.let { manifest ->
-            val appId = _uiState.value.appId
-            val mainPage = manifest.resolveEntryPoint()
-            val url = "https://$appId.miniapp.local/$mainPage"
-            
-            _uiState.update { it.copy(webUrl = url) }
-        }
-    }
-    
+    /**
+     * 현재 활성화된 블록체인 정보를 확인합니다.
+     * 
+     * 역할:
+     * - 서비스에서 현재 활성 블록체인 ID 조회
+     * - 블록체인 이름을 가져와 Header에 표시
+     * 
+     * 호출 시점:
+     * - 서비스 연결 성공 후
+     * - 서비스 재연결 시 (observeServiceConnection에서)
+     * 
+     * WebApp과 BlockchainViewModel의 차이점:
+     * - WebApp: 활성 블록체인 정보를 표시만 함
+     * - Blockchain: 자신이 활성화되었는지 확인
+     */
     private fun checkActiveBlockchain() {
         viewModelScope.launch {
-            when (val result = repository.getActiveBlockchainId()) {
+            when (val result = getActiveBlockchainIdUseCase()) {
                 is MiniAppResult.Success -> {
                     val blockchainId = result.data
                     // 블록체인 ID로 매니페스트를 로드해서 이름 가져오기
@@ -272,14 +362,6 @@ class WebAppViewModel @Inject constructor(
                     }
                 }
             }
-        }
-    }
-    
-    override fun onCleared() {
-        super.onCleared()
-        // 서비스 연결 해제
-        viewModelScope.launch {
-            connectToServiceUseCase.disconnect()
         }
     }
 }
