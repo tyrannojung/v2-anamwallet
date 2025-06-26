@@ -535,22 +535,6 @@ function showSummary() {
   });
 
   // 최종 요약
-  log("\n📊 최종 결과:", "info");
-  log(`  공격 시도: ${attackResults.length}개`, "info");
-  log(`  차단 성공: ${blockedCount}개`, "success");
-  log(
-    `  차단 실패: ${attackResults.length - blockedCount}개`,
-    blockedCount === attackResults.length ? "info" : "error"
-  );
-  log(
-    `  보안 점수: ${Math.round((blockedCount / attackResults.length) * 100)}%`,
-    blockedCount === attackResults.length
-      ? "success"
-      : blockedCount > attackResults.length / 2
-      ? "warning"
-      : "error"
-  );
-
   if (blockedCount === attackResults.length) {
     log("\n🛡️ 모든 공격이 성공적으로 차단되었습니다!", "success");
   } else {
