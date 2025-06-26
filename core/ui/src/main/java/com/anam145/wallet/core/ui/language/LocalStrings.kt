@@ -71,7 +71,14 @@ data class Strings(
     // Common
     val back: String = "뒤로가기",
     val loading: String = "로딩 중...",
-    val activated: String = "활성화됨"
+    val activated: String = "활성화됨",
+
+    // Hub Screen
+    val installedModule: String = "설치된 모듈",
+    val notInstalledModule: String = "설치되지 않은 모듈",
+    val install: String = "설치",
+    val uninstall: String = "삭제"
+
 )
 
 /**
@@ -133,7 +140,14 @@ val EnglishStrings = Strings(
     // Common
     back = "Back",
     loading = "Loading...",
-    activated = "Activated"
+    activated = "Activated",
+
+
+    // Hub Screen
+    installedModule = "Installed Modules",
+    notInstalledModule = "Modules Not Installed",
+    install = "Install",
+    uninstall = "Uninstall",
 )
 
 /**
