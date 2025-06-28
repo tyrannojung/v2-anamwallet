@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.anam145.wallet.core.ui.language.LocalStrings
-import com.anam145.wallet.feature.hub.ui.components.ModuleItem
+import com.anam145.wallet.feature.hub.ui.components.MiniAppItem
 
 /**
  * 허브 화면
@@ -47,7 +47,7 @@ fun HubScreen(
                 }
 
                 items(installedModules) { module ->
-                    ModuleItem(moduleName = module, installed = true)
+                    MiniAppItem(moduleName = module, installed = true)
                 }
 
                 item {
@@ -60,7 +60,7 @@ fun HubScreen(
                 }
 
                 items(notInstalledModules) { module ->
-                    ModuleItem(moduleName = module, installed = false)
+                    MiniAppItem(moduleName = module, installed = false)
                 }
             }
         }

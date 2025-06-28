@@ -11,12 +11,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.anam145.wallet.core.ui.language.LocalStrings
 
 @Composable
-fun ModuleItem(moduleName: String, installed: Boolean) {
+fun MiniAppItem(moduleName: String, installed: Boolean) {
     val strings = LocalStrings.current
     Card(
         modifier = Modifier
