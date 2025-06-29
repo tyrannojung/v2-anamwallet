@@ -6,9 +6,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.feature.hub.ui.components.MiniAppItem
 
@@ -20,10 +24,14 @@ import com.anam145.wallet.feature.hub.ui.components.MiniAppItem
  */
 @Composable
 fun HubScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: HubViewModel = hiltViewModel()
 ) {
     val strings = LocalStrings.current
-    val installedModules: List<String> = listOf("installcoin1", "installcoin2")
+//    val installedModules: List<String> = listOf("installcoin1", "installcoin2")
+//    val notInstalledModules: List<String> = listOf("uninstallcoin1", "uninstallcoin2")
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val installedMiniApp: List<MiniApp> = uiState.installedMiniApp
     val notInstalledModules: List<String> = listOf("uninstallcoin1", "uninstallcoin2")
 
     Box(
@@ -46,8 +54,8 @@ fun HubScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                items(installedModules) { module ->
-                    MiniAppItem(moduleName = module, installed = true)
+                items(installedMiniApp) { module ->
+                    MiniAppItem(moduleName = module.name, installed = true)
                 }
 
                 item {

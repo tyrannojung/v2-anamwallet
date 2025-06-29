@@ -16,7 +16,7 @@ interface HubContract {
 
     data class HubState(
         val installedMiniApp: List<MiniApp> = emptyList(),
-        val downloadableMiniApp: List<MiniApp>  = emptyList()
+        val installedMiniAppManifest: List<MiniApp> = emptyList(),
     )
 
 

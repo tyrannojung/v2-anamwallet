@@ -9,17 +9,17 @@ import javax.inject.Singleton
 @Singleton // 앱 전체에서 인스턴스 하나만
 class MiniAppRepositoryImpl @Inject constructor(
     private val miniAppDao: MiniAppDao
-) {
+) : MiniAppRepository {
 
-    fun getMiniApps() : Flow<List<MiniApp>> {
+    override fun getMiniApps() : Flow<List<MiniApp>> {
         return miniAppDao.getMiniApps()
     }
 
-    suspend fun updateMiniApp(miniApp: MiniApp) {
+    override suspend fun updateMiniApp(miniApp: MiniApp) {
         miniAppDao.updateMiniApp(miniApp)
     }
 
-    suspend fun deleteMiniApp(miniApp: MiniApp) {
+    override suspend fun deleteMiniApp(miniApp: MiniApp) {
         miniAppDao.deleteMiniApp(miniApp)
     }
 

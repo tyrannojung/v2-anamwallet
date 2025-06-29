@@ -9,16 +9,16 @@ import javax.inject.Singleton
 @Singleton // 앱 전체에서 인스턴스 하나만
 class MiniAppManifestRepositoryImpl @Inject constructor(
     private val miniAppFestDao: MiniAppManifestDao
-) {
-    fun getMiniAppManifest() : List<MiniAppManifest>{
+) : MiniAppManifestRepository{
+    override fun getMiniAppManifest() : Flow<List<MiniAppManifest>> {
         return miniAppFestDao.getMiniAppManifest()
     }
 
-    suspend fun updateMiniAppManifest(miniAppManifest: MiniAppManifest) {
+    override suspend fun updateMiniAppManifest(miniAppManifest: MiniAppManifest) {
         miniAppFestDao.updateMiniAppManifest(miniAppManifest)
     }
 
-    suspend fun deleteMiniAppManifest(miniAppManifest: MiniAppManifest) {
+    override suspend fun deleteMiniAppManifest(miniAppManifest: MiniAppManifest) {
         miniAppFestDao.deleteMiniAppManifest(miniAppManifest)
     }
 
