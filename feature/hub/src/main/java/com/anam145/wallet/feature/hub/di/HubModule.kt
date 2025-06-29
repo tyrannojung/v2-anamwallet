@@ -21,6 +21,4 @@ abstract class HubModule {
     abstract fun bindMiniAppManifestRepository(
         miniAppManifestRepository: MiniAppManifestRepositoryImpl
     ): MiniAppManifestRepositoryImpl
-
-
 }

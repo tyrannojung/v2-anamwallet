@@ -10,7 +10,7 @@ import javax.inject.Singleton
 class MiniAppManifestRepositoryImpl @Inject constructor(
     private val miniAppFestDao: MiniAppManifestDao
 ) {
-    fun getMiniAppManifest() : Flow<List<MiniAppManifest>>{
+    fun getMiniAppManifest() : List<MiniAppManifest>{
         return miniAppFestDao.getMiniAppManifest()
     }
 

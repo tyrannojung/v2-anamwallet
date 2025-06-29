@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MiniAppManifestDao {
     @Query("SELECT * FROM mini_app_manifest")
-    fun getMiniAppManifest(): Flow<List<MiniAppManifest>>
+    fun getMiniAppManifest(): List<MiniAppManifest>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMiniAppManifests(miniAppManifest: List<MiniAppManifest>)

@@ -11,7 +11,7 @@ class MiniAppRepositoryImpl @Inject constructor(
     private val miniAppDao: MiniAppDao
 ) {
 
-    fun getMiniApps() : Flow<List<MiniApp>>{
+    fun getMiniApps() : Flow<List<MiniApp>> {
         return miniAppDao.getMiniApps()
     }
 
