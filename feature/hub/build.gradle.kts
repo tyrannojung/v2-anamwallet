@@ -65,15 +65,13 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
+    //roomDB
+    ksp("androidx.room:room-compiler:2.7.2")
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    testImplementation(libs.androidx.room.testing)
+    implementation(libs.androidx.room.paging)
 
-    val room_version = "2.7.2"
-    implementation("androidx.room:room-runtime:$room_version")
-    // optional - Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-ktx:$room_version")
-    // optional - Test helpers
-    testImplementation("androidx.room:room-testing:$room_version")
-    // optional - Paging 3 Integration
-    implementation("androidx.room:room-paging:$room_version")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
