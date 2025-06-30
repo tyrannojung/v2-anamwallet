@@ -1,9 +1,11 @@
 package com.anam145.wallet.feature.hub.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.anam145.wallet.feature.hub.usecase.GetMiniAppManifestsUseCase
 import com.anam145.wallet.feature.hub.usecase.GetMiniAppsUseCase
+import com.anam145.wallet.feature.hub.usecase.InstallMiniAppUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HubViewModel @Inject constructor (
     private val getMiniAppsUseCase: GetMiniAppsUseCase,
-    private val getMiniAppManifestsUseCase: GetMiniAppManifestsUseCase
+    private val getMiniAppManifestsUseCase: GetMiniAppManifestsUseCase,
+    private val installMiniAppUseCase: InstallMiniAppUseCase
 ) : ViewModel() {
     /**
      * UI 상태
@@ -57,11 +60,17 @@ class HubViewModel @Inject constructor (
      * MVI 방식 - 모든 액션을 Intent로 통합!
      */
     fun handleIntent(intent: HubContract.HubIntent) {
-//        when (intent) {
-//            is HubContract.HubIntent.ClickMiniApp -> navigateToManifest()
-//            is HubContract.HubIntent.InstallMiniApp -> navigateToInstall()
-//            is HubContract.HubIntent.UnInstallMiniApp -> navigateToUnInstall()
-//        }
+        when (intent) {
+            is HubContract.HubIntent.ClickMiniApp -> { Log.d(">>>", "miniapp 클릭됨") }
+
+            is HubContract.HubIntent.InstallMiniApp -> {
+                Log.d(">>>", "miniApp install 클릭됨")
+                viewModelScope.launch {
+                    installMiniAppUseCase(intent.miniApp)
+                }
+            }
+            is HubContract.HubIntent.UnInstallMiniApp -> { Log.d(">>>", "miniapp unistall 클릭됨") }
+        }
     }
 
 

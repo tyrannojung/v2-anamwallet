@@ -12,11 +12,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.core.ui.language.LocalStrings
+import com.anam145.wallet.feature.hub.ui.HubContract
+import com.anam145.wallet.feature.hub.ui.HubViewModel
 
 @Composable
-fun MiniAppItem(moduleName: String, installed: Boolean) {
+fun MiniAppItem(
+    miniApp: MiniApp,
+    installed: Boolean,
+    viewModel: HubViewModel = hiltViewModel()
+) {
     val strings = LocalStrings.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -29,13 +38,15 @@ fun MiniAppItem(moduleName: String, installed: Boolean) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = moduleName,
+                text = miniApp.name,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.weight(1f)
             )
 
             if (!installed) {
-                Button(onClick = { /*TODO: 설치 로직*/}) {
+                Button(onClick = {
+                    viewModel.handleIntent(HubContract.HubIntent.InstallMiniApp(miniApp))
+                }) {
                     Text(strings.install)
                 }
             }

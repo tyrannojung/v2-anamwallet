@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anam145.wallet.core.common.model.MiniApp
+import com.anam145.wallet.core.common.model.MiniAppType
 import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.feature.hub.ui.components.MiniAppItem
 
@@ -32,7 +33,22 @@ fun HubScreen(
 //    val notInstalledModules: List<String> = listOf("uninstallcoin1", "uninstallcoin2")
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val installedMiniApp: List<MiniApp> = uiState.installedMiniApp
-    val notInstalledModules: List<String> = listOf("uninstallcoin1", "uninstallcoin2")
+    val notInstalledModules: List<MiniApp> = listOf(
+        MiniApp(
+            appId = "app_id_1",
+            name = "Blockchain Wallet",
+            type = MiniAppType.BLOCKCHAIN,
+            iconPath = "/path/to/blockchain_icon",
+            balance = "0.25 ETH"
+        ),
+        MiniApp(
+            appId = "app_id_2",
+            name = "APP",
+            type = MiniAppType.APP,
+            iconPath = "/path/to/web_icon",
+            balance = "-"
+        ),
+    )
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -55,7 +71,7 @@ fun HubScreen(
                 }
 
                 items(installedMiniApp) { module ->
-                    MiniAppItem(moduleName = module.name, installed = true)
+                    MiniAppItem(miniApp = module, installed = true)
                 }
 
                 item {
@@ -68,7 +84,7 @@ fun HubScreen(
                 }
 
                 items(notInstalledModules) { module ->
-                    MiniAppItem(moduleName = module, installed = false)
+                    MiniAppItem(miniApp = module, installed = false)
                 }
             }
         }

@@ -69,7 +69,7 @@ abstract class HubModule {
                 context,
                 MiniAppManifestDB::class.java,
                 "mini_app_manifest_db"
-            ).build()
+            ).fallbackToDestructiveMigration().build()
         }
 
         @Provides

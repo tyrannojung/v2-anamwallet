@@ -23,4 +23,12 @@ class MiniAppRepositoryImpl @Inject constructor(
         miniAppDao.deleteMiniApp(miniApp)
     }
 
+    override suspend fun insertMiniApp(miniApp: MiniApp) {
+        miniAppDao.insertMiniApp(miniApp)
+    }
+
+    override suspend fun insertMiniApps(miniApps: List<MiniApp>) {
+        miniAppDao.insertMiniApps(miniApps)
+    }
+
 }
