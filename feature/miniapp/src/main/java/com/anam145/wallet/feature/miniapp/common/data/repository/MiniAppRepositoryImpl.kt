@@ -27,6 +27,7 @@ class MiniAppRepositoryImpl @Inject constructor(
             
             if (!isInitialized) {
                 when (val result = fileManager.installAllFromAssets()) {
+                    // 리스트 반환 x, 설치만 진행
                     is MiniAppResult.Success -> {
                         // 캐시 클리어하여 최신 데이터 읽도록 보장
                         scanner.clearCache()

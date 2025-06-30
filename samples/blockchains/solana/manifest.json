@@ -1,0 +1,10 @@
+{
+  "app_id": "com.anam.solana",
+  "type": "blockchain",
+  "name": "solana",
+  "version": "1.0.0",
+  "icon": "assets/icons/app_icon.png",
+  "pages": [
+    "pages/index/index"
+  ]
+}

@@ -8,7 +8,6 @@ import com.anam145.wallet.core.common.model.MiniAppManifest
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
@@ -23,11 +22,6 @@ class MiniAppFileManager @Inject constructor(
 ) {
     companion object {
         private const val TAG = "MiniAppFileManager"
-    }
-    
-    private val json = Json { 
-        ignoreUnknownKeys = true
-        isLenient = true
     }
     
     suspend fun installAllFromAssets(): MiniAppResult<Unit> = withContext(Dispatchers.IO) {
