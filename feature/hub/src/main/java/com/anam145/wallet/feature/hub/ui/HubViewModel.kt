@@ -3,9 +3,12 @@ package com.anam145.wallet.feature.hub.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.anam145.wallet.core.common.model.Language
+import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.feature.hub.usecase.GetMiniAppManifestsUseCase
 import com.anam145.wallet.feature.hub.usecase.GetMiniAppsUseCase
 import com.anam145.wallet.feature.hub.usecase.InstallMiniAppUseCase
+import com.anam145.wallet.feature.hub.usecase.UninstallMiniAppUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,13 +27,14 @@ import javax.inject.Inject
 class HubViewModel @Inject constructor (
     private val getMiniAppsUseCase: GetMiniAppsUseCase,
     private val getMiniAppManifestsUseCase: GetMiniAppManifestsUseCase,
-    private val installMiniAppUseCase: InstallMiniAppUseCase
+    private val installMiniAppUseCase: InstallMiniAppUseCase,
+    private val uninstallMiniAppUseCase: UninstallMiniAppUseCase
 ) : ViewModel() {
     /**
      * UI 상태
      * MutableStateFlow : 이 상태를 관찰 가능하게 만드는 도구
-     * private - 내부에서만 수정 가능한 MutableStateFlow
-     * public - 외부에서는 읽기만 가능한 StateFlow
+     * private - 내부에서만 수정 가능한 MutableStateFlow     * public - 외부에서는 읽기만 가능한 StateFlow
+     *
      * _uiState: ViewModel 내부에서만 값을 변경
      * uiState: UI는 읽기만 가능 (캡슐화)
      * */
@@ -63,16 +67,24 @@ class HubViewModel @Inject constructor (
         when (intent) {
             is HubContract.HubIntent.ClickMiniApp -> { Log.d(">>>", "miniapp 클릭됨") }
 
-            is HubContract.HubIntent.InstallMiniApp -> {
-                Log.d(">>>", "miniApp install 클릭됨")
-                viewModelScope.launch {
-                    installMiniAppUseCase(intent.miniApp)
-                }
-            }
-            is HubContract.HubIntent.UnInstallMiniApp -> { Log.d(">>>", "miniapp unistall 클릭됨") }
+            is HubContract.HubIntent.InstallMiniApp -> installMiniApp(intent.miniApp)
+            is HubContract.HubIntent.UninstallMiniApp -> uninstallMiniApp(intent.miniApp)
         }
     }
 
+    private fun installMiniApp(miniApp : MiniApp) {
+        Log.d(">>>", "miniApp install 클릭됨")
+        viewModelScope.launch {
+            installMiniAppUseCase(miniApp)
+        }
+    }
+
+    private fun uninstallMiniApp(miniApp : MiniApp) {
+        Log.d(">>>", "miniapp unistall 클릭됨")
+        viewModelScope.launch {
+            uninstallMiniAppUseCase(miniApp)
+        }
+    }
 
 
     /**

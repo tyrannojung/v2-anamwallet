@@ -34,7 +34,7 @@ interface HubContract {
      */
     sealed interface HubIntent {
         data class InstallMiniApp(val miniApp: MiniApp) : HubIntent
-        data class UnInstallMiniApp(val miniApp: MiniApp) : HubIntent
+        data class UninstallMiniApp(val miniApp: MiniApp) : HubIntent
         data class ClickMiniApp(val miniApp: MiniApp) : HubIntent
     }
 

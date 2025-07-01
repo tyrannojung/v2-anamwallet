@@ -51,7 +51,9 @@ fun MiniAppItem(
                 }
             }
             else{
-                Button(onClick = {  /*TODO: 삭제 로직*/}) {
+                Button(onClick = {
+                    viewModel.handleIntent(HubContract.HubIntent.UninstallMiniApp(miniApp))
+                }) {
                     Text(strings.uninstall)
                 }
             }
