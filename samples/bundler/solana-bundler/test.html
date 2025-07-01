@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solana Bundle Test</title>
+</head>
+<body>
+    <h1>Solana Web3.js Bundle Test</h1>
+    <div id="output"></div>
+    
+    <script src="./dist/solana-bundle.umd.cjs"></script>
+    <script>
+        // 번들이 제대로 로드되었는지 테스트
+        const output = document.getElementById('output');
+        
+        if (window.solanaWeb3) {
+            output.innerHTML = `
+                <p>✅ Solana Web3.js loaded successfully!</p>
+                <p>Version: ${window.solanaWeb3.version}</p>
+                <p>Available modules:</p>
+                <ul>
+                    ${Object.keys(window.solanaWeb3).map(key => `<li>${key}</li>`).join('')}
+                </ul>
+            `;
+            
+            // 테스트 1: 키페어 생성
+            try {
+                const keypair = window.solanaWeb3.Keypair.generate();
+                output.innerHTML += `<p>✅ Keypair generated: ${keypair.publicKey.toString()}</p>`;
+            } catch (e) {
+                output.innerHTML += `<p>❌ Keypair Error: ${e.message}</p>`;
+            }
+            
+            // 테스트 2: 니모닉 생성 및 복구
+            try {
+                const mnemonic = window.solanaWeb3.generateMnemonic();
+                output.innerHTML += `<p>✅ Mnemonic generated: ${mnemonic.split(' ').slice(0, 3).join(' ')}...</p>`;
+                
+                const recoveredKeypair = window.solanaWeb3.keypairFromMnemonic(mnemonic);
+                output.innerHTML += `<p>✅ Keypair from mnemonic: ${recoveredKeypair.publicKey.toString()}</p>`;
+            } catch (e) {
+                output.innerHTML += `<p>❌ Mnemonic Error: ${e.message}</p>`;
+            }
+        } else {
+            output.innerHTML = '<p>❌ Solana Web3.js not loaded</p>';
+        }
+    </script>
+</body>
+</html>

@@ -3,26 +3,26 @@
 
 const CoinConfig = {
   // 기본 정보
-  name: "COIN_NAME",              // 예: "Bitcoin"
-  symbol: "SYMBOL",               // 예: "BTC"
-  decimals: 18,                   // 소수점 자릿수
+  name: "Ethereum",
+  symbol: "ETH",
+  decimals: 18,
   
   // 네트워크 설정
   network: {
-    // QuickNode RPC 엔드포인트
-    rpcEndpoint: "https://YOUR-ENDPOINT.NETWORK.quiknode.pro/YOUR-TOKEN/",
+    // QuickNode RPC 엔드포인트 (Sepolia 테스트넷)
+    rpcEndpoint: "https://still-fluent-yard.ethereum-sepolia.quiknode.pro/ed1e699042dab42a0b3d7d6c7f059eaaef2cc930/",
     // 네트워크 이름
-    networkName: "testnet",       // 예: "mainnet", "testnet"
-    // 체인 ID (EVM 체인의 경우)
-    chainId: 1,
+    networkName: "sepolia",
+    // 체인 ID
+    chainId: 11155111,  // Sepolia testnet
   },
   
   // UI 테마 설정
   theme: {
-    primaryColor: "#4338CA",      // 메인 색상
-    secondaryColor: "#6366F1",    // 보조 색상
-    logoSymbol: "Ω",              // 로고 심볼
-    logoText: "COIN",             // 로고 텍스트
+    primaryColor: "#4338CA",      // 이더리움 보라색
+    secondaryColor: "#6366F1",    // 밝은 보라색
+    logoSymbol: "Ξ",              // 이더리움 심볼
+    logoText: "Ethereum",
   },
   
   // 주소 설정
@@ -47,8 +47,8 @@ const CoinConfig = {
   options: {
     // 니모닉 지원 여부
     supportsMnemonic: true,
-    // 토큰 지원 여부
-    supportsTokens: false,
+    // ERC-20 토큰 지원
+    supportsTokens: true,
     // QR 코드 지원
     supportsQRCode: true,
   }

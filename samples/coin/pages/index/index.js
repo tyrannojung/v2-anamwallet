@@ -4,16 +4,10 @@
 // 전역 변수
 let adapter = null; // 코인 어댑터 인스턴스
 let currentWallet = null; // 현재 지갑 정보
-let provider = null; // RPC 프로바이더 (필요한 경우)
 
 // 페이지 초기화
 document.addEventListener("DOMContentLoaded", function () {
   console.log(`${CoinConfig.name} 지갑 페이지 로드`);
-
-  // 디버깅: 페이지 로드 시 origin 확인
-  console.log("Page load - Current origin:", window.location.origin);
-  console.log("Page load - Current href:", window.location.href);
-  console.log("Page load - localStorage keys:", Object.keys(localStorage));
 
   // Bridge API 초기화
   if (window.anam) {
@@ -109,7 +103,6 @@ function checkWalletStatus() {
 
       displayWalletInfo();
       updateBalance();
-      loadTransactionHistory();
     } catch (error) {
       console.error("지갑 로드 실패:", error);
       showToast("지갑 로드 실패");
@@ -273,18 +266,6 @@ function displayWalletInfo() {
     navigator.clipboard.writeText(address);
     showToast("주소가 복사되었습니다");
   };
-
-  // Receive 모달에도 주소 설정
-  document.getElementById("receive-address").textContent = address;
-  
-  // Receive 정보 업데이트
-  const receiveInfo = document.querySelector('.receive-info');
-  if (receiveInfo) {
-    receiveInfo.innerHTML = `
-      <p>이 주소로 <strong>${CoinConfig.name}</strong>을(를) 전송할 수 있습니다.</p>
-      <p class="receive-warning">다른 코인을 전송하면 자산을 잃을 수 있습니다.</p>
-    `;
-  }
 }
 
 // 잔액 업데이트
@@ -296,7 +277,6 @@ async function updateBalance() {
     const formattedBalance = adapter.formatBalance(balance);
 
     document.getElementById("balance-display").textContent = formattedBalance;
-    document.getElementById("available-balance").textContent = formattedBalance;
 
     // TODO: 실제 환율 API 호출
     const fiatPrice = 100; // 임시 가격
@@ -307,207 +287,55 @@ async function updateBalance() {
   }
 }
 
-// 거래 내역 로드
-async function loadTransactionHistory() {
-  if (!currentWallet || !adapter) return;
-
-  try {
-    const transactions = await adapter.getTransactionHistory(
-      currentWallet.address,
-      10
-    );
-    displayTransactions(transactions);
-  } catch (error) {
-    console.error("거래 내역 조회 실패:", error);
-  }
-}
-
-// 거래 내역 표시
-function displayTransactions(transactions) {
-  const listElement = document.getElementById("transaction-list");
-
-  if (!transactions || transactions.length === 0) {
-    listElement.innerHTML =
-      '<div class="empty-state"><span>거래 내역이 없습니다</span></div>';
-    return;
-  }
-
-  listElement.innerHTML = transactions
-    .map((tx) => {
-      const isReceived =
-        tx.to.toLowerCase() === currentWallet.address.toLowerCase();
-      const amount = adapter.formatBalance(tx.amount);
-      const time = new Date(tx.timestamp * 1000).toLocaleString("ko-KR");
-
-      return `
-      <div class="transaction-item">
-        <div class="transaction-info">
-          <div class="transaction-type">${isReceived ? "받기" : "보내기"}</div>
-          <div class="transaction-time">${time}</div>
-        </div>
-        <div class="transaction-amount ${isReceived ? "received" : "sent"}">
-          ${isReceived ? "+" : "-"}${amount} ${CoinConfig.symbol}
-        </div>
-      </div>
-    `;
-    })
-    .join("");
-}
-
-// Send 모달 표시
-function showSendForm() {
-  document.getElementById("send-modal").style.display = "flex";
-}
-
-// Send 모달 닫기
-function closeSendModal() {
-  document.getElementById("send-modal").style.display = "none";
-  // 입력값 초기화
-  document.getElementById("recipient-address").value = "";
-  document.getElementById("send-amount").value = "";
-  document.getElementById("tx-fee").value = "medium";
-}
-
-// 전송 확인
-async function confirmSend() {
-  if (!currentWallet || !adapter) {
-    showToast("지갑이 없습니다");
-    return;
-  }
-
-  const recipient = document.getElementById("recipient-address").value.trim();
-  const amount = document.getElementById("send-amount").value.trim();
-  const feeLevel = document.getElementById("tx-fee").value;
-
-  // 유효성 검증
-  if (!recipient || !amount) {
-    showToast("받는 주소와 금액을 입력해주세요");
-    return;
-  }
-
-  if (!adapter.isValidAddress(recipient)) {
-    showToast("올바른 주소 형식이 아닙니다");
-    return;
-  }
-
-  if (parseFloat(amount) <= 0) {
-    showToast("0보다 큰 금액을 입력해주세요");
-    return;
-  }
-
-  try {
-    showToast("트랜잭션 전송 중...");
-
-    // 수수료 가져오기
-    const gasPrice = await adapter.getGasPrice();
-    const fee = gasPrice[feeLevel];
-
-    // 트랜잭션 전송 (코인별로 파라미터가 다를 수 있음)
-    // TODO: 각 코인 어댑터에 맞는 파라미터 전달
-    const txParams = {
-      from: currentWallet.address,
-      to: recipient,
-      amount: amount,
-      privateKey: currentWallet.privateKey,
-      // 코인별 추가 파라미터 예시:
-      // - Bitcoin: utxos, feeRate
-      // - Ethereum: gasPrice, gasLimit, nonce
-      // - Solana: keypair, recentBlockhash
-    };
-
-    // 수수료 관련 파라미터 추가
-    // 코인 별로 다를 수 있음
-    if (feeLevel && fee) {
-      txParams.fee = fee;
-      txParams.feePreference = feeLevel;
-    }
-
-    const result = await adapter.sendTransaction(txParams);
-
-    showToast(`트랜잭션 전송 성공!`);
-    console.log("트랜잭션 해시:", result.hash);
-
-    // 모달 닫기
-    closeSendModal();
-
-    // 잔액 업데이트
-    setTimeout(updateBalance, 3000);
-
-    // 거래 내역 업데이트
-    setTimeout(loadTransactionHistory, 5000);
-  } catch (error) {
-    console.error("트랜잭션 실패:", error);
-    showToast("트랜잭션 실패: " + error.message);
-  }
-}
-
-// Receive 모달 표시
-function showReceiveModal() {
+// Send 페이지로 이동
+function navigateToSend() {
   if (!currentWallet) {
     showToast("지갑이 없습니다");
     return;
   }
-  
-  document.getElementById("receive-modal").style.display = "flex";
-
-  // QR 코드 생성
-  const qrContainer = document.getElementById('qr-code');
-  qrContainer.innerHTML = ''; // 기존 QR 코드 제거
-  
-  // Canvas 엘리먼트 생성
-  const canvas = document.createElement('canvas');
-  qrContainer.appendChild(canvas);
-  
-  // QR 코드 옵션
-  const qrOptions = {
-    width: 200,
-    height: 200,
-    margin: 2,
-    color: {
-      dark: '#000000',
-      light: '#FFFFFF'
-    },
-    errorCorrectionLevel: 'M'
-  };
-  
-  // QR 코드 생성
-  QRCode.toCanvas(canvas, currentWallet.address, qrOptions, (error) => {
-    if (error) {
-      console.error('QR 코드 생성 실패:', error);
-      qrContainer.innerHTML = '<div style="padding: 20px; color: #999;">QR 코드 생성 실패</div>';
-    }
-  });
-  
-  // 주소 표시 업데이트
-  document.getElementById("receive-address").textContent = currentWallet.address;
+  // blockchain miniapp은 anamUI 네임스페이스 사용
+  if (window.anamUI && window.anamUI.navigateTo) {
+    window.anamUI.navigateTo("pages/send/send");
+  } else if (window.anam && window.anam.navigateTo) {
+    window.anam.navigateTo("pages/send/send");
+  } else {
+    console.error("navigateTo API not available");
+  }
 }
 
-// Receive 모달 닫기
-function closeReceiveModal() {
-  document.getElementById("receive-modal").style.display = "none";
-}
-
-// 주소 복사
-function copyAddress() {
-  if (!currentWallet) return;
-
-  navigator.clipboard.writeText(currentWallet.address);
-  showToast("주소가 클립보드에 복사되었습니다");
+// Receive 페이지로 이동
+function navigateToReceive() {
+  if (!currentWallet) {
+    showToast("지갑이 없습니다");
+    return;
+  }
+  // blockchain miniapp은 anamUI 네임스페이스 사용
+  if (window.anamUI && window.anamUI.navigateTo) {
+    window.anamUI.navigateTo("pages/receive/receive");
+  } else if (window.anam && window.anam.navigateTo) {
+    window.anam.navigateTo("pages/receive/receive");
+  } else {
+    console.error("navigateTo API not available");
+  }
 }
 
 // 지갑 초기화
 function resetWallet() {
-  if (confirm("정말로 지갑을 초기화하시겠습니까?\n복구할 수 없습니다.")) {
-    const walletKey = `${CoinConfig.symbol.toLowerCase()}_wallet`;
-    localStorage.removeItem(walletKey);
-    currentWallet = null;
+  const walletKey = `${CoinConfig.symbol.toLowerCase()}_wallet`;
+  localStorage.removeItem(walletKey);
+  currentWallet = null;
 
-    // 화면 전환
-    document.getElementById("wallet-main").style.display = "none";
-    document.getElementById("wallet-creation").style.display = "block";
+  // 화면 전환
+  document.getElementById("wallet-main").style.display = "none";
+  document.getElementById("wallet-creation").style.display = "block";
 
-    showToast("지갑이 초기화되었습니다");
-  }
+  // 입력 필드 초기화
+  const mnemonicInput = document.getElementById("mnemonic-input");
+  const privateKeyInput = document.getElementById("privatekey-input");
+  if (mnemonicInput) mnemonicInput.value = "";
+  if (privateKeyInput) privateKeyInput.value = "";
+
+  showToast("지갑이 초기화되었습니다");
 }
 
 // 트랜잭션 요청 처리 (Bridge API)
@@ -570,7 +398,6 @@ async function handleTransactionRequest(event) {
 
     // UI 업데이트
     setTimeout(updateBalance, 3000);
-    setTimeout(loadTransactionHistory, 5000);
   } catch (error) {
     console.error("트랜잭션 실패:", error);
 
@@ -606,9 +433,5 @@ function showToast(message) {
   }, 3000);
 }
 
-// 모달 외부 클릭 시 닫기
-window.onclick = function (event) {
-  if (event.target.classList.contains("modal")) {
-    event.target.style.display = "none";
-  }
-};
+// HTML onclick을 위한 전역 함수 등록
+window.resetWallet = resetWallet;

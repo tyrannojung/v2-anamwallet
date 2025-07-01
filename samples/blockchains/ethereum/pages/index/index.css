@@ -1,6 +1,15 @@
-/* 이더리움 지갑 메인 페이지 스타일 */
+/* Coin 지갑 스타일 - 커스터마이징 가능한 변수들 */
 
-/* 지갑 화면 컨테이너 */
+:root {
+  /* 코인별로 변경 가능한 테마 색상 */
+  --coin-primary: #4338CA;      /* 메인 색상 */
+  --coin-secondary: #6366F1;    /* 보조 색상 */
+  --coin-dark: #312E81;         /* 어두운 색상 */
+  --coin-light: #E0E7FF;        /* 밝은 색상 */
+  --coin-gradient: linear-gradient(135deg, var(--coin-primary) 0%, var(--coin-secondary) 100%);
+}
+
+/* 지갑 화면 공통 */
 .wallet-screen {
   min-height: 100vh;
   display: flex;
@@ -9,70 +18,55 @@
 
 /* 지갑 생성 화면 */
 .creation-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 60px 20px;
   text-align: center;
 }
 
-.eth-logo-large {
-  width: 120px;
-  height: 120px;
-  background: var(--eth-primary);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 60px;
-  font-weight: bold;
-  margin-bottom: 32px;
-  box-shadow: 0 4px 20px rgba(67, 56, 202, 0.3);
+.coin-logo-large {
+  font-size: 80px;
+  color: var(--coin-primary);
+  margin-bottom: 20px;
+  font-weight: 300;
+  text-shadow: 0 0 20px rgba(67, 56, 202, 0.3);
 }
 
 .creation-title {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  color: #222;
 }
 
 .creation-description {
-  font-size: 18px;
-  color: var(--text-secondary);
-  margin-bottom: 48px;
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 40px;
 }
 
 .create-wallet-btn {
-  background: var(--eth-primary);
+  width: 100%;
+  padding: 16px;
+  background: var(--coin-gradient);
   color: white;
   border: none;
-  border-radius: 16px;
-  padding: 20px 60px;
-  font-size: 18px;
+  border-radius: 12px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(67, 56, 202, 0.2);
 }
 
 .create-wallet-btn:hover {
-  background: var(--eth-primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(67, 56, 202, 0.3);
-}
-
-.create-wallet-btn:active {
-  transform: translateY(0);
+  box-shadow: 0 6px 20px rgba(67, 56, 202, 0.4);
 }
 
 .divider {
-  margin: 40px 0;
-  position: relative;
+  margin: 30px 0;
   text-align: center;
+  position: relative;
 }
 
 .divider::before {
@@ -82,66 +76,85 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: #e5e7eb;
+  background: #e0e0e0;
 }
 
 .divider span {
   background: white;
-  padding: 0 20px;
+  padding: 0 15px;
   position: relative;
-  color: #9ca3af;
+  color: #999;
   font-size: 14px;
 }
 
-.mnemonic-import {
-  width: 100%;
-  max-width: 500px;
+/* 가져오기 섹션 */
+.import-section {
+  text-align: left;
 }
 
-.mnemonic-import h3 {
+.import-section h3 {
   font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
 }
 
-.mnemonic-input {
+.import-option {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.import-option h4 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.import-input {
   width: 100%;
-  padding: 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 16px;
-  font-family: monospace;
-  resize: none;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 10px;
+  transition: border-color 0.3s;
+}
+
+.import-input:focus {
+  border-color: var(--coin-primary);
   outline: none;
-  margin-bottom: 16px;
 }
 
-.mnemonic-input:focus {
-  border-color: var(--eth-primary);
+textarea.import-input {
+  resize: none;
+  font-family: 'Courier New', monospace;
 }
 
-.import-wallet-btn {
+.import-btn {
   width: 100%;
-  background: #6b7280;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 16px 32px;
-  font-size: 16px;
+  padding: 12px;
+  background: white;
+  color: var(--coin-primary);
+  border: 2px solid var(--coin-primary);
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.import-wallet-btn:hover {
-  background: #4b5563;
+.import-btn:hover {
+  background: var(--coin-primary);
+  color: white;
 }
 
-/* 헤더 */
+/* 헤더 스타일 */
 .header {
   background: white;
+  border-bottom: 1px solid #e0e0e0;
   padding: 16px 20px;
-  box-shadow: 0 1px 0 var(--border-color);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -151,66 +164,74 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 600px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
-.eth-logo {
-  width: 32px;
-  height: 32px;
-  background: var(--eth-primary);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: bold;
+.coin-logo {
+  font-size: 32px;
+  color: var(--coin-primary);
+  font-weight: 300;
 }
 
 .logo-text {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 700;
+  color: #222;
 }
 
-/* 지갑 초기화 버튼 */
 .reset-wallet-btn {
-  background: #f3f4f6;
+  background: none;
   border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: #666;
   cursor: pointer;
-  color: #6b7280;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s;
 }
 
 .reset-wallet-btn:hover {
-  background: #e5e7eb;
-  color: #ef4444;
+  background: #f5f5f5;
+  color: #333;
 }
 
+/* 카드 스타일 */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
 
 /* 잔액 카드 */
 .balance-card {
-  margin: 40px 20px;
-  padding: 32px;
-  background: white;
-  color: #111827;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  background: var(--coin-gradient);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.balance-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 0.8; }
 }
 
 .balance-header {
@@ -222,200 +243,132 @@
 
 .balance-label {
   font-size: 14px;
-  color: #6b7280;
+  opacity: 0.9;
 }
 
+.network-status {
+  font-size: 8px;
+  color: #4cff4c;
+}
+
+.balance-amount {
+  margin-bottom: 30px;
+}
+
+.coin-balance {
+  font-size: 36px;
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.coin-unit {
+  font-size: 20px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.fiat-value {
+  font-size: 16px;
+  opacity: 0.8;
+  margin-top: 5px;
+}
 
 /* 주소 컨테이너 */
 .address-container {
-  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
   padding: 16px;
-  background: #f9fafb;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  margin-bottom: 20px;
 }
 
 .address-label {
   font-size: 12px;
-  color: #6b7280;
+  opacity: 0.8;
   margin-bottom: 8px;
-  font-weight: 500;
 }
 
 .address-display {
-  font-family: monospace;
-  font-size: 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
   word-break: break-all;
-  line-height: 1.4;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #111827;
+  opacity: 0.9;
+  cursor: pointer;
 }
 
-
-.balance-amount {
-  margin-bottom: 32px;
+.address-display:hover {
+  opacity: 1;
 }
 
-.eth-balance {
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 0;
-  color: #111827;
-}
-
-.eth-unit {
-  font-size: 20px;
-  margin-left: 8px;
-  color: #6b7280;
-}
-
-
-/* 액션 버튼들 */
+/* 액션 버튼 */
 .action-buttons {
   display: flex;
-  gap: 16px;
-  justify-content: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
 }
 
 .action-btn {
   flex: 1;
-  background: var(--eth-primary);
-  border: 1px solid var(--eth-primary);
-  border-radius: 12px;
-  padding: 14px 24px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
   color: white;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
 }
 
 .action-btn:hover {
-  background: var(--eth-primary-dark);
-  border-color: var(--eth-primary-dark);
+  background: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
 }
 
-/* 거래 내역 섹션 */
-.transactions-section {
-  padding: 20px;
-  max-width: 600px;
-  margin: 0 auto;
-}
 
-.section-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-}
 
-.tx-list {
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-
-.tx-item {
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--border-color);
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.tx-item:hover {
-  background: var(--bg-secondary);
-}
-
-.tx-item:last-child {
-  border-bottom: none;
-}
-
-.tx-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  margin-right: 12px;
-}
-
-.tx-icon.send {
-  background: #EEF2FF;
-  color: var(--eth-primary);
-}
-
-.tx-icon.receive {
-  background: #EEF2FF;
-  color: var(--eth-primary);
-}
-
-.tx-details {
-  flex: 1;
-}
-
-.tx-type {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text-primary);
-  margin-bottom: 2px;
-}
-
-.tx-address {
+/* 토스트 메시지 */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 16px 24px;
+  border-radius: 8px;
   font-size: 14px;
-  color: var(--text-secondary);
-  font-family: monospace;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  animation: slideUp 0.3s ease;
 }
 
-.tx-amount {
-  text-align: right;
+@keyframes slideUp {
+  from {
+    transform: translate(-50%, 100px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
 }
-
-.tx-eth {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.tx-eth.send {
-  color: #111827;
-}
-
-.tx-eth.receive {
-  color: #111827;
-}
-
-.tx-time {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
-
 
 /* 반응형 디자인 */
-@media (max-width: 480px) {
-  .balance-card {
-    margin: 20px 16px;
-    padding: 24px;
+@media (max-width: 600px) {
+  .card {
+    margin: 12px;
   }
   
-  .eth-balance {
+  .coin-balance {
     font-size: 28px;
   }
   
-  .action-buttons {
-    gap: 12px;
+  .coin-unit {
+    font-size: 16px;
   }
   
-  .action-btn {
-    padding: 12px 20px;
-    font-size: 14px;
-  }
 }

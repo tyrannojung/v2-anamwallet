@@ -100,97 +100,19 @@
           
           <!-- 액션 버튼들 -->
           <div class="action-buttons">
-            <button class="action-btn" onclick="showSendForm()">
+            <button class="action-btn" onclick="navigateToSend()">
               <span>Send</span>
             </button>
-            <button class="action-btn" onclick="showReceiveModal()">
+            <button class="action-btn" onclick="navigateToReceive()">
               <span>Receive</span>
             </button>
           </div>
         </div>
-
-        <!-- 거래 내역 -->
-        <div class="card history-card">
-          <h3 class="card-title">최근 거래</h3>
-          <div id="transaction-list" class="transaction-list">
-            <div class="empty-state">
-              <span>거래 내역이 없습니다</span>
-            </div>
-          </div>
-        </div>
       </div>
 
-      <!-- Send 모달 -->
-      <div id="send-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Send COIN</h2>
-            <button class="close-btn" onclick="closeSendModal()">×</button>
-          </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="recipient-address">받는 주소</label>
-              <input 
-                type="text" 
-                id="recipient-address" 
-                class="form-input" 
-                placeholder="받는 사람의 주소를 입력하세요"
-              />
-            </div>
-            <div class="form-group">
-              <label for="send-amount">금액</label>
-              <input 
-                type="number" 
-                id="send-amount" 
-                class="form-input" 
-                placeholder="0.0000"
-                step="0.0001"
-              />
-              <span class="input-hint">사용 가능: <span id="available-balance">0.0000</span> COIN</span>
-            </div>
-            <div class="form-group">
-              <label for="tx-fee">수수료</label>
-              <select id="tx-fee" class="form-input">
-                <option value="low">느림 (Low)</option>
-                <option value="medium" selected>보통 (Medium)</option>
-                <option value="high">빠름 (High)</option>
-              </select>
-            </div>
-            <button class="send-confirm-btn" onclick="confirmSend()">
-              전송 확인
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Receive 모달 -->
-      <div id="receive-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Receive COIN</h2>
-            <button class="close-btn" onclick="closeReceiveModal()">×</button>
-          </div>
-          <div class="modal-body">
-            <div class="qr-container" id="qr-code">
-              <!-- QR 코드가 여기에 생성됨 -->
-            </div>
-            <div class="receive-address-box">
-              <span id="receive-address">Loading...</span>
-              <button class="copy-btn" onclick="copyAddress()">복사</button>
-            </div>
-            <div class="receive-info">
-              <p>이 주소로 <strong>${CoinConfig.name}</strong>을(를) 전송할 수 있습니다.</p>
-              <p class="receive-warning">다른 코인을 전송하면 자산을 잃을 수 있습니다.</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- 필요한 라이브러리들 -->
-    <!-- QR 코드 생성 라이브러리 -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    
     <!-- 각 코인별로 필요한 라이브러리를 여기에 추가 -->
     <!-- 예: <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script> -->
     

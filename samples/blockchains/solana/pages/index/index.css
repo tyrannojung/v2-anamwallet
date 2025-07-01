@@ -1,11 +1,12 @@
-/* 솔라나 지갑 스타일 */
+/* Coin 지갑 스타일 - 커스터마이징 가능한 변수들 */
 
-/* 솔라나 브랜드 색상 */
 :root {
-  --sol-primary: #14F195;
-  --sol-secondary: #9945FF;
-  --sol-dark: #0A0B0D;
-  --sol-gradient: linear-gradient(135deg, #14F195 0%, #9945FF 100%);
+  /* 코인별로 변경 가능한 테마 색상 */
+  --coin-primary: #4338CA;      /* 메인 색상 */
+  --coin-secondary: #6366F1;    /* 보조 색상 */
+  --coin-dark: #312E81;         /* 어두운 색상 */
+  --coin-light: #E0E7FF;        /* 밝은 색상 */
+  --coin-gradient: linear-gradient(135deg, var(--coin-primary) 0%, var(--coin-secondary) 100%);
 }
 
 /* 지갑 화면 공통 */
@@ -23,12 +24,12 @@
   text-align: center;
 }
 
-.sol-logo-large {
+.coin-logo-large {
   font-size: 80px;
-  color: var(--sol-primary);
+  color: var(--coin-primary);
   margin-bottom: 20px;
   font-weight: 300;
-  text-shadow: 0 0 20px rgba(20, 241, 149, 0.3);
+  text-shadow: 0 0 20px rgba(67, 56, 202, 0.3);
 }
 
 .creation-title {
@@ -47,7 +48,7 @@
 .create-wallet-btn {
   width: 100%;
   padding: 16px;
-  background: var(--sol-gradient);
+  background: var(--coin-gradient);
   color: white;
   border: none;
   border-radius: 12px;
@@ -59,7 +60,7 @@
 
 .create-wallet-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(20, 241, 149, 0.4);
+  box-shadow: 0 6px 20px rgba(67, 56, 202, 0.4);
 }
 
 .divider {
@@ -86,43 +87,66 @@
   font-size: 14px;
 }
 
-.mnemonic-import h3 {
-  font-size: 18px;
-  margin-bottom: 15px;
-  color: #333;
+/* 가져오기 섹션 */
+.import-section {
+  text-align: left;
 }
 
-.mnemonic-input {
-  width: 100%;
+.import-section h3 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+
+.import-option {
+  margin-bottom: 20px;
   padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.import-option h4 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.import-input {
+  width: 100%;
+  padding: 12px;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 14px;
-  resize: none;
+  margin-bottom: 10px;
   transition: border-color 0.3s;
-  margin-bottom: 15px;
 }
 
-.mnemonic-input:focus {
-  border-color: var(--sol-primary);
+.import-input:focus {
+  border-color: var(--coin-primary);
   outline: none;
 }
 
-.import-wallet-btn {
+textarea.import-input {
+  resize: none;
+  font-family: 'Courier New', monospace;
+}
+
+.import-btn {
   width: 100%;
-  padding: 14px;
+  padding: 12px;
   background: white;
-  color: var(--sol-secondary);
-  border: 2px solid var(--sol-secondary);
-  border-radius: 12px;
-  font-size: 16px;
+  color: var(--coin-primary);
+  border: 2px solid var(--coin-primary);
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.import-wallet-btn:hover {
-  background: var(--sol-secondary);
+.import-btn:hover {
+  background: var(--coin-primary);
   color: white;
 }
 
@@ -150,9 +174,9 @@
   gap: 10px;
 }
 
-.sol-logo {
+.coin-logo {
   font-size: 32px;
-  color: var(--sol-primary);
+  color: var(--coin-primary);
   font-weight: 300;
 }
 
@@ -188,7 +212,7 @@
 
 /* 잔액 카드 */
 .balance-card {
-  background: var(--sol-gradient);
+  background: var(--coin-gradient);
   color: white;
   position: relative;
   overflow: hidden;
@@ -231,7 +255,7 @@
   margin-bottom: 30px;
 }
 
-.sol-balance {
+.coin-balance {
   font-size: 36px;
   font-weight: 700;
   display: flex;
@@ -239,13 +263,13 @@
   gap: 8px;
 }
 
-.sol-unit {
+.coin-unit {
   font-size: 20px;
   font-weight: 500;
   opacity: 0.8;
 }
 
-.usd-value {
+.fiat-value {
   font-size: 16px;
   opacity: 0.8;
   margin-top: 5px;
@@ -270,12 +294,19 @@
   font-size: 12px;
   word-break: break-all;
   opacity: 0.9;
+  cursor: pointer;
+}
+
+.address-display:hover {
+  opacity: 1;
 }
 
 /* 액션 버튼 */
 .action-buttons {
   display: flex;
   gap: 12px;
+  position: relative;
+  z-index: 1;
 }
 
 .action-btn {
@@ -297,65 +328,7 @@
   transform: translateY(-1px);
 }
 
-/* 히스토리 카드 */
-.history-card {
-  max-height: 400px;
-  overflow-y: auto;
-}
 
-.card-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.transaction-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px;
-  color: #999;
-  font-size: 14px;
-}
-
-/* 트랜잭션 아이템 */
-.transaction-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  border-radius: 8px;
-  background: #f8f8f8;
-  transition: background 0.3s;
-}
-
-.transaction-item:hover {
-  background: #f0f0f0;
-}
-
-.transaction-type {
-  font-size: 14px;
-  font-weight: 500;
-  color: #666;
-}
-
-.transaction-amount {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.transaction-amount.received {
-  color: var(--sol-primary);
-}
-
-.transaction-amount.sent {
-  color: #ff4444;
-}
 
 /* 토스트 메시지 */
 .toast {
@@ -390,11 +363,12 @@
     margin: 12px;
   }
   
-  .sol-balance {
+  .coin-balance {
     font-size: 28px;
   }
   
-  .sol-unit {
+  .coin-unit {
     font-size: 16px;
   }
+  
 }
