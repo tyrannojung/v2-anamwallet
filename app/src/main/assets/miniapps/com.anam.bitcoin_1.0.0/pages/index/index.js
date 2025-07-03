@@ -114,7 +114,7 @@ function initMockLibrary() {
   };
 }
 
-// 간단한 니모닉 생성
+// 간단한 니모닉 생성 - 수정 필요
 function generateMnemonic() {
   const words = [
     'abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract',
@@ -299,6 +299,10 @@ async function createWallet() {
     if (typeof Bitcoin.ECKey === 'function') {
       // Legacy 0.2.0 API
       eckey = new Bitcoin.ECKey();
+
+      eckey.priv = crypto.getRandomValues(new Uint8Array(32)); // 추후 키 재생성 필요
+      console.log("✅ Legacy ECKey 생성됨:", eckey);
+
       publicKey = eckey.pub;
       privateKeyHex = Array.from(eckey.priv, b => b.toString(16).padStart(2, '0')).join('');
       
@@ -327,6 +331,9 @@ async function createWallet() {
       blockchain: "bitcoin",
       createdAt: new Date().toISOString()
     };
+    
+    // privateKeyHex값 로깅
+    console.log("🔑 개인키 (Hex):", privateKeyHex);
 
     console.log("📤 네이티브 앱으로 지갑 키 전달 중...");
     
