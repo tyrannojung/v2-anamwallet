@@ -71,7 +71,8 @@ data class Strings(
     // Common
     val back: String = "뒤로가기",
     val loading: String = "로딩 중...",
-    val activated: String = "활성화됨"
+    val activated: String = "활성화됨",
+    val active: String = "활성"
 )
 
 /**
@@ -133,7 +134,8 @@ val EnglishStrings = Strings(
     // Common
     back = "Back",
     loading = "Loading...",
-    activated = "Activated"
+    activated = "Activated",
+    active = "Active"
 )
 
 /**

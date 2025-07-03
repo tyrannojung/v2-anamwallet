@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.anam145.wallet.core.ui.language.LocalStrings
 
 /**
  * ANAM Wallet 공통 헤더 컴포넌트
@@ -66,13 +67,14 @@ fun Header(
             ) {
                 // 뒤로가기 버튼
                 if (showBackButton && onBackClick != null) {
+                    val strings = LocalStrings.current
                     IconButton(
                         onClick = onBackClick,
                         modifier = Modifier.align(Alignment.CenterStart)
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "뒤로가기"
+                            contentDescription = strings.back
                         )
                     }
                 }
@@ -122,6 +124,8 @@ private fun BlockchainStatusChip(
     blockchainName: String,
     onClick: (() -> Unit)?
 ) {
+    val strings = LocalStrings.current
+    
     Card(
         modifier = Modifier
             .height(32.dp)
@@ -145,7 +149,7 @@ private fun BlockchainStatusChip(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "🔗 $blockchainName 활성화됨",
+                text = "🔗 $blockchainName ${strings.activated}",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )

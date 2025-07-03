@@ -294,45 +294,75 @@ private fun BlockchainCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // 상단: 아이콘
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = ShapeNormal
-                    ),
-                contentAlignment = Alignment.Center
+            // 상단: 아이콘과 Active 뱃지
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
             ) {
-                MiniAppIcon(
-                    miniApp = miniApp,
-                    size = 48.dp,
-                    iconSize = 32.dp,
-                    showBackground = false
-                )
-            }
-            
-            // 중간: 이름과 잔액
-            Column {
-                Text(
-                    text = miniApp.name,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                
-                miniApp.balance?.let { balance ->
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = balance,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                // 아이콘
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = ShapeNormal
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    MiniAppIcon(
+                        miniApp = miniApp,
+                        size = 48.dp,
+                        iconSize = 32.dp,
+                        showBackground = false
                     )
                 }
+                
+                // Active 뱃지
+                if (isActive) {
+                    val strings = LocalStrings.current
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(6.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = RoundedCornerShape(3.dp)
+                                    )
+                            )
+                            Text(
+                                text = strings.active,
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.Medium
+                                ),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
             }
+            
+            // 중간: 이름
+            Text(
+                text = miniApp.name,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
