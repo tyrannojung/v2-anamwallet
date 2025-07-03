@@ -127,12 +127,50 @@ class SolanaAdapter extends CoinAdapter {
       );
       const fromKeypair = this.solanaWeb3.Keypair.fromSecretKey(secretKey);
       
+      // 전송할 금액 계산
+      const lamportsToSend = Math.floor(parseFloat(amount) * this.solanaWeb3.LAMPORTS_PER_SOL);
+      
+      // 수신자 계정 정보 확인
+      const toPublicKey = new this.solanaWeb3.PublicKey(to);
+      const receiverInfo = await this.connection.getAccountInfo(toPublicKey);
+      
+      // Rent-exempt minimum (약 0.00203928 SOL = 2039280 lamports)
+      const rentExemptMinimum = await this.connection.getMinimumBalanceForRentExemption(0);
+      
+      // 수신자가 새 계정인 경우
+      if (!receiverInfo) {
+        if (lamportsToSend < rentExemptMinimum) {
+          const minSOL = (rentExemptMinimum / this.solanaWeb3.LAMPORTS_PER_SOL).toFixed(9);
+          throw new Error(`새 계정에는 최소 ${minSOL} SOL을 보내야 합니다`);
+        }
+      }
+      
+      // 송신자 잔액 확인
+      const senderBalance = await this.connection.getBalance(fromKeypair.publicKey);
+      const transactionFee = 5000; // 기본 트랜잭션 수수료
+      
+      // 송신자가 충분한 잔액을 가지고 있는지 확인
+      const totalRequired = lamportsToSend + transactionFee;
+      if (senderBalance < totalRequired) {
+        const currentSOL = (senderBalance / this.solanaWeb3.LAMPORTS_PER_SOL).toFixed(9);
+        const requiredSOL = (totalRequired / this.solanaWeb3.LAMPORTS_PER_SOL).toFixed(9);
+        throw new Error(`잔액이 부족합니다. 현재: ${currentSOL} SOL, 필요: ${requiredSOL} SOL`);
+      }
+      
+      // 송신자가 rent-exempt minimum을 유지할 수 있는지 확인
+      const senderRemainingBalance = senderBalance - totalRequired;
+      if (senderRemainingBalance < rentExemptMinimum) {
+        const maxSendable = Math.max(0, senderBalance - rentExemptMinimum - transactionFee);
+        const maxSendableSOL = (maxSendable / this.solanaWeb3.LAMPORTS_PER_SOL).toFixed(9);
+        throw new Error(`송신 계정에도 최소 잔액을 유지해야 합니다. 최대 전송 가능: ${maxSendableSOL} SOL`);
+      }
+      
       // 트랜잭션 생성
       const transaction = new this.solanaWeb3.Transaction().add(
         this.solanaWeb3.SystemProgram.transfer({
           fromPubkey: fromKeypair.publicKey,
           toPubkey: new this.solanaWeb3.PublicKey(to),
-          lamports: Math.floor(parseFloat(amount) * this.solanaWeb3.LAMPORTS_PER_SOL)
+          lamports: lamportsToSend
         })
       );
       
@@ -151,7 +189,39 @@ class SolanaAdapter extends CoinAdapter {
       };
     } catch (error) {
       console.error('트랜잭션 전송 실패:', error);
+      
+      // rent 관련 오류 메시지 개선
+      if (error.message && error.message.includes('insufficient funds for rent')) {
+        throw new Error('계정에 최소 잔액(0.00203928 SOL)을 유지해야 합니다');
+      }
+      
       throw new Error(error.message || '트랜잭션 전송에 실패했습니다');
+    }
+  }
+
+  // 트랜잭션 상태 조회
+  async getTransactionStatus(txHash) {
+    try {
+      await this.initProvider();
+      const status = await this.connection.getSignatureStatus(txHash);
+      
+      if (!status || !status.value) {
+        return {
+          status: 'pending',
+          confirmations: 0
+        };
+      }
+      
+      return {
+        status: status.value.err ? 'failed' : 'confirmed',
+        confirmations: status.value.confirmations || 0
+      };
+    } catch (error) {
+      console.error('트랜잭션 상태 조회 실패:', error);
+      return {
+        status: 'unknown',
+        confirmations: 0
+      };
     }
   }
 
@@ -164,6 +234,42 @@ class SolanaAdapter extends CoinAdapter {
     } catch (error) {
       console.error('Slot 조회 실패:', error);
       return 0;
+    }
+  }
+
+  // 수수료 조회 (Solana는 고정 수수료 사용)
+  async getGasPrice() {
+    try {
+      await this.initProvider();
+      
+      // Solana는 고정 수수료를 사용하며, 우선순위 수수료를 추가할 수 있음
+      // 기본 수수료는 5000 lamports (0.000005 SOL)
+      const baseFee = 5000;
+      
+      return {
+        low: baseFee.toString(),
+        medium: (baseFee * 2).toString(),  // 2배
+        high: (baseFee * 5).toString()     // 5배 (우선순위 높음)
+      };
+    } catch (error) {
+      console.error('수수료 조회 실패:', error);
+      // 기본값 반환
+      return {
+        low: "5000",
+        medium: "10000",
+        high: "25000"
+      };
+    }
+  }
+
+  // 트랜잭션 수수료 예상
+  async estimateFee(txParams) {
+    try {
+      // Solana의 기본 트랜잭션 수수료는 5000 lamports
+      return "5000";
+    } catch (error) {
+      console.error('수수료 예상 실패:', error);
+      return "5000";
     }
   }
 
