@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
 }
 
 /**
- * ANAM Wallet 메인 앱 컴포저블
+ * Haeundae Wallet 메인 앱 컴포저블
  * 
  * Navigation Controller를 생성하고 Bottom Navigation과
  * NavHost를 포함한 Scaffold를 구성.

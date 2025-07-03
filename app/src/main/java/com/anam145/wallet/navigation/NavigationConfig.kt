@@ -50,8 +50,8 @@ object NavigationConfig {
             labelKey = "browser"
         ),
         AnamNavRoute.Identity to NavIconInfo(
-            selectedIcon = Icons.Filled.QrCode,
-            unselectedIcon = Icons.Outlined.QrCode,
+            selectedIcon = Icons.Filled.Collections,  // 부산일보 버전: QrCode → Collections (NFT)
+            unselectedIcon = Icons.Outlined.Collections,
             labelKey = "identity"
         ),
         AnamNavRoute.Settings to NavIconInfo(
@@ -64,10 +64,11 @@ object NavigationConfig {
     /**
      * Bottom Navigation에 표시될 라우트 목록
      * 순서대로 하단 탭에 표시됨.
+     * 부산일보 버전: Hub 제거하여 4개 탭으로 구성
      */
     private val bottomNavRoutes = listOf(
         AnamNavRoute.Main,
-        AnamNavRoute.Hub,
+        // AnamNavRoute.Hub,  // 부산일보 버전에서는 제거
         AnamNavRoute.Browser,
         AnamNavRoute.Identity,
         AnamNavRoute.Settings

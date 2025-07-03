@@ -111,8 +111,8 @@ fun MainScreen(
                     regularApps = uiState.regularApps,
                     activeBlockchainId = uiState.activeBlockchainId,
                     onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
-                    onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) },
-                    onAddMoreClick = { viewModel.handleIntent(MainContract.MainIntent.ClickAddMore) }
+                    onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) }
+                    // 부산일보 버전: onAddMoreClick 제거
                 )
             }
         }
@@ -125,8 +125,8 @@ private fun MiniAppList(
     regularApps: List<MiniApp>,
     activeBlockchainId: String?,
     onBlockchainClick: (MiniApp) -> Unit,
-    onAppClick: (MiniApp) -> Unit,
-    onAddMoreClick: () -> Unit
+    onAppClick: (MiniApp) -> Unit
+    // 부산일보 버전: onAddMoreClick 파라미터 제거
 ) {
     val strings = LocalStrings.current
     
@@ -211,6 +211,8 @@ private fun MiniAppList(
             }
         }
         
+        // 부산일보 버전: "더보기" 카드 제거
+        /*
         Spacer(modifier = Modifier.height(24.dp))
         
         // Add More Card
@@ -242,6 +244,7 @@ private fun MiniAppList(
                 )
             }
         }
+        */
     }
 }
 

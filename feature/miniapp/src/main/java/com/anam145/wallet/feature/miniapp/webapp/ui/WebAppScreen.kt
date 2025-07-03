@@ -62,7 +62,7 @@ fun WebAppScreen(
     Scaffold(
         topBar = {
             Header(
-                title = "AnamWallet",
+                title = "Haeundae Wallet",
                 showBackButton = true,
                 onBackClick = {
                     viewModel.handleIntent(WebAppContract.Intent.NavigateBack)

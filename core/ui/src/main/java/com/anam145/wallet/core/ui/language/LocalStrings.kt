@@ -17,16 +17,16 @@ val LocalStrings = compositionLocalOf { Strings() }
  */
 data class Strings(
     // Header
-    val headerTitle: String = "AnamWallet",
-    val headerTitleMain: String = "AnamWallet",
+    val headerTitle: String = "Haeundae Wallet",
+    val headerTitleMain: String = "Haeundae Wallet",
     val headerTitleHub: String = "허브",
     val headerTitleBrowser: String = "웹뷰",
-    val headerTitleIdentity: String = "디지털 신분증",
+    val headerTitleIdentity: String = "NFT 컬렉션",  // 부산일보 버전
     val headerTitleSettings: String = "설정",
     
     // Bottom Navigation
     val navMain: String = "메인",
-    val navDid: String = "신분증",
+    val navDid: String = "NFT",  // 부산일보 버전: 신분증 → NFT
     val navHub: String = "허브",
     val navBrowser: String = "브라우저",
     val navSettings: String = "설정",
@@ -48,7 +48,7 @@ data class Strings(
     val settingsFaqDescription: String = "FAQ 확인하기",
     
     val settingsAppInfo: String = "앱 소개",
-    val settingsAppInfoDescription: String = "AnamWallet에 대해 알아보기",
+    val settingsAppInfoDescription: String = "Haeundae Wallet에 대해 알아보기",
     val settingsLicense: String = "라이선스",
     val settingsLicenseDescription: String = "오픈소스 라이선스 정보",
     
@@ -59,7 +59,7 @@ data class Strings(
     val mainScreenTitle: String = "홈 대시보드",
     val hubScreenTitle: String = "허브 화면",
     val browserScreenTitle: String = "브라우저 화면",
-    val identityScreenTitle: String = "디지털 신분증 화면",
+    val identityScreenTitle: String = "NFT 컬렉션",  // 부산일보 버전
     
     // Main Screen
     val mainSectionBlockchain: String = "블록체인",
@@ -79,16 +79,16 @@ data class Strings(
  */
 val EnglishStrings = Strings(
     // Header
-    headerTitle = "AnamWallet",
-    headerTitleMain = "AnamWallet",
+    headerTitle = "Haeundae Wallet",
+    headerTitleMain = "Haeundae Wallet",
     headerTitleHub = "Hub",
     headerTitleBrowser = "WebView",
-    headerTitleIdentity = "Digital ID",
+    headerTitleIdentity = "NFT Collection",  // 부산일보 버전
     headerTitleSettings = "Settings",
     
     // Bottom Navigation
     navMain = "Main",
-    navDid = "ID",
+    navDid = "NFT",  // 부산일보 버전: ID → NFT
     navHub = "Hub",
     navBrowser = "Browser",
     navSettings = "Settings",
@@ -110,7 +110,7 @@ val EnglishStrings = Strings(
     settingsFaqDescription = "Check frequently asked questions",
     
     settingsAppInfo = "App Info",
-    settingsAppInfoDescription = "Learn about AnamWallet",
+    settingsAppInfoDescription = "Learn about Haeundae Wallet",
     settingsLicense = "License",
     settingsLicenseDescription = "Open source license information",
     
@@ -121,7 +121,7 @@ val EnglishStrings = Strings(
     mainScreenTitle = "Home Dashboard",
     hubScreenTitle = "Hub Screen",
     browserScreenTitle = "Browser Screen",
-    identityScreenTitle = "Digital ID Screen",
+    identityScreenTitle = "NFT Collection",  // 부산일보 버전
     
     // Main Screen
     mainSectionBlockchain = "Blockchain",

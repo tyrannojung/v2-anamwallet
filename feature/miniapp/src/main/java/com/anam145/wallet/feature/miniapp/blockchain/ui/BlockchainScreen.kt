@@ -38,7 +38,7 @@ fun BlockchainScreen(
     Scaffold(
         topBar = {
             Header(
-                title = "AnamWallet",
+                title = "Haeundae Wallet",
                 showBackButton = true,
                 onBackClick = {
                     viewModel.handleIntent(BlockchainContract.Intent.NavigateBack)
