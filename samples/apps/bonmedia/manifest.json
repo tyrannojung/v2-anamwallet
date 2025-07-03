@@ -1,0 +1,8 @@
+{
+  "app_id": "com.bon.media",
+  "type": "app",
+  "name": "비온미디어",
+  "version": "1.0.0",
+  "icon": "assets/icons/app_icon.png",
+  "pages": ["pages/index/index"]
+}
