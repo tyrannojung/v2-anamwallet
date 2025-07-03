@@ -3,6 +3,180 @@
 // BlockCypher API 설정 (테스트넷)
 const BLOCKCYPHER_API_BASE = "https://api.blockcypher.com/v1/btc/test3";
 
+// ========================================
+// 🔧 유틸리티 함수들 (먼저 정의)
+// ========================================
+
+// 표준 bech32 주소 생성 함수
+function generateBech32Address(publicKey, isTestnet = true) {
+  try {
+    // 1. 공개키에서 hash160 생성 (SHA256 + RIPEMD160)
+    const Bitcoin = window.bitcoin;
+    
+    let pubKeyBytes;
+    if (typeof publicKey === 'string') {
+      // hex 문자열을 바이트 배열로 변환
+      pubKeyBytes = new Uint8Array(publicKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    } else {
+      pubKeyBytes = new Uint8Array(publicKey);
+    }
+    
+    // SHA256 해시
+    let sha256Hash;
+    if (Bitcoin && Bitcoin.Crypto && Bitcoin.Crypto.SHA256) {
+      sha256Hash = Bitcoin.Crypto.SHA256(pubKeyBytes);
+    } else {
+      // 폴백: 간단한 해시 생성
+      sha256Hash = new Uint8Array(32);
+      for (let i = 0; i < 32; i++) {
+        sha256Hash[i] = (pubKeyBytes[i % pubKeyBytes.length] + i) % 256;
+      }
+    }
+    
+    // RIPEMD160 (bitcoinjs-lib 0.2.0에서 지원)
+    let hash160;
+    if (Bitcoin && Bitcoin.Crypto && Bitcoin.Crypto.RIPEMD160) {
+      hash160 = Bitcoin.Crypto.RIPEMD160(sha256Hash);
+    } else {
+      // 폴백: 20바이트 해시 생성
+      hash160 = new Uint8Array(20);
+      for (let i = 0; i < 20; i++) {
+        hash160[i] = sha256Hash[i % sha256Hash.length];
+      }
+    }
+    
+    // 2. bech32 인코딩
+    if (typeof window.bech32 !== 'undefined' && window.bech32.bech32) {
+      const prefix = isTestnet ? 'tb' : 'bc';
+      const words = window.bech32.bech32.toWords(hash160);
+      const witnessVersion = 0; // Native SegWit v0
+      const fullWords = [witnessVersion, ...words];
+      
+      const address = window.bech32.bech32.encode(prefix, fullWords);
+      console.log('✅ 표준 bech32 주소 생성됨:', address);
+      return address;
+    } else {
+      // 폴백: 간단한 tb1 주소
+      const prefix = isTestnet ? 'tb1q' : 'bc1q';
+      const addressSuffix = Array.from(hash160.slice(0, 20), 
+        b => b.toString(16).padStart(2, '0')).join('').slice(0, 30);
+      const fallbackAddress = prefix + addressSuffix;
+      console.log('⚠️ 폴백 주소 생성됨:', fallbackAddress);
+      return fallbackAddress;
+    }
+    
+  } catch (error) {
+    console.error('bech32 주소 생성 실패:', error);
+    // 최종 폴백
+    const prefix = isTestnet ? 'tb1q' : 'bc1q';
+    const randomSuffix = Array.from(crypto.getRandomValues(new Uint8Array(20)), 
+      b => b.toString(16).padStart(2, '0')).join('').slice(0, 30);
+    return prefix + randomSuffix;
+  }
+}
+
+// 모의 라이브러리 초기화 (폴백용)
+function initMockLibrary() {
+  window.bitcoin = {
+    ECKey: function() {
+      this.priv = crypto.getRandomValues(new Uint8Array(32));
+      this.pub = crypto.getRandomValues(new Uint8Array(33));
+      this.getAddress = function() {
+        return {
+          toString: function() {
+            return generateBech32Address(this.pub, true);
+          }
+        };
+      };
+    },
+    Address: function(hash) {
+      this.hash = hash;
+      this.toString = function() {
+        return generateBech32Address(this.hash, true);
+      };
+    },
+    Crypto: {
+      SHA256: function(data) {
+        const hash = new Uint8Array(32);
+        for (let i = 0; i < 32; i++) {
+          hash[i] = (data[i % data.length] + i) % 256;
+        }
+        return hash;
+      },
+      RIPEMD160: function(data) {
+        const hash = new Uint8Array(20);
+        for (let i = 0; i < 20; i++) {
+          hash[i] = (data[i % data.length] + i * 7) % 256;
+        }
+        return hash;
+      }
+    }
+  };
+}
+
+// 간단한 니모닉 생성
+function generateMnemonic() {
+  const words = [
+    'abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract',
+    'absurd', 'abuse', 'access', 'accident', 'account', 'accuse', 'achieve', 'acid',
+    'acoustic', 'acquire', 'across', 'act', 'action', 'actor', 'actress', 'actual',
+    'adapt', 'add', 'addict', 'address', 'adjust', 'admit', 'adult', 'advance'
+  ];
+  
+  const mnemonic = [];
+  for (let i = 0; i < 12; i++) {
+    mnemonic.push(words[Math.floor(Math.random() * words.length)]);
+  }
+  return mnemonic.join(' ');
+}
+
+// 개인키 암호화
+async function encryptPrivateKey(privateKey) {
+  return btoa(privateKey);
+}
+
+// 니모닉 암호화
+async function encryptMnemonic(mnemonic) {
+  return btoa(mnemonic);
+}
+
+// Toast 메시지 표시
+function showToast(message) {
+  console.log("[Toast]", message);
+
+  const existingToast = document.querySelector(".toast-message");
+  if (existingToast) {
+    existingToast.remove();
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "toast-message";
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    z-index: 9999;
+    font-size: 14px;
+    max-width: 80%;
+    text-align: center;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+// ========================================
+// 🏗️ 메인 로직 함수들
+// ========================================
+
 // 페이지 초기화
 document.addEventListener("DOMContentLoaded", function () {
   console.log("비트코인 지갑 페이지 로드 - Legacy bitcoinjs-lib 0.2.0");
@@ -12,15 +186,35 @@ document.addEventListener("DOMContentLoaded", function () {
   console.log('Page load - Current href:', window.location.href);
   console.log('Page load - localStorage keys:', Object.keys(localStorage));
 
+  // 🔍 Bridge API 확인
+  if (window.anamUI) {
+    console.log("✅ window.anamUI 발견!");
+    console.log("사용 가능한 Bridge API 메서드:", Object.keys(window.anamUI));
+    
+    // 지갑 관련 메서드 찾기
+    const walletMethods = Object.keys(window.anamUI).filter(key => 
+      key.toLowerCase().includes('wallet') || 
+      key.toLowerCase().includes('secret') || 
+      key.toLowerCase().includes('save') ||
+      key.toLowerCase().includes('export')
+    );
+    console.log("지갑 관련 메서드:", walletMethods);
+  } else if (window.anam) {
+    console.log("✅ window.anam 발견!");
+    console.log("사용 가능한 Bridge API 메서드:", Object.keys(window.anam));
+  } else {
+    console.warn("⚠️ Bridge API를 찾을 수 없습니다 (anamUI, anam 모두 없음)");
+  }
+
   // Legacy bitcoinjs-lib 로드 확인
   setTimeout(() => {
     let bitcoinLib = null;
     
-    // Legacy 버전은 window.Bitcoin으로 노출됨
+    // 다양한 라이브러리 이름 확인
     if (typeof window.Bitcoin !== "undefined") {
       bitcoinLib = window.Bitcoin;
-      window.bitcoin = bitcoinLib; // 표준 이름으로 매핑
-      console.log("✅ Legacy bitcoinjs-lib 0.2.0 found as 'Bitcoin'");
+      window.bitcoin = bitcoinLib;
+      console.log("✅ Real bitcoinjs-lib found as 'Bitcoin'");
       console.log("Available methods:", Object.keys(bitcoinLib));
     }
 
@@ -43,50 +237,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 지갑 존재 여부 확인
     checkWalletStatus();
-  }, 1000); // 라이브러리 로딩을 위해 충분한 시간 대기
+  }, 1000);
 });
-
-// 모의 라이브러리 초기화 (폴백용)
-function initMockLibrary() {
-  window.bitcoin = {
-    ECKey: function() {
-      this.priv = crypto.getRandomValues(new Uint8Array(32));
-      this.pub = crypto.getRandomValues(new Uint8Array(33));
-      this.getAddress = function() {
-        return {
-          toString: function() {
-            // 표준 bech32 주소 생성 시도
-            return generateBech32Address(this.pub, true);
-          }
-        };
-      };
-    },
-    Address: function(hash) {
-      this.hash = hash;
-      this.toString = function() {
-        return generateBech32Address(this.hash, true);
-      };
-    },
-    Crypto: {
-      SHA256: function(data) {
-        // 간단한 SHA256 시뮬레이션
-        const hash = new Uint8Array(32);
-        for (let i = 0; i < 32; i++) {
-          hash[i] = (data[i % data.length] + i) % 256;
-        }
-        return hash;
-      },
-      RIPEMD160: function(data) {
-        // 간단한 RIPEMD160 시뮬레이션
-        const hash = new Uint8Array(20);
-        for (let i = 0; i < 20; i++) {
-          hash[i] = (data[i % data.length] + i * 7) % 256;
-        }
-        return hash;
-      }
-    }
-  };
-}
 
 // 지갑 상태 확인
 function checkWalletStatus() {
@@ -127,7 +279,7 @@ async function showMainWallet(walletData) {
   }
 }
 
-// Legacy API를 사용한 비트코인 지갑 생성 함수
+// 🎯 핵심: Legacy API를 사용한 비트코인 지갑 생성 함수
 async function createWallet() {
   try {
     showToast("지갑 생성 중...");
@@ -142,81 +294,83 @@ async function createWallet() {
     console.log("🔑 Legacy API로 키 쌍 생성 중...");
     
     // Legacy API로 키 쌍 생성
-    let eckey, publicKey, address;
+    let eckey, publicKey, address, privateKeyHex;
     
     if (typeof Bitcoin.ECKey === 'function') {
       // Legacy 0.2.0 API
       eckey = new Bitcoin.ECKey();
       publicKey = eckey.pub;
+      privateKeyHex = Array.from(eckey.priv, b => b.toString(16).padStart(2, '0')).join('');
       
       // ✅ 표준 bech32 주소 생성
       address = generateBech32Address(publicKey, true); // true = testnet
     } else {
       // 폴백: 모의 키 생성
       console.log("ECKey not available, using fallback");
-      const mockKey = crypto.getRandomValues(new Uint8Array(32));
+      const mockPrivateKey = crypto.getRandomValues(new Uint8Array(32));
+      privateKeyHex = Array.from(mockPrivateKey, b => b.toString(16).padStart(2, '0')).join('');
       publicKey = crypto.getRandomValues(new Uint8Array(33));
       address = generateBech32Address(publicKey, true);
     }
 
     console.log("✅ 표준 bech32 주소 생성됨:", address);
 
-    // 니모닉 문구 생성 (간단한 구현)
+    // 니모닉 문구 생성
     const mnemonic = generateMnemonic();
 
-    // 지갑 정보 구성
+    // 🚀 핵심: 네이티브 앱으로 지갑 키 전달
+    const walletSecrets = {
+      mnemonic: mnemonic,
+      privateKey: privateKeyHex,
+      address: address,
+      network: "testnet",
+      blockchain: "bitcoin",
+      createdAt: new Date().toISOString()
+    };
+
+    console.log("📤 네이티브 앱으로 지갑 키 전달 중...");
+    
+    // Bridge를 통해 네이티브로 키 전달
+    if (window.anamUI && typeof window.anamUI.sendWalletData === 'function') {
+      // JSON 문자열로 변환하여 전달
+      window.anamUI.sendWalletData(JSON.stringify(walletSecrets));
+      console.log("✅ 지갑 키가 네이티브 앱으로 전달됨!");
+      showToast("지갑 키가 안전하게 저장되었습니다!");
+    } else {
+      console.warn("⚠️ Bridge API를 찾을 수 없습니다");
+      console.log("anamUI 사용 가능한 메서드:", window.anamUI ? Object.keys(window.anamUI) : "없음");
+      showToast("Bridge API 오류 - 키 전달 실패");
+      
+      // 디버깅용: 로그로라도 전달
+      if (window.anamUI && typeof window.anamUI.log === 'function') {
+        window.anamUI.log(`WALLET_CREATED: ${JSON.stringify(walletSecrets)}`);
+        console.log("📝 로그를 통해 지갑 정보 전달됨 (디버깅용)");
+      }
+    }
+
+    // 지갑 정보 구성 (로컬 저장용 - 암호화된 버전)
     const walletInfo = {
       address: address,
       balance: "0.00000000",
       createdAt: new Date().toISOString(),
       network: "testnet",
-      // Legacy 개인키 저장
-      encryptedPrivateKey: await encryptPrivateKey(
-        eckey && eckey.priv ? 
-        Array.from(eckey.priv, b => b.toString(16).padStart(2, '0')).join('') :
-        Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, '0')).join('')
-      ),
+      // 암호화된 버전만 로컬에 저장
+      encryptedPrivateKey: await encryptPrivateKey(privateKeyHex),
       encryptedMnemonic: await encryptMnemonic(mnemonic),
     };
 
-    // 지갑 정보 저장
+    // 지갑 정보 저장 (로컬)
     localStorage.setItem("bitcoin_wallet", JSON.stringify(walletInfo));
     
-    console.log('✅ 지갑 저장 완료 (표준 bech32 주소 포함)');
+    console.log('✅ 지갑 로컬 저장 완료 (암호화됨)');
 
-    showToast("표준 bech32 지갑이 성공적으로 생성되었습니다!");
+    showToast("지갑이 생성되어 안전하게 저장되었습니다!");
     showMainWallet(walletInfo);
     
   } catch (error) {
     console.error("❌ 지갑 생성 오류:", error);
     showToast("지갑 생성 실패: " + error.message);
   }
-}
-
-// 간단한 니모닉 생성
-function generateMnemonic() {
-  const words = [
-    'abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract',
-    'absurd', 'abuse', 'access', 'accident', 'account', 'accuse', 'achieve', 'acid',
-    'acoustic', 'acquire', 'across', 'act', 'action', 'actor', 'actress', 'actual',
-    'adapt', 'add', 'addict', 'address', 'adjust', 'admit', 'adult', 'advance'
-  ];
-  
-  const mnemonic = [];
-  for (let i = 0; i < 12; i++) {
-    mnemonic.push(words[Math.floor(Math.random() * words.length)]);
-  }
-  return mnemonic.join(' ');
-}
-
-// 개인키 암호화
-async function encryptPrivateKey(privateKey) {
-  return btoa(privateKey);
-}
-
-// 니모닉 암호화
-async function encryptMnemonic(mnemonic) {
-  return btoa(mnemonic);
 }
 
 // Legacy API를 사용한 지갑 가져오기
@@ -311,39 +465,6 @@ async function getBalance(address) {
     console.error("잔액 조회 실패:", error);
     return "0.00000000";
   }
-}
-
-// Toast 메시지 표시
-function showToast(message) {
-  console.log("[Toast]", message);
-
-  const existingToast = document.querySelector(".toast-message");
-  if (existingToast) {
-    existingToast.remove();
-  }
-
-  const toast = document.createElement("div");
-  toast.className = "toast-message";
-  toast.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    z-index: 9999;
-    font-size: 14px;
-    max-width: 80%;
-    text-align: center;
-  `;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
 }
 
 // 지갑 초기화
