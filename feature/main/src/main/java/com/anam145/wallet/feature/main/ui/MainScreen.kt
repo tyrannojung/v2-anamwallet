@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.core.common.model.MiniAppType
 import com.anam145.wallet.core.ui.language.LocalStrings
+import com.anam145.wallet.feature.main.utils.MasterKeyUtil;
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
@@ -108,6 +110,7 @@ fun MainScreen(
                 )
             }
             else -> {
+                val context = LocalContext.current;
                 MiniAppList(
                     blockchainApps = uiState.blockchainApps,
                     regularApps = uiState.regularApps,
@@ -117,7 +120,8 @@ fun MainScreen(
                     onAddMoreClick = { viewModel.handleIntent(MainContract.MainIntent.ClickAddMore) },
                     onPasswordChanged = { input -> password = input },
                     onPasswordSubmit = { pw ->
-                        android.util.Log.d("MainScreen", "현재 비밀번호: $pw")
+                        android.util.Log.d("MainScreen", "현재 비밀번호: $pw");
+                        MasterKeyUtil.genMasterKey(context, pw);
                     }
                 )
             }
