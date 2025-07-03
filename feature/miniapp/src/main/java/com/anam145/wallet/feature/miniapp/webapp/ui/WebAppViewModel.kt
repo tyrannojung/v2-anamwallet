@@ -370,4 +370,14 @@ class WebAppViewModel @Inject constructor(
             }
         }
     }
+    
+    /**
+     * 현재 활성화된 블록체인 ID를 반환합니다.
+     * JavaScript Bridge에서 호출됩니다.
+     * 
+     * @return 활성화된 블록체인 ID, 없으면 null
+     */
+    fun getActiveBlockchainId(): String? {
+        return _uiState.value.activeBlockchainId
+    }
 }

@@ -181,6 +181,15 @@
   font-weight: 500;
 }
 
+.inactive-badge {
+  background-color: #f39c12;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 /* 결제 버튼 */
 .payment-button {
   width: 100%;

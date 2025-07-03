@@ -102,6 +102,9 @@ fun WebAppScreen(
                                     WebAppContract.Intent.RequestTransaction(transactionData)
                                 )
                             },
+                            onGetActiveBlockchain = {
+                                viewModel.getActiveBlockchainId()
+                            },
                             onWebViewCreated = { 
                                 webView = it
                                 viewModel.onWebViewReady()

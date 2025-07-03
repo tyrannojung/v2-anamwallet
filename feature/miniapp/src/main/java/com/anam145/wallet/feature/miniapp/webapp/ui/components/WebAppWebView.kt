@@ -20,6 +20,7 @@ fun WebAppWebView(
     manifest: MiniAppManifest,
     fileManager: MiniAppFileManager,
     onTransactionRequest: (JSONObject) -> Unit,
+    onGetActiveBlockchain: () -> String?,
     onWebViewCreated: (WebView) -> Unit
 ) {
     val context = LocalContext.current
@@ -29,7 +30,8 @@ fun WebAppWebView(
         WebAppJavaScriptBridge(
             context = context,
             manifest = manifest,
-            onTransactionRequest = onTransactionRequest
+            onTransactionRequest = onTransactionRequest,
+            onGetActiveBlockchain = onGetActiveBlockchain
         )
     }
     

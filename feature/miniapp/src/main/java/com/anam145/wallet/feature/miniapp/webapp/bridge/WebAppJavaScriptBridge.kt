@@ -16,7 +16,8 @@ import org.json.JSONObject
 class WebAppJavaScriptBridge(
     private val context: Context,
     private val manifest: MiniAppManifest?,
-    private val onTransactionRequest: ((JSONObject) -> Unit)? = null
+    private val onTransactionRequest: ((JSONObject) -> Unit)? = null,
+    private val onGetActiveBlockchain: (() -> String?)? = null
 ) {
     
     // WebView 인스턴스 참조
@@ -109,5 +110,49 @@ class WebAppJavaScriptBridge(
         } ?: Log.e(TAG, "Context is not ComponentActivity")
     }
     
-    
+    /**
+     * 활성화된 블록체인 정보 가져오기
+     * JavaScript: window.anam.getActiveBlockchain()
+     * 
+     * @return JSON 문자열 형태의 블록체인 정보
+     *         예: {"blockchainId": "com.anam.ethereum", "name": "Ethereum"}
+     */
+    @JavascriptInterface
+    fun getActiveBlockchain(): String {
+        Log.d(TAG, "getActiveBlockchain called")
+        
+        return try {
+            val blockchainId = onGetActiveBlockchain?.invoke()
+            
+            if (blockchainId.isNullOrEmpty()) {
+                // 활성화된 블록체인이 없는 경우
+                JSONObject().apply {
+                    put("blockchainId", "")
+                    put("name", "")
+                    put("isActive", false)
+                }.toString()
+            } else {
+                // 블록체인 이름 추출 (예: com.anam.ethereum -> Ethereum)
+                // TODO: 임시 하드코딩 - 블록체인 이름 매핑은 실제로는 manifest에서 가져와야 함
+                val name = when (blockchainId) {
+                    "com.anam.ethereum" -> "Ethereum"
+                    "com.anam.solana" -> "Solana"
+                    else -> blockchainId.substringAfterLast(".")
+                        .replaceFirstChar { it.uppercase() }
+                }
+                
+                JSONObject().apply {
+                    put("blockchainId", blockchainId)
+                    put("name", name)
+                    put("isActive", true)
+                }.toString()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting active blockchain", e)
+            JSONObject().apply {
+                put("error", e.message ?: "Unknown error")
+                put("isActive", false)
+            }.toString()
+        }
+    }
 }
