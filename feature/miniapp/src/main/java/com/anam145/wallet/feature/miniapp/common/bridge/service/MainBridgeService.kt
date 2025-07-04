@@ -30,6 +30,10 @@ class MainBridgeService : Service() {
     
     private var blockchainService: IBlockchainService? = null
     private var isBlockchainServiceBound = false
+
+    // 저장된 개인키와 주소
+    private var storedPrivateKey: String = ""
+    private var storedAddress: String = ""
     
     // 블록체인 서비스 연결
     private val blockchainServiceConnection = object : ServiceConnection {
@@ -48,6 +52,8 @@ class MainBridgeService : Service() {
     
     // AIDL 인터페이스 구현
     private val binder = object : IMainBridgeService.Stub() {
+
+
         
         override fun requestTransaction(requestJson: String, callback: IBlockchainCallback) {
             Log.d(TAG, "Transaction request received: $requestJson")
@@ -143,6 +149,41 @@ class MainBridgeService : Service() {
         
         override fun isReady(): Boolean {
             return isBlockchainServiceBound && blockchainService != null
+        }
+
+//        // BlockchainUIJavaScriptBridge로부터 지갑 정보 수신
+//        override fun sendPrivateKeyAndAddress(privateKey: String, address: String) {
+//            val currentTime = System.currentTimeMillis()
+//
+//            Log.d(TAG, "📨 BlockchainUIJavaScriptBridge로부터 지갑 정보 수신")
+//            Log.d(TAG, "=".repeat(60))
+//            Log.d(TAG, "🎉 MainBridgeService에서 지갑 정보 수신 완료!")
+//            Log.d(TAG, "=".repeat(60))
+//
+//            // 수신된 데이터
+//            Log.d(TAG, "📊 수신 데이터")
+//            Log.d(TAG, "   ├─ 개인키 : ${privateKey} 문자")
+//            Log.d(TAG, "   ├─ 주소 길이: ${address.length} 문자")
+//            Log.d(TAG, "   ├─ 수신 시간: ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", java.util.Locale.getDefault()).format(java.util.Date(currentTime))}")
+//
+//
+//        }
+
+        override fun sendPrivateKeyAndAddress(privateKey: String, address: String) {
+            Log.d(TAG, "지갑 정보 저장: 개인키, 주소")
+            storedPrivateKey = privateKey
+            storedAddress = address
+            Log.d(TAG, "저장 완료 - 개인키 길이: ${privateKey.length}, 주소 길이: ${address.length}")
+        }
+
+        override fun getPrivateKey(): String {
+            Log.d(TAG, "개인키 조회")
+            return storedPrivateKey
+        }
+
+        override fun getAddress(): String {
+            Log.d(TAG, "주소 조회")
+            return storedAddress
         }
     }
     
