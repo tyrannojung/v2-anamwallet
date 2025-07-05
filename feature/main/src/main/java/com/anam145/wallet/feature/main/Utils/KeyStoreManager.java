@@ -1,6 +1,6 @@
-package com.anam145.wallet.feature.main.utils;
+package com.anam145.wallet.feature.main.Utils;
 
-import org.web3j.crypto.exception.Exception;
+import org.web3j.crypto.CipherException;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.NoSuchPaddingException;
 import java.security.InvalidKeyException;
@@ -179,19 +179,19 @@ public class KeyStoreManager {
         // how to make & return JSONObject
         //TODO
 
-        WalletFile WalletFile = new WalletFile();
-        WalletFile.setAddress(address);
+        KeyStoreFile KeyStoreFile = new KeyStoreFile();
+        KeyStoreFile.setAddress(address);
 
-        WalletFile.Crypto crypto = new WalletFile.Crypto();
+        KeyStoreFile.Crypto crypto = new KeyStoreFile.Crypto();
         crypto.setCipher("aes-128-ctr");
         crypto.setCiphertext(toHexStringNoPrefix(cipherText));
 
-        WalletFile.CipherParams cipherParams = new WalletFile.CipherParams();
+        KeyStoreFile.CipherParams cipherParams = new KeyStoreFile.CipherParams();
         cipherParams.setIv(toHexStringNoPrefix(iv));
         crypto.setCipherparams(cipherParams);
 
         crypto.setKdf("scrypt");
-        WalletFile.ScryptKdfParams kdfParams = new WalletFile.ScryptKdfParams();
+        KeyStoreFile.ScryptKdfParams kdfParams = new KeyStoreFile.ScryptKdfParams();
         kdfParams.setDklen(32);
         kdfParams.setN(262144);
         kdfParams.setP(1);
@@ -200,17 +200,19 @@ public class KeyStoreManager {
         crypto.setKdfparams(kdfParams);
 
         crypto.setMac(toHexStringNoPrefix(mac));
-        WalletFile.setCrypto(crypto);
-        WalletFile.setId(UUID.randomUUID().toString());
-        WalletFile.setVersion(1);
+        KeyStoreFile.setCrypto(crypto);
+        KeyStoreFile.setId(UUID.randomUUID().toString());
+        KeyStoreFile.setVersion(1);
 
         DateTimeFormatter format = DateTimeFormatter.ofPattern("'UTC--'yyyy-MM-dd'T'HH-mm-ss.nVV'--'");
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-        String fileName = now.format(format) + WalletFile.getAddress() + ".json";
+        String fileName = now.format(format) + KeyStoreFile.getAddress() + ".json";
 
-        File Destination = new File(destinationDirectory, fileName);
+//        File Destination = new File(destinationDirectory, fileName);
+//
+//        objectMapper.writeValue(Destination, KeyStoreFile);
 
-        objectMapper.writeValue(Destination, WalletFile);
+        String contents = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(KeyStoreFile);
         return fileName;
     }
 
@@ -241,25 +243,25 @@ public class KeyStoreManager {
         System.out.println("AES CipherText: " +toHexString(cipherText, 0, mac.length, false));
         System.out.println("Mac: "+toHexString(mac, 0, mac.length, false));
     }
-    static void validate(WalletFile WalletFile) throws Exception {
-        WalletFile.Crypto crypto = WalletFile.getCrypto();
+    static void validate(KeyStoreFile KeyStoreFile) throws CipherException {
+        KeyStoreFile.Crypto crypto = KeyStoreFile.getCrypto();
 
-        if (WalletFile.getVersion() != 1) {
-            throw new Exception("Wallet version is not supported");
+        if (KeyStoreFile.getVersion() != 1) {
+            throw new CipherException("Wallet version is not supported");
         }
 
         if (!crypto.getCipher().equals("aes-128-ctr")) {
-            throw new Exception("Wallet cipher is not supported");
+            throw new CipherException("Wallet cipher is not supported");
         }
 
         if (!crypto.getKdf().equals("pbkdf2") && !crypto.getKdf().equals("scrypt")) {
-            throw new Exception("KDF type is not supported");
+            throw new CipherException("KDF type is not supported");
         }
     }
-    public static Credentials decrypt(String password, WalletFile WalletFile) throws Exception{
-        validate(WalletFile);
+    public static Credentials decrypt(String password, KeyStoreFile KeyStoreFile) throws CipherException{
+        validate(KeyStoreFile);
 
-        WalletFile.Crypto crypto = WalletFile.getCrypto();
+        KeyStoreFile.Crypto crypto = KeyStoreFile.getCrypto();
 
         byte[] mac = hexStringToByteArray(crypto.getMac());
         byte[] iv = hexStringToByteArray(crypto.getCipherparams().getIv());
@@ -267,9 +269,9 @@ public class KeyStoreManager {
 
         byte[] derivedKey;
 
-        WalletFile.KdfParams kdfParams = crypto.getKdfparams();
-        if(kdfParams instanceof WalletFile.ScryptKdfParams){
-            WalletFile.ScryptKdfParams scryptKdfParams = (WalletFile.ScryptKdfParams) crypto.getKdfparams();
+        KeyStoreFile.KdfParams kdfParams = crypto.getKdfparams();
+        if(kdfParams instanceof KeyStoreFile.ScryptKdfParams){
+            KeyStoreFile.ScryptKdfParams scryptKdfParams = (KeyStoreFile.ScryptKdfParams) crypto.getKdfparams();
             int dklen = scryptKdfParams.getDklen();
             int n = scryptKdfParams.getN();
             int p = scryptKdfParams.getP();
@@ -279,13 +281,13 @@ public class KeyStoreManager {
         }
         // TODO: 아니면 어떡하는데?
         else{
-            throw new Exception("Unable to deserialize params: " + crypto.getKdf());
+            throw new CipherException("Unable to deserialize params: " + crypto.getKdf());
         }
 
         byte[] derivedMac = generateMac(derivedKey, cipherText);
 
         if(!Arrays.equals(derivedMac, mac)){
-            throw new Exception("Invalid Password provided");
+            throw new CipherException("Invalid Password provided");
         }
 
         byte[] encryptKey = Arrays.copyOfRange(derivedKey, 0, 16);
@@ -303,8 +305,9 @@ public class KeyStoreManager {
                  | InvalidKeyException
                  | IllegalBlockSizeException
                  | BadPaddingException e) {
-            throw new Exception("Error performing cipher operation", e);
+            throw new CipherException("Error performing cipher operation", e);
         }
-        return new Credentials(WalletFile.getAddress(), toHexStringNoPrefix(privateKey));
+        return new Credentials(KeyStoreFile.getAddress(), toHexStringNoPrefix(privateKey));
     }
+
 }

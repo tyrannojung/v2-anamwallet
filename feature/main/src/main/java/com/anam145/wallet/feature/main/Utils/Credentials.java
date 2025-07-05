@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.main.utils;
+package com.anam145.wallet.feature.main.Utils;
 
 public class Credentials {
     private final String address;

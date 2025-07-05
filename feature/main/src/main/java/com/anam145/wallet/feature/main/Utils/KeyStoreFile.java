@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.main.utils;
+package com.anam145.wallet.feature.main.Utils;
 
 import java.io.IOException;
 
@@ -12,13 +12,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class WalletFile {
+public class KeyStoreFile {
     private String address;
     private Crypto crypto;
     private String id;
     private int version;
 
-    public WalletFile() {}
+    public KeyStoreFile() {}
 
     public String getAddress() {
         return address;
@@ -63,11 +63,11 @@ public class WalletFile {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof WalletFile)) {
+        if (!(o instanceof KeyStoreFile)) {
             return false;
         }
 
-        WalletFile that = (WalletFile) o;
+        KeyStoreFile that = (KeyStoreFile) o;
 
         if (getAddress() != null
                 ? !getAddress().equals(that.getAddress())

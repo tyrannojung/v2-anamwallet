@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.main.utils;
+package com.anam145.wallet.feature.main.Utils;
 
 import android.content.Context;
 import android.util.Base64;
@@ -10,7 +10,6 @@ import com.google.gson.annotations.SerializedName;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FileReader;
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 
