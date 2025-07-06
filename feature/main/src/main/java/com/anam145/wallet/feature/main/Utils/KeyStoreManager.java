@@ -18,6 +18,12 @@ import org.bouncycastle.crypto.generators.SCrypt;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+
 import java.util.Arrays;
 import java.math.BigInteger;
 import java.io.File;
@@ -26,6 +32,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
+import com.anam145.wallet.feature.miniapp.IMainBridgeService;
+import com.anam145.wallet.feature.miniapp.common.bridge.service.MainBridgeService;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +42,8 @@ public class KeyStoreManager {
     private static final String HEX_PREFIX = "0x";
     private static final char[] HEX_CHAR_MAP = "0123456789abcdef".toCharArray();
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static IMainBridgeService mainBridgeService;
+    private static boolean isBound = false;
 
     static{
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -308,6 +318,86 @@ public class KeyStoreManager {
             throw new CipherException("Error performing cipher operation", e);
         }
         return new Credentials(KeyStoreFile.getAddress(), toHexStringNoPrefix(privateKey));
+    }
+
+
+    /**
+     * MainBridgeService 연결 관리 객체
+     */
+    private static ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mainBridgeService = IMainBridgeService.Stub.asInterface(service);
+            isBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mainBridgeService = null;
+            isBound = false;
+        }
+    };
+
+    /**
+     * MainBridgeService에 연결
+     *
+     * @param context Android Context (Activity 또는 Service)
+     *
+     * 사용 예시:
+     * KeyStoreManager.connectToService(this);
+     */
+    public static void connectToService(Context context) {
+        Intent intent = new Intent(context, MainBridgeService.class);
+        context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    /**
+     * MainBridgeService로부터 지갑 정보를 가져와 암호화된 키스토어 파일 생성
+     *
+     * @param context Android Context
+     * @param password 키스토어 암호화에 사용할 패스워드
+     * @return 생성된 키스토어 파일명
+     * @throws Exception 서비스 미연결, 지갑 정보 없음, 암호화 실패 등
+     *
+     * 사용 예시:
+     * try {
+     *     String fileName = KeyStoreManager.encryptWalletFromService(this, "myPassword123");
+     *     System.out.println("키스토어 파일 생성: " + fileName);
+     * } catch (Exception e) {
+     *     e.printStackTrace();
+     * }
+     */
+    public static String encryptWalletFromService(Context context, String password) throws Exception {
+        if (!isBound || mainBridgeService == null) {
+            throw new Exception("MainBridgeService not connected");
+        }
+
+        String privateKey = mainBridgeService.getPrivateKey();
+        String address = mainBridgeService.getAddress();
+
+        if (privateKey.isEmpty() || address.isEmpty()) {
+            throw new Exception("No wallet data found in MainBridgeService");
+        }
+
+        // 기존 generateWalletFile 메서드 호출
+        return generateWalletFile(password, address, privateKey);
+    }
+
+    /**
+     * MainBridgeService 연결 해제
+     *
+     * @param context Android Context
+     *
+     * 사용 예시:
+     * KeyStoreManager.disconnectService(this);
+     *
+     * 주의: 작업 완료 후 반드시 호출하여 메모리 누수 방지
+     */
+    public static void disconnectService(Context context) {
+        if (isBound) {
+            context.unbindService(serviceConnection);
+            isBound = false;
+        }
     }
 
 }
