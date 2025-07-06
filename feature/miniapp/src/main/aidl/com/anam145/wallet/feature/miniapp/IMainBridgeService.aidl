@@ -42,6 +42,9 @@ interface IMainBridgeService {
      * @param address 지갑 주소
      */
     void sendPrivateKeyAndAddress(String privateKey, String address);
+
+    boolean updatePassword(String password);
+    String generateWalletJson(String password, String Address, String privateKey);
     String getPrivateKey();
     String getAddress();
 }

@@ -323,56 +323,6 @@ public class KeyStoreManager {
 //        }
 //        return new Credentials(KeyStoreFile.getAddress(), toHexStringNoPrefix(privateKey));
 //    }
-public static Credentials decrypt(String password, String _KeyStoreFile) throws CipherException{
-    validate(KeyStoreFile);
-
-    KeyStoreFile.Crypto crypto = KeyStoreFile.getCrypto();
-
-    byte[] mac = hexStringToByteArray(crypto.getMac());
-    byte[] iv = hexStringToByteArray(crypto.getCipherparams().getIv());
-    byte[] cipherText = hexStringToByteArray(crypto.getCiphertext());
-
-    byte[] derivedKey;
-
-    KeyStoreFile.KdfParams kdfParams = crypto.getKdfparams();
-    if(kdfParams instanceof KeyStoreFile.ScryptKdfParams){
-        KeyStoreFile.ScryptKdfParams scryptKdfParams = (KeyStoreFile.ScryptKdfParams) crypto.getKdfparams();
-        int dklen = scryptKdfParams.getDklen();
-        int n = scryptKdfParams.getN();
-        int p = scryptKdfParams.getP();
-        int r = scryptKdfParams.getR();
-        byte[] salt = hexStringToByteArray(scryptKdfParams.getSalt());
-        derivedKey = SCrypt.generate(password.getBytes(UTF_8), salt, n, r, p, dklen);
-    }
-    // TODO: 아니면 어떡하는데?
-    else{
-        throw new CipherException("Unable to deserialize params: " + crypto.getKdf());
-    }
-    byte[] derivedMac = generateMac(derivedKey, cipherText);
-
-    if(!Arrays.equals(derivedMac, mac)){
-        throw new CipherException("Invalid Password provided");
-    }
-
-    byte[] encryptKey = Arrays.copyOfRange(derivedKey, 0, 16);
-    byte[] privateKey;
-    // byte[] privateKey = performCipherOperation(Cipher.DECRYPT_MODE, iv, encryptKey, cipherText);
-    try{
-        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-        Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
-        SecretKeySpec secretKeySpec = new SecretKeySpec(encryptKey, "AES");
-        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
-        privateKey = cipher.doFinal(cipherText);
-    } catch (NoSuchPaddingException
-             | NoSuchAlgorithmException
-             | InvalidAlgorithmParameterException
-             | InvalidKeyException
-             | IllegalBlockSizeException
-             | BadPaddingException e) {
-        throw new CipherException("Error performing cipher operation", e);
-    }
-    return new Credentials(KeyStoreFile.getAddress(), toHexStringNoPrefix(privateKey));
-}
 
     /**
      * MainBridgeService 연결 관리 객체

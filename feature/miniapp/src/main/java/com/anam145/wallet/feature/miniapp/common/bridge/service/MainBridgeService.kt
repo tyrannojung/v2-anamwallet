@@ -17,7 +17,7 @@ import org.json.JSONObject
 
 /**
  * 메인 브릿지 서비스 - 메인 프로세스에서 실행
- * 
+ *
  * 일반 웹앱(정부24 등)과 블록체인 서비스 간의 브릿지 역할을 합니다.
  * 웹앱 프로세스(:app)에서의 요청을 받아 블록체인 프로세스(:blockchain)로 전달합니다.
  */
@@ -31,10 +31,14 @@ class MainBridgeService : Service() {
     private var blockchainService: IBlockchainService? = null
     private var isBlockchainServiceBound = false
 
+
     // 저장된 개인키와 주소
     private var storedPrivateKey: String = ""
     private var storedAddress: String = ""
-    
+
+    //main에서 받을 password
+    private var password: String = ""
+
     // 블록체인 서비스 연결
     private val blockchainServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -52,9 +56,6 @@ class MainBridgeService : Service() {
     
     // AIDL 인터페이스 구현
     private val binder = object : IMainBridgeService.Stub() {
-
-
-        
         override fun requestTransaction(requestJson: String, callback: IBlockchainCallback) {
             Log.d(TAG, "Transaction request received: $requestJson")
             
@@ -175,6 +176,22 @@ class MainBridgeService : Service() {
             storedAddress = address
             Log.d(TAG, "저장 완료 - 개인키 길이: ${privateKey.length}, 주소 길이: ${address.length}")
         }
+
+        override fun updatePassword(password: String): Boolean {
+            return try {
+                Log.d("해치웠나", "비밀번호 받아오기 해치웠나?")
+                this@MainBridgeService.password = password
+                true // 성공적으로 저장했을 때
+            } catch (e: Exception) {
+                Log.e("MainBridgeService", "비밀번호 저장 실패: ${e.message}")
+                false // 예외가 발생하면 실패 처리
+            }
+        }
+        override fun generateWalletJson(password: String, Address: String, privateKey: String): String {
+
+            return "";
+        }
+
 
         override fun getPrivateKey(): String {
             Log.d(TAG, "개인키 조회")

@@ -120,7 +120,7 @@ fun MainScreen(
                     onPasswordChanged = { input -> password = input },
                     onPasswordSubmit = { pw ->
                         android.util.Log.d("MainScreen", "현재 비밀번호: $pw");
-                        MasterKeyUtil.genMasterKey(context, pw);
+                        viewModel.sendPasswordToService(pw);
                     }
                 )
             }
