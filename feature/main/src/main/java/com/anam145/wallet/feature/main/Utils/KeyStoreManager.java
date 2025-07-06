@@ -1,5 +1,7 @@
 package com.anam145.wallet.feature.main.Utils;
 
+import static android.content.ContentValues.TAG;
+
 import org.web3j.crypto.CipherException;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.NoSuchPaddingException;
@@ -18,6 +20,13 @@ import org.bouncycastle.crypto.generators.SCrypt;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.util.Log;
+
 import java.util.Arrays;
 import java.math.BigInteger;
 import java.io.File;
@@ -26,6 +35,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
+import com.anam145.wallet.feature.miniapp.IMainBridgeService;
+import com.anam145.wallet.feature.miniapp.common.bridge.service.MainBridgeService;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +45,9 @@ public class KeyStoreManager {
     private static final String HEX_PREFIX = "0x";
     private static final char[] HEX_CHAR_MAP = "0123456789abcdef".toCharArray();
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static IMainBridgeService mainBridgeService;
+    private static boolean isBound = false;
+    private static Context applicationContext;
 
     static{
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -334,7 +348,6 @@ public static Credentials decrypt(String password, String _KeyStoreFile) throws 
     else{
         throw new CipherException("Unable to deserialize params: " + crypto.getKdf());
     }
-
     byte[] derivedMac = generateMac(derivedKey, cipherText);
 
     if(!Arrays.equals(derivedMac, mac)){
@@ -360,5 +373,193 @@ public static Credentials decrypt(String password, String _KeyStoreFile) throws 
     }
     return new Credentials(KeyStoreFile.getAddress(), toHexStringNoPrefix(privateKey));
 }
+
+    /**
+     * MainBridgeService 연결 관리 객체
+     */
+    private static ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mainBridgeService = IMainBridgeService.Stub.asInterface(service);
+            isBound = true;
+            Log.d(TAG, "MainBridgeService 연결됨");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mainBridgeService = null;
+            isBound = false;
+            Log.d(TAG, "MainBridgeService 연결 해제됨");
+        }
+    };
+
+    /**
+     * 지갑 암호화 전체 프로세스 실행 (템플릿 메서드)
+     *
+     * 연결 -> 암호화 -> 해제를 자동으로 처리
+     *
+     * @param context Android Context
+     * @param password 암호화에 사용할 패스워드
+     * @return 암호화 결과 (성공 시 키스토어 파일명, 실패 시 null)
+     */
+    public static String processWalletEncryption(Context context, String password) {
+        String result = null;
+
+        try {
+            // 1. MainBridgeService 연결
+            connectToService(context);
+
+            // 2. 연결 대기 (최대 5초)
+            if (waitForConnection(5000)) {
+                Log.d(TAG, "MainBridgeService 연결 완료");
+
+                // 3. 지갑 데이터 가져오기
+                String privateKey = getPrivateKeyFromService();
+                String address = getAddressFromService();
+
+                // 4. 암호화 실행
+                result = encryptWalletData(privateKey, address, password);
+
+            } else {
+                Log.e(TAG, "MainBridgeService 연결 타임아웃");
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "지갑 암호화 프로세스 실패", e);
+
+        } finally {
+            // 5. 연결 해제 (항상 실행)
+            disconnectService(context);
+        }
+
+        return result;
+    }
+
+    /**
+     * MainBridgeService에 연결
+     */
+    private static void connectToService(Context context) {
+        applicationContext = context.getApplicationContext();
+        Intent intent = new Intent(applicationContext, MainBridgeService.class);
+        applicationContext.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        Log.d(TAG, "MainBridgeService 연결 시도 중...");
+    }
+
+    /**
+     * 서비스 연결 대기
+     *
+     * @param timeoutMs 대기 시간 (밀리초)
+     * @return 연결 성공 여부
+     */
+    private static boolean waitForConnection(long timeoutMs) {
+        long startTime = System.currentTimeMillis();
+
+        while (!isServiceConnected()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return false;
+            }
+
+            if (System.currentTimeMillis() - startTime > timeoutMs) {
+                Log.e(TAG, "서비스 연결 타임아웃");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * MainBridgeService로부터 개인키 가져오기
+     */
+    private static String getPrivateKeyFromService() throws Exception {
+        if (!isServiceConnected()) {
+            throw new Exception("MainBridgeService not connected");
+        }
+
+        String privateKey = mainBridgeService.getPrivateKey();
+
+        if (privateKey == null || privateKey.isEmpty()) {
+            throw new Exception("No private key found in MainBridgeService");
+        }
+
+        Log.d(TAG, "개인키 조회 성공: " + privateKey.length() + "자");
+        return privateKey;
+    }
+
+    /**
+     * MainBridgeService로부터 주소 가져오기
+     */
+    private static String getAddressFromService() throws Exception {
+        if (!isServiceConnected()) {
+            throw new Exception("MainBridgeService not connected");
+        }
+
+        String address = mainBridgeService.getAddress();
+
+        if (address == null || address.isEmpty()) {
+            throw new Exception("No address found in MainBridgeService");
+        }
+
+        Log.d(TAG, "주소 조회 성공: " + address);
+        return address;
+    }
+
+    /**
+     * MainBridgeService 연결 해제
+     */
+    private static void disconnectService(Context context) {
+        if (isBound && applicationContext != null) {
+            try {
+                applicationContext.unbindService(serviceConnection);
+                isBound = false;
+                Log.d(TAG, "MainBridgeService 연결 해제됨");
+            } catch (Exception e) {
+                Log.e(TAG, "Service 연결 해제 중 오류", e);
+            }
+        }
+    }
+
+    /**
+     * 서비스 연결 상태 확인
+     */
+    private static boolean isServiceConnected() {
+        return isBound && mainBridgeService != null;
+    }
+
+    // =========================================================================
+    // 개발자가 구현해야 할 부분
+    // =========================================================================
+
+    /**
+     * 지갑 데이터 암호화 구현 영역
+     *
+     * 이 메서드를 구현하여 개인키와 주소를 암호화하세요.
+     *
+     * @param privateKey MainBridgeService로부터 가져온 개인키
+     * @param address MainBridgeService로부터 가져온 지갑 주소
+     * @param password 사용자가 입력한 암호화 패스워드
+     * @return 암호화 결과 (예: 키스토어 파일명, 암호화된 데이터 등)
+     */
+    private static String encryptWalletData(String privateKey, String address, String password) {
+        // TODO: 암호화 로직
+
+        Log.d(TAG, "암호화 시작");
+        Log.d(TAG, "개인키 길이: " + privateKey.length());
+        Log.d(TAG, "주소: " + address);
+        Log.d(TAG, "패스워드 설정됨: " + (password != null && !password.isEmpty()));
+
+        try {
+            // 수정.
+
+            return null;
+
+        } catch (Exception e) {
+            Log.e(TAG, "암호화 실패", e);
+            return null;
+        }
+    }
 
 }
