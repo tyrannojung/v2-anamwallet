@@ -16,7 +16,7 @@ interface HubContract {
 
     data class HubState(
         val installedMiniApp: List<MiniApp> = emptyList(),
-        val installedMiniAppManifest: List<MiniApp> = emptyList(),
+        val unInstalledMiniApp: List<MiniApp> = emptyList(),
     )
 
 
@@ -35,6 +35,7 @@ interface HubContract {
     sealed interface HubIntent {
         data class InstallMiniApp(val miniApp: MiniApp) : HubIntent
         data class UninstallMiniApp(val miniApp: MiniApp) : HubIntent
+        data object RefreshUninstlledMiniApp : HubIntent
         data class ClickMiniApp(val miniApp: MiniApp) : HubIntent
     }
 

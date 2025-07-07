@@ -1,5 +1,6 @@
 package com.anam145.wallet.feature.hub.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,26 +30,10 @@ fun HubScreen(
     viewModel: HubViewModel = hiltViewModel()
 ) {
     val strings = LocalStrings.current
-//    val installedModules: List<String> = listOf("installcoin1", "installcoin2")
-//    val notInstalledModules: List<String> = listOf("uninstallcoin1", "uninstallcoin2")
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val installedMiniApp: List<MiniApp> = uiState.installedMiniApp
-    val notInstalledModules: List<MiniApp> = listOf(
-        MiniApp(
-            appId = "app_id_1",
-            name = "Blockchain Wallet",
-            type = MiniAppType.BLOCKCHAIN,
-            iconPath = "/path/to/blockchain_icon",
-            balance = "0.25 ETH"
-        ),
-        MiniApp(
-            appId = "app_id_2",
-            name = "APP",
-            type = MiniAppType.APP,
-            iconPath = "/path/to/web_icon",
-            balance = "-"
-        ),
-    )
+    val notInstalledModules: List<MiniApp> = uiState.unInstalledMiniApp
+    viewModel.handleIntent(HubContract.HubIntent.RefreshUninstlledMiniApp)
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -59,6 +44,18 @@ fun HubScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+            // 새로고침 버튼
+            Text(
+                text = "새로고침",
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(bottom = 8.dp)
+                    .clickable {
+                        viewModel.handleIntent(HubContract.HubIntent.RefreshUninstlledMiniApp)
+                    },
+                color = MaterialTheme.colorScheme.primary
+            )
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -90,4 +87,3 @@ fun HubScreen(
         }
     }
 }
-

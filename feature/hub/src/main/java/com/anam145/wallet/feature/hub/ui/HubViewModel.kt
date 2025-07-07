@@ -3,10 +3,10 @@ package com.anam145.wallet.feature.hub.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.anam145.wallet.core.common.model.Language
 import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.feature.hub.usecase.GetMiniAppManifestsUseCase
-import com.anam145.wallet.feature.hub.usecase.GetMiniAppsUseCase
+import com.anam145.wallet.feature.hub.usecase.GetInstalledMiniAppsUseCase
+import com.anam145.wallet.feature.hub.usecase.GetUnInstalledMiniAppsUseCase
 import com.anam145.wallet.feature.hub.usecase.InstallMiniAppUseCase
 import com.anam145.wallet.feature.hub.usecase.UninstallMiniAppUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,8 +25,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HubViewModel @Inject constructor (
-    private val getMiniAppsUseCase: GetMiniAppsUseCase,
+    private val getInstalledMiniAppsUseCase: GetInstalledMiniAppsUseCase,
     private val getMiniAppManifestsUseCase: GetMiniAppManifestsUseCase,
+    private val getUnInstalledMiniAppsUseCase: GetUnInstalledMiniAppsUseCase,
     private val installMiniAppUseCase: InstallMiniAppUseCase,
     private val uninstallMiniAppUseCase: UninstallMiniAppUseCase
 ) : ViewModel() {
@@ -66,9 +67,9 @@ class HubViewModel @Inject constructor (
     fun handleIntent(intent: HubContract.HubIntent) {
         when (intent) {
             is HubContract.HubIntent.ClickMiniApp -> { Log.d(">>>", "miniapp 클릭됨") }
-
             is HubContract.HubIntent.InstallMiniApp -> installMiniApp(intent.miniApp)
             is HubContract.HubIntent.UninstallMiniApp -> uninstallMiniApp(intent.miniApp)
+            is HubContract.HubIntent.RefreshUninstlledMiniApp -> refreshUninstlledMiniApp()
         }
     }
 
@@ -86,6 +87,18 @@ class HubViewModel @Inject constructor (
         }
     }
 
+    fun refreshUninstlledMiniApp() {
+        Log.d(">>>", "miniapp refreshUninstlledMiniApp 클릭됨")
+        viewModelScope.launch {
+            getUnInstalledMiniAppsUseCase().collect { uninstalledList ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        unInstalledMiniApp = uninstalledList
+                    )
+                }
+            }
+        }
+    }
 
     /**
      *  저장된 설정 불러오기
@@ -105,16 +118,17 @@ class HubViewModel @Inject constructor (
     private fun loadSettings() {
         // 1. 코루틴 스코프
         viewModelScope.launch {
+
             // 2. 두 개의 Flow 합치기
             combine(
-                getMiniAppsUseCase(),
-                getMiniAppManifestsUseCase()
-            ) { miniApp, miniAppManifest ->
+                getInstalledMiniAppsUseCase(),
+                getUnInstalledMiniAppsUseCase()
+            ) { installedMiniApp, unInstalledMiniApp ->
                 // 3. 두 값이 모두 도착하면 실행
                 _uiState.update { currentState ->
                     currentState.copy(
-                        installedMiniApp = miniApp,
-                        installedMiniAppManifest = miniAppManifest
+                        installedMiniApp = installedMiniApp,
+                        unInstalledMiniApp = unInstalledMiniApp
                     )
                 }
             }.collect() // 4. Flow 구독 시작 , collect는 suspend 함수 코루틴 필요.

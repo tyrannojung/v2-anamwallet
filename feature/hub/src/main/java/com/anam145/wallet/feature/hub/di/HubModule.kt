@@ -13,12 +13,15 @@ import com.anam145.wallet.feature.hub.domain.db.MiniAppManifestDB
 import com.anam145.wallet.feature.hub.domain.repository.MiniAppManifestRepositoryImpl
 import com.anam145.wallet.feature.hub.domain.repository.MiniAppRepository
 import com.anam145.wallet.feature.hub.domain.repository.MiniAppRepositoryImpl
+import com.anam145.wallet.feature.hub.remote.api.HubServerApi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 
@@ -80,6 +83,17 @@ abstract class HubModule {
             return database.miniAppManifestDao()
         }
 
+        @Provides
+        @Singleton
+        fun provideHubApi(): HubServerApi {
+            val BASE_URL = "http://10.0.2.2:8080"
+
+            return Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+                    .create(HubServerApi::class.java)
+        }
     }
 }
 
