@@ -69,7 +69,7 @@ class HubViewModel @Inject constructor (
             is HubContract.HubIntent.ClickMiniApp -> { Log.d(">>>", "miniapp 클릭됨") }
             is HubContract.HubIntent.InstallMiniApp -> installMiniApp(intent.miniApp)
             is HubContract.HubIntent.UninstallMiniApp -> uninstallMiniApp(intent.miniApp)
-            is HubContract.HubIntent.RefreshUninstlledMiniApp -> refreshUninstlledMiniApp()
+            is HubContract.HubIntent.RefreshUninstalledMiniApp -> refreshUninstalledMiniApp()
         }
     }
 
@@ -87,7 +87,7 @@ class HubViewModel @Inject constructor (
         }
     }
 
-    fun refreshUninstlledMiniApp() {
+    private fun refreshUninstalledMiniApp() {
         Log.d(">>>", "miniapp refreshUninstlledMiniApp 클릭됨")
         viewModelScope.launch {
             getUnInstalledMiniAppsUseCase().collect { uninstalledList ->

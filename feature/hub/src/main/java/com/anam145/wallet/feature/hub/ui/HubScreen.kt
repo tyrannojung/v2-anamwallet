@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anam145.wallet.core.common.model.MiniApp
-import com.anam145.wallet.core.common.model.MiniAppType
 import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.feature.hub.ui.components.MiniAppItem
 
@@ -33,7 +32,7 @@ fun HubScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val installedMiniApp: List<MiniApp> = uiState.installedMiniApp
     val notInstalledModules: List<MiniApp> = uiState.unInstalledMiniApp
-    viewModel.handleIntent(HubContract.HubIntent.RefreshUninstlledMiniApp)
+    viewModel.handleIntent(HubContract.HubIntent.RefreshUninstalledMiniApp)
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -51,7 +50,7 @@ fun HubScreen(
                     .align(Alignment.End)
                     .padding(bottom = 8.dp)
                     .clickable {
-                        viewModel.handleIntent(HubContract.HubIntent.RefreshUninstlledMiniApp)
+                        viewModel.handleIntent(HubContract.HubIntent.RefreshUninstalledMiniApp)
                     },
                 color = MaterialTheme.colorScheme.primary
             )
