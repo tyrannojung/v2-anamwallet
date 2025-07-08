@@ -83,6 +83,12 @@ sealed class AnamNavRoute(
     
     /** 학생증 상세 화면 */
     data object StudentCardDetail : AnamNavRoute("student_card")
+    
+    /** NFT 상세 화면 */
+    data object NFTDetail : AnamNavRoute("nft/{nftId}") {
+        /** 특정 NFT로 이동하기 위한 경로 생성 */
+        fun createRoute(nftId: String) = "nft/$nftId"
+    }
 
     
     companion object {
@@ -105,6 +111,7 @@ sealed class AnamNavRoute(
                     when {
                         route?.startsWith("miniapp/") == true -> MiniAppDetail
                         route?.startsWith("module/") == true -> ModuleDetail
+                        route?.startsWith("nft/") == true -> NFTDetail
                         else -> null
                     }
                 }

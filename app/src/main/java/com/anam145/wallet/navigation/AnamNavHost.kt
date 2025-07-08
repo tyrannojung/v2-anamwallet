@@ -12,6 +12,7 @@ import com.anam145.wallet.feature.main.ui.MainViewModel
 import com.anam145.wallet.feature.hub.HubScreen
 import com.anam145.wallet.feature.browser.BrowserScreen
 import com.anam145.wallet.feature.identity.IdentityScreen
+import com.anam145.wallet.feature.identity.NFTDetailScreen
 import com.anam145.wallet.feature.settings.ui.SettingsScreen
 import com.anam145.wallet.feature.miniapp.webapp.WebAppActivity
 import com.anam145.wallet.feature.miniapp.blockchain.BlockchainActivity
@@ -81,7 +82,11 @@ fun AnamNavHost(
         
         // 신원 화면
         composable(route = AnamNavRoute.Identity.route) {
-            IdentityScreen()
+            IdentityScreen(
+                onNFTClick = { nftId ->
+                    navController.navigate(AnamNavRoute.NFTDetail.createRoute(nftId))
+                }
+            )
         }
         
         // 설정 화면
@@ -120,6 +125,22 @@ fun AnamNavHost(
         // 학생증 상세 화면
         composable(route = AnamNavRoute.StudentCardDetail.route) {
             // TODO: StudentCardDetailScreen()
+        }
+        
+        // NFT 상세 화면
+        composable(
+            route = AnamNavRoute.NFTDetail.route,
+            arguments = listOf(
+                navArgument("nftId") { 
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val nftId = backStackEntry.arguments?.getString("nftId") ?: ""
+            NFTDetailScreen(
+                nftId = nftId,
+                onBackClick = { navController.popBackStack() }
+            )
         }
     }
 }
