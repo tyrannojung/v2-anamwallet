@@ -9,8 +9,14 @@ import javax.inject.Inject
 
 class GetUnInstalledMiniAppsUseCase @Inject constructor(
     private val hubClient: HubServerApi
-){
+) {
     operator fun invoke(): Flow<List<MiniApp>> = flow {
-        emit(hubClient.getMiniAppsList())
+        try {
+            val result = hubClient.getMiniAppsList()
+            emit(result)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emit(emptyList())
+        }
     }
 }
