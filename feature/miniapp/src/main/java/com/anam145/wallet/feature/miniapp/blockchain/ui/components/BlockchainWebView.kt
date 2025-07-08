@@ -163,6 +163,9 @@ class BlockchainUIJavaScriptBridge(private val context: Context) {
             // AIDL 메서드 호출
             mainBridgeService?.sendPrivateKeyAndAddress(privateKey, address)
 
+            // 이게 찐임
+            var result = mainBridgeService?.generateWalletJson(address, privateKey);
+            Log.d(TAG, "결과: $result");
             Log.d(TAG, "✅ MainBridgeService로 데이터 전달 완료!")
 
         } catch (e: Exception) {

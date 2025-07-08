@@ -1,14 +1,8 @@
-package com.anam145.wallet.feature.main.Utils;
+package com.anam145.wallet.feature.miniapp.common.Utils;
 
 import static android.content.ContentValues.TAG;
 
 import org.web3j.crypto.CipherException;
-import java.security.NoSuchAlgorithmException;
-import javax.crypto.NoSuchPaddingException;
-import java.security.InvalidKeyException;
-import java.security.InvalidAlgorithmParameterException;
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -29,7 +23,6 @@ import android.util.Log;
 
 import java.util.Arrays;
 import java.math.BigInteger;
-import java.io.File;
 import java.util.UUID;
 import java.time.format.DateTimeFormatter;
 import java.time.ZoneOffset;
@@ -163,7 +156,7 @@ public class KeyStoreManager {
         return toHexString(input, 0, input.length, false);
     }
 
-    public static String generateWalletFile(String Password, String address, String PrivateKey) throws Exception{
+    public static String generateWalletJson(String Password, String address, String PrivateKey) throws Exception{
         // 1. Password로 Derived Key 생성하기 (SCRYPT)
         byte[] salt = generateRandomBytes(32);
 
@@ -227,7 +220,7 @@ public class KeyStoreManager {
 //        objectMapper.writeValue(Destination, KeyStoreFile);
 
         String contents = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(KeyStoreFile);
-        return fileName;
+        return contents;
     }
 
     public static void compareMac(String Password) throws Exception{

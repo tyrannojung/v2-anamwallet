@@ -8,6 +8,7 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.os.RemoteException
 import android.util.Log
+import com.anam145.wallet.feature.miniapp.common.Utils.KeyStoreManager;
 import com.anam145.wallet.feature.miniapp.IBlockchainCallback
 import com.anam145.wallet.feature.miniapp.IBlockchainService
 import com.anam145.wallet.feature.miniapp.IMainBridgeService
@@ -187,9 +188,9 @@ class MainBridgeService : Service() {
                 false // 예외가 발생하면 실패 처리
             }
         }
-        override fun generateWalletJson(password: String, Address: String, privateKey: String): String {
-
-            return "";
+        override fun generateWalletJson(Address: String, privateKey: String): String {
+            Log.d("뭐노", password);
+            return KeyStoreManager.generateWalletJson(password, Address, privateKey);
         }
 
 

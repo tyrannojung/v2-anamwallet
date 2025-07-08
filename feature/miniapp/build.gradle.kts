@@ -77,6 +77,9 @@ dependencies {
     
     // WebView
     implementation("androidx.webkit:webkit:1.11.0")
+
+    // KeyStoreManager
+    implementation("org.web3j:crypto:5.0.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
