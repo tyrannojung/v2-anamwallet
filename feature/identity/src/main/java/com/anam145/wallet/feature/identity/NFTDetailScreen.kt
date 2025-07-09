@@ -156,7 +156,7 @@ fun NFTDetailScreen(
                     )
                 }
                 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 
                 // QR 코드 섹션
                 Card(
@@ -181,7 +181,7 @@ fun NFTDetailScreen(
                         
                         Spacer(modifier = Modifier.height(16.dp))
                         
-                        // QR 코드 플레이스홀더
+                        // QR 코드 이미지
                         Box(
                             modifier = Modifier
                                 .size(200.dp)
@@ -189,14 +189,14 @@ fun NFTDetailScreen(
                                     color = Color.White,
                                     shape = RoundedCornerShape(8.dp)
                                 )
-                                .padding(16.dp),
+                                .padding(8.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
+                            Image(
+                                painter = painterResource(id = R.drawable.qr_sample),
                                 contentDescription = "QR Code",
-                                modifier = Modifier.size(168.dp),
-                                tint = Color.Black
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
                             )
                         }
                         

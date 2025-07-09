@@ -140,6 +140,15 @@ class MainViewModel @Inject constructor(
                 is MiniAppResult.Success -> {
                     val miniApps = result.data
                     val blockchainApps = miniApps.filter { it.type == MiniAppType.BLOCKCHAIN }
+                        .sortedBy { app ->
+                            // 해운대, 이더리움, 솔라나 순서로 정렬
+                            when (app.appId) {
+                                "com.anam.haeundea" -> 0
+                                "com.anam.ethereum" -> 1
+                                "com.anam.solana" -> 2
+                                else -> 99 // 다른 블록체인은 뒤에 배치
+                            }
+                        }
                     val regularApps = miniApps.filter { it.type == MiniAppType.APP }
                     
                     // 저장된 활성 블록체인 ID 복원 또는 첫 번째 블록체인 선택

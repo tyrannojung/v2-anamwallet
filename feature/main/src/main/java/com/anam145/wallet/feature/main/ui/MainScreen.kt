@@ -136,32 +136,6 @@ private fun MiniAppList(
             .verticalScroll(rememberScrollState())
             .padding(bottom = 80.dp) // Space for bottom navigation
     ) {
-        // Blockchain Section
-        if (blockchainApps.isNotEmpty()) {
-            Text(
-                text = strings.mainSectionBlockchain,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.SemiBold
-                ),
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
-            )
-            
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(blockchainApps) { app ->
-                    BlockchainCard(
-                        miniApp = app,
-                        isActive = app.appId == activeBlockchainId,
-                        onClick = { onBlockchainClick(app) }
-                    )
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-        
         // Apps Section
         Text(
             text = strings.mainSectionApps,
@@ -209,6 +183,34 @@ private fun MiniAppList(
                     }
                 }
             }
+        }
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        // Blockchain Section
+        if (blockchainApps.isNotEmpty()) {
+            Text(
+                text = strings.mainSectionBlockchain,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+            )
+            
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(blockchainApps) { app ->
+                    BlockchainCard(
+                        miniApp = app,
+                        isActive = app.appId == activeBlockchainId,
+                        onClick = { onBlockchainClick(app) }
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
         }
         
         // 부산일보 버전: "더보기" 카드 제거

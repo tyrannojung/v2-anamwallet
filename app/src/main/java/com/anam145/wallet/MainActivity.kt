@@ -160,6 +160,7 @@ fun AnamWalletApp() {
                             AnamNavRoute.Hub -> strings.headerTitleHub
                             AnamNavRoute.Browser -> strings.headerTitleBrowser
                             AnamNavRoute.Identity -> strings.headerTitleIdentity
+                            AnamNavRoute.NFTDetail -> strings.headerTitleIdentity  // NFT 상세도 같은 제목 사용
                             AnamNavRoute.Settings -> strings.headerTitleSettings
                             else -> strings.headerTitle
                         },

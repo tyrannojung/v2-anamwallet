@@ -1,7 +1,7 @@
 {
-  "app_id": "com.visit.busan",
+  "app_id": "com.busan.holdem",
   "type": "app",
-  "name": "Visit Busan",
+  "name": "Busan Holdem",
   "version": "1.0.0",
   "icon": "assets/icons/app_icon.png",
   "pages": ["pages/index/index"]
