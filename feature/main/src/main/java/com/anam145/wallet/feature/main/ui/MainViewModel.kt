@@ -242,8 +242,7 @@ class MainViewModel @Inject constructor(
             // 둘 중 하나라도 새 값을 방출하면 최신 값들로 조합하여 방출
             combine(
                 // 첫 번째 Flow: 블록체인 서비스 연결 상태를 관찰
-                // invoke()는 operator fun invoke()의 호출 (UseCase 패턴)
-                observeBlockchainServiceUseCase.invoke(), // → Flow<ServiceState>
+                observeBlockchainServiceUseCase(), // → Flow<ServiceState>
                 
                 // 두 번째 Flow: UI 상태에서 activeBlockchainId만 추출
                 // map: Flow의 각 값을 변환 (State 전체 → activeBlockchainId만)

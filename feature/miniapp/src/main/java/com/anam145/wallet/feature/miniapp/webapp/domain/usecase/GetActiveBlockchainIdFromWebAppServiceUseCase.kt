@@ -15,7 +15,7 @@ class GetActiveBlockchainIdFromWebAppServiceUseCase @Inject constructor(
     private val repository: WebAppServiceRepository
 ) : GetActiveBlockchainIdUseCase {
     
-    override suspend fun invoke(): MiniAppResult<String> {
+    override suspend operator fun invoke(): MiniAppResult<String> {
         return repository.getActiveBlockchainId()
     }
 }
