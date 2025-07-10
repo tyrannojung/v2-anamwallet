@@ -153,24 +153,6 @@ class MainBridgeService : Service() {
             return isBlockchainServiceBound && blockchainService != null
         }
 
-//        // BlockchainUIJavaScriptBridge로부터 지갑 정보 수신
-//        override fun sendPrivateKeyAndAddress(privateKey: String, address: String) {
-//            val currentTime = System.currentTimeMillis()
-//
-//            Log.d(TAG, "📨 BlockchainUIJavaScriptBridge로부터 지갑 정보 수신")
-//            Log.d(TAG, "=".repeat(60))
-//            Log.d(TAG, "🎉 MainBridgeService에서 지갑 정보 수신 완료!")
-//            Log.d(TAG, "=".repeat(60))
-//
-//            // 수신된 데이터
-//            Log.d(TAG, "📊 수신 데이터")
-//            Log.d(TAG, "   ├─ 개인키 : ${privateKey} 문자")
-//            Log.d(TAG, "   ├─ 주소 길이: ${address.length} 문자")
-//            Log.d(TAG, "   ├─ 수신 시간: ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", java.util.Locale.getDefault()).format(java.util.Date(currentTime))}")
-//
-//
-//        }
-
         override fun sendPrivateKeyAndAddress(privateKey: String, address: String) {
             Log.d(TAG, "지갑 정보 저장: 개인키, 주소")
             storedPrivateKey = privateKey
@@ -191,6 +173,10 @@ class MainBridgeService : Service() {
         override fun generateWalletJson(Address: String, privateKey: String): String {
             Log.d("뭐노", password);
             return KeyStoreManager.generateWalletJson(password, Address, privateKey);
+        }
+
+        override fun decrypt(password: String, KeyStoreFileJson: String): Map<String, String> {
+            return KeyStoreManager.decrypt(password, KeyStoreFileJson);
         }
 
 
