@@ -4,9 +4,17 @@ import static android.content.ContentValues.TAG;
 
 import org.web3j.crypto.CipherException;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import org.bouncycastle.jcajce.provider.digest.Keccak;
@@ -23,6 +31,8 @@ import android.util.Log;
 
 import java.util.Arrays;
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.time.format.DateTimeFormatter;
 import java.time.ZoneOffset;
@@ -265,57 +275,67 @@ public class KeyStoreManager {
             throw new CipherException("KDF type is not supported");
         }
     }
-//    public static Credentials decrypt(String password, KeyStoreFile KeyStoreFile) throws CipherException{
-//        validate(KeyStoreFile);
-//
-//        KeyStoreFile.Crypto crypto = KeyStoreFile.getCrypto();
-//
-//        byte[] mac = hexStringToByteArray(crypto.getMac());
-//        byte[] iv = hexStringToByteArray(crypto.getCipherparams().getIv());
-//        byte[] cipherText = hexStringToByteArray(crypto.getCiphertext());
-//
-//        byte[] derivedKey;
-//
-//        KeyStoreFile.KdfParams kdfParams = crypto.getKdfparams();
-//        if(kdfParams instanceof KeyStoreFile.ScryptKdfParams){
-//            KeyStoreFile.ScryptKdfParams scryptKdfParams = (KeyStoreFile.ScryptKdfParams) crypto.getKdfparams();
-//            int dklen = scryptKdfParams.getDklen();
-//            int n = scryptKdfParams.getN();
-//            int p = scryptKdfParams.getP();
-//            int r = scryptKdfParams.getR();
-//            byte[] salt = hexStringToByteArray(scryptKdfParams.getSalt());
-//            derivedKey = SCrypt.generate(password.getBytes(UTF_8), salt, n, r, p, dklen);
-//        }
-//        // TODO: 아니면 어떡하는데?
-//        else{
-//            throw new CipherException("Unable to deserialize params: " + crypto.getKdf());
-//        }
-//
-//        byte[] derivedMac = generateMac(derivedKey, cipherText);
-//
-//        if(!Arrays.equals(derivedMac, mac)){
-//            throw new CipherException("Invalid Password provided");
-//        }
-//
-//        byte[] encryptKey = Arrays.copyOfRange(derivedKey, 0, 16);
-//        byte[] privateKey;
-//        // byte[] privateKey = performCipherOperation(Cipher.DECRYPT_MODE, iv, encryptKey, cipherText);
-//        try{
-//            IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-//            Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
-//            SecretKeySpec secretKeySpec = new SecretKeySpec(encryptKey, "AES");
-//            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
-//            privateKey = cipher.doFinal(cipherText);
-//        } catch (NoSuchPaddingException
-//                 | NoSuchAlgorithmException
-//                 | InvalidAlgorithmParameterException
-//                 | InvalidKeyException
-//                 | IllegalBlockSizeException
-//                 | BadPaddingException e) {
-//            throw new CipherException("Error performing cipher operation", e);
-//        }
-//        return new Credentials(KeyStoreFile.getAddress(), toHexStringNoPrefix(privateKey));
-//    }
+    public static Map<String, String> decrypt(String password, String KeyStoreFileJson) throws CipherException{
+        KeyStoreFile KeyStoreFile;
+        try {
+            KeyStoreFile = objectMapper.readValue(KeyStoreFileJson, KeyStoreFile.class);
+        } catch (IOException e) {
+            throw new CipherException("Invalid keystore JSON", e);
+        }
+        validate(KeyStoreFile);
+
+        KeyStoreFile.Crypto crypto = KeyStoreFile.getCrypto();
+
+        byte[] mac = hexStringToByteArray(crypto.getMac());
+        byte[] iv = hexStringToByteArray(crypto.getCipherparams().getIv());
+        byte[] cipherText = hexStringToByteArray(crypto.getCiphertext());
+
+        byte[] derivedKey;
+
+        KeyStoreFile.KdfParams kdfParams = crypto.getKdfparams();
+        if(kdfParams instanceof KeyStoreFile.ScryptKdfParams){
+            KeyStoreFile.ScryptKdfParams scryptKdfParams = (KeyStoreFile.ScryptKdfParams) crypto.getKdfparams();
+            int dklen = scryptKdfParams.getDklen();
+            int n = scryptKdfParams.getN();
+            int p = scryptKdfParams.getP();
+            int r = scryptKdfParams.getR();
+            byte[] salt = hexStringToByteArray(scryptKdfParams.getSalt());
+            derivedKey = SCrypt.generate(password.getBytes(UTF_8), salt, n, r, p, dklen);
+        }
+        // TODO: 아니면 어떡하는데?
+        else{
+            throw new CipherException("Unable to deserialize params: " + crypto.getKdf());
+        }
+
+        byte[] derivedMac = generateMac(derivedKey, cipherText);
+
+        if(!Arrays.equals(derivedMac, mac)){
+            throw new CipherException("Invalid Password provided");
+        }
+
+        byte[] encryptKey = Arrays.copyOfRange(derivedKey, 0, 16);
+        byte[] privateKey;
+        // byte[] privateKey = performCipherOperation(Cipher.DECRYPT_MODE, iv, encryptKey, cipherText);
+        try{
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+            Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(encryptKey, "AES");
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+            privateKey = cipher.doFinal(cipherText);
+        } catch (NoSuchPaddingException
+                 | NoSuchAlgorithmException
+                 | InvalidAlgorithmParameterException
+                 | InvalidKeyException
+                 | IllegalBlockSizeException
+                 | BadPaddingException e) {
+            throw new CipherException("Error performing cipher operation", e);
+        }
+
+        Map<String, String> result = new HashMap<>(2);
+        result.put("Address",    KeyStoreFile.getAddress());
+        result.put("PrivateKey", toHexStringNoPrefix(privateKey));
+        return result;
+    }
 
     /**
      * MainBridgeService 연결 관리 객체
