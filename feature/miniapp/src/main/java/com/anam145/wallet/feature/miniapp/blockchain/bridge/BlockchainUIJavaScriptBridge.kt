@@ -11,8 +11,6 @@ import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import com.anam145.wallet.core.common.model.MiniAppManifest
 import com.anam145.wallet.feature.miniapp.IMainBridgeService
-import com.anam145.wallet.feature.miniapp.blockchain.ui.components.BlockchainUIJavaScriptBridge
-import com.anam145.wallet.feature.miniapp.blockchain.ui.components.BlockchainUIJavaScriptBridge.Companion
 import com.anam145.wallet.feature.miniapp.common.bridge.service.MainBridgeService
 import org.json.JSONObject
 
