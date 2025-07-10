@@ -89,13 +89,31 @@ class WebAppJavaScriptBridge(
                     return@runOnUiThread
                 }
                 
-                // 현재 URL에서 도메인 추출
-                val domain = "https://$appId.miniapp.local/"
-                
                 // 쿼리 파라미터 분리
                 val parts = pagePath.split("?", limit = 2)
                 val path = parts[0]
                 val queryString = if (parts.size > 1) "?${parts[1]}" else ""
+                
+                // manifest.pages 체크
+                manifest?.pages?.let { pages ->
+                    if (pages.isNotEmpty()) {
+                        val normalizedPath = path.removePrefix("/").removeSuffix(".html")
+                        val isAllowed = pages.any { allowedPage ->
+                            val normalizedAllowedPage = allowedPage.removePrefix("/").removeSuffix(".html")
+                            normalizedPath == normalizedAllowedPage || 
+                            normalizedPath.startsWith("$normalizedAllowedPage/")
+                        }
+                        
+                        if (!isAllowed) {
+                            Log.e(TAG, "Navigation blocked: '$path' is not in manifest.pages")
+                            Log.e(TAG, "Allowed pages: $pages")
+                            return@runOnUiThread
+                        }
+                    }
+                }
+                
+                // 현재 URL에서 도메인 추출
+                val domain = "https://$appId.miniapp.local/"
                 
                 // 페이지 경로 정리 (확장자 추가)
                 val page = if (path.endsWith(".html")) path else "$path.html"

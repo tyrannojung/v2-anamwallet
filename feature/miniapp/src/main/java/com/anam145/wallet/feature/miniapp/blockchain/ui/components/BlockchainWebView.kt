@@ -19,13 +19,14 @@ import java.io.File
 @Composable
 fun BlockchainWebView(
     blockchainId: String,
+    manifest: MiniAppManifest,
     fileManager: MiniAppFileManager,
     onWebViewCreated: (WebView) -> Unit
 ) {
     val context = LocalContext.current
     
     // JavaScript Bridge 생성
-    val bridge = remember { BlockchainUIJavaScriptBridge(context, blockchainId) }
+    val bridge = remember { BlockchainUIJavaScriptBridge(context, blockchainId, manifest) }
     
     AndroidView(
         factory = { ctx ->

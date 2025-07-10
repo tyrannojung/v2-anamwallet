@@ -70,14 +70,17 @@ fun BlockchainScreen(
                     )
                 }
                 uiState.manifest != null -> {
-                    BlockchainWebView(
-                        blockchainId = blockchainId,
-                        fileManager = fileManager,
-                        onWebViewCreated = { 
-                            webView = it
-                            viewModel.onWebViewReady()
-                        }
-                    )
+                    uiState.manifest?.let { manifest ->
+                        BlockchainWebView(
+                            blockchainId = blockchainId,
+                            manifest = manifest,
+                            fileManager = fileManager,
+                            onWebViewCreated = { 
+                                webView = it
+                                viewModel.onWebViewReady()
+                            }
+                        )
+                    }
                 }
             }
             

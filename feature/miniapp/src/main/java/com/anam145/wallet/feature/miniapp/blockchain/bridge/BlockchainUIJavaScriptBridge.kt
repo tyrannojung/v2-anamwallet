@@ -5,13 +5,15 @@ import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
+import com.anam145.wallet.core.common.model.MiniAppManifest
 
 /**
  * 블록체인 UI용 JavaScript Bridge
  */
 class BlockchainUIJavaScriptBridge(
     private val context: Context,
-    private val blockchainId: String
+    private val blockchainId: String,
+    private val manifest: MiniAppManifest
 ) {
     private var webView: WebView? = null
     
@@ -31,13 +33,29 @@ class BlockchainUIJavaScriptBridge(
         
         (context as? ComponentActivity)?.runOnUiThread {
             webView?.let { web ->
-                // 현재 URL에서 도메인 추출
-                val domain = "https://$blockchainId.miniapp.local/"
-                
                 // 쿼리 파라미터 분리
                 val parts = pagePath.split("?", limit = 2)
                 val path = parts[0]
                 val queryString = if (parts.size > 1) "?${parts[1]}" else ""
+                
+                // manifest.pages 체크
+                if (manifest.pages.isNotEmpty()) {
+                    val normalizedPath = path.removePrefix("/").removeSuffix(".html")
+                    val isAllowed = manifest.pages.any { allowedPage ->
+                        val normalizedAllowedPage = allowedPage.removePrefix("/").removeSuffix(".html")
+                        normalizedPath == normalizedAllowedPage || 
+                        normalizedPath.startsWith("$normalizedAllowedPage/")
+                    }
+                    
+                    if (!isAllowed) {
+                        Log.e("BlockchainUI", "Navigation blocked: '$path' is not in manifest.pages")
+                        Log.e("BlockchainUI", "Allowed pages: ${manifest.pages}")
+                        return@runOnUiThread
+                    }
+                }
+                
+                // 현재 URL에서 도메인 추출
+                val domain = "https://$blockchainId.miniapp.local/"
                 
                 // 페이지 경로 정리 (확장자 추가)
                 val page = if (path.endsWith(".html")) path else "$path.html"
