@@ -13,6 +13,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.anam145.wallet.core.common.model.MiniAppManifest
 import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
 import com.anam145.wallet.feature.miniapp.common.webview.WebViewFactory
+import com.anam145.wallet.feature.miniapp.blockchain.bridge.BlockchainUIJavaScriptBridge
 import java.io.File
 
 @Composable
@@ -50,50 +51,4 @@ fun BlockchainWebView(
         },
         modifier = Modifier.fillMaxSize()
     )
-}
-
-/**
- * 블록체인 UI용 JavaScript Bridge
- */
-class BlockchainUIJavaScriptBridge(
-    private val context: Context,
-    private val blockchainId: String
-) {
-    private var webView: WebView? = null
-    
-    fun setWebView(webView: WebView) {
-        this.webView = webView
-    }
-    
-    @android.webkit.JavascriptInterface
-    fun log(message: String) {
-        // JavaScript 로그 (필요시에만 활성화)
-        // Log.d("BlockchainUI", "JS: $message")
-    }
-    
-    @android.webkit.JavascriptInterface
-    fun navigateTo(pagePath: String) {
-        Log.d("BlockchainUI", "Navigate to: $pagePath")
-        
-        (context as? ComponentActivity)?.runOnUiThread {
-            webView?.let { web ->
-                // 현재 URL에서 도메인 추출
-                val domain = "https://$blockchainId.miniapp.local/"
-                
-                // 쿼리 파라미터 분리
-                val parts = pagePath.split("?", limit = 2)
-                val path = parts[0]
-                val queryString = if (parts.size > 1) "?${parts[1]}" else ""
-                
-                // 페이지 경로 정리 (확장자 추가)
-                val page = if (path.endsWith(".html")) path else "$path.html"
-                
-                // 전체 URL 생성
-                val fullUrl = domain + page + queryString
-                
-                Log.d("BlockchainUI", "Navigating to: $fullUrl")
-                web.loadUrl(fullUrl)
-            } ?: Log.e("BlockchainUI", "WebView is null, cannot navigate")
-        } ?: Log.e("BlockchainUI", "Context is not ComponentActivity")
-    }
 }
