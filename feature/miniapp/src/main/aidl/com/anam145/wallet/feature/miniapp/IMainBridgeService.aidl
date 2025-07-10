@@ -45,7 +45,7 @@ interface IMainBridgeService {
 
     boolean updatePassword(String password);
     String generateWalletJson(String Address, String privateKey);
-    Map<String, String> decrypt(String KeyStoreFileJson);
+    Map<String, String> decryptKeystore(String KeyStoreFileJson);
     String getPrivateKey();
     String getAddress();
 }
