@@ -164,7 +164,12 @@ class MainViewModel @Inject constructor(
     private fun observeBlockchainService() {
         viewModelScope.launch {
             combine(
-                observeBlockchainServiceUseCase.invoke(),
+                // 첫 번째 Flow: 블록체인 서비스 연결 상태를 관찰
+                observeBlockchainServiceUseCase(), // → Flow<ServiceState>
+                
+                // 두 번째 Flow: UI 상태에서 activeBlockchainId만 추출
+                // map: Flow의 각 값을 변환 (State 전체 → activeBlockchainId만)
+                // distinctUntilChanged: 같은 값이 연속으로 오면 무시 (중복 제거)
                 _uiState.map { it.activeBlockchainId }.distinctUntilChanged()
             ) { serviceState, activeId ->
                 serviceState to activeId

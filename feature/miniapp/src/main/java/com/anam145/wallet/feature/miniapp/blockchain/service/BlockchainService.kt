@@ -15,6 +15,7 @@ import com.anam145.wallet.feature.miniapp.IBlockchainService
 import com.anam145.wallet.feature.miniapp.common.webview.WebViewFactory
 import com.anam145.wallet.core.common.extension.resolveEntryPoint
 import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
+import com.anam145.wallet.feature.miniapp.blockchain.bridge.BlockchainJavaScriptBridge
 import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONObject
 import java.io.File
@@ -422,26 +423,6 @@ class BlockchainService : Service() {
                     CallbackAction.Error(requestId, e.message ?: "Unknown error")
                 )
             }
-        }
-    }
-    
-    /**
-     * 블록체인 JavaScript Bridge
-     */
-    private inner class BlockchainJavaScriptBridge(
-        private val onResponse: (String, String) -> Unit
-    ) {
-        @android.webkit.JavascriptInterface
-        fun sendTransactionResponse(requestId: String, responseJson: String) {
-            Log.d(TAG, "sendTransactionResponse from blockchain: $requestId")
-            handler.post {
-                onResponse(requestId, responseJson)
-            }
-        }
-        
-        @android.webkit.JavascriptInterface
-        fun log(message: String) {
-            Log.d(TAG, "Blockchain JS: $message")
         }
     }
     

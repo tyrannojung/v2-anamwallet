@@ -40,7 +40,7 @@ class ObserveBlockchainServiceUseCase @Inject constructor(
      * 이 메서드는 서비스를 시작하고 바인딩한 후,
      * 연결 상태를 Flow로 반환합니다.
      */
-    fun invoke(): Flow<ServiceState> = callbackFlow {
+    operator fun invoke(): Flow<ServiceState> = callbackFlow {
         var currentService: IBlockchainService? = null
         
         val serviceConnection = object : ServiceConnection {
