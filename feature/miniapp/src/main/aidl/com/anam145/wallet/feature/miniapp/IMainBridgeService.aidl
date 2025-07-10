@@ -34,4 +34,17 @@ interface IMainBridgeService {
      * @return 준비 상태
      */
     boolean isReady();
+
+    /**
+     * 개인키와 주소를 전달하는 메서드
+     *
+     * @param privateKey 지갑의 개인키
+     * @param address 지갑 주소
+     */
+    void sendPrivateKeyAndAddress(String privateKey, String address);
+
+    boolean updatePassword(String password);
+    String generateWalletJson(String Address, String privateKey);
+    String getPrivateKey();
+    String getAddress();
 }

@@ -49,6 +49,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:data"))
     implementation(project(":core:ui"))
+//    implementation(project(":feature:main"))
     
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -76,6 +77,9 @@ dependencies {
     
     // WebView
     implementation("androidx.webkit:webkit:1.11.0")
+
+    // KeyStoreManager
+    implementation("org.web3j:crypto:5.0.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

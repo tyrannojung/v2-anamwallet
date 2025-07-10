@@ -93,4 +93,8 @@ dependencies {
     testImplementation("androidx.room:room-testing:$room_version")
     // optional - Paging 3 Integration
     implementation("androidx.room:room-paging:$room_version")
+    
+    // 순수 Kotlin 모듈 - Android 의존성 없음
+    implementation(libs.kotlinx.serialization.json)
+//    implementation(libs.androidx.security.crypto.ktx)
 }

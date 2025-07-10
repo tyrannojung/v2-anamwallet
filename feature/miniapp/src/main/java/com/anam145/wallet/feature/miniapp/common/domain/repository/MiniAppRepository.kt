@@ -9,4 +9,5 @@ interface MiniAppRepository {
     suspend fun getInstalledMiniApps(): MiniAppResult<List<MiniApp>>
     suspend fun loadMiniAppManifest(appId: String): MiniAppResult<MiniAppManifest>
     suspend fun isMiniAppsInitialized(): Boolean
+    suspend fun clearCache()
 }

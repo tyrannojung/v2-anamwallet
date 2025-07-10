@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.core.common.model.MiniAppType
 import com.anam145.wallet.core.ui.language.LocalStrings
+import com.anam145.wallet.feature.main.Utils.MasterKeyUtil;
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
@@ -60,6 +62,7 @@ fun MainScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val strings = LocalStrings.current
+    var password by remember { mutableStateOf("") }
 
     // key = 이 작업을 다시 실행할 조건
     LaunchedEffect(key1 = viewModel) {
@@ -106,13 +109,19 @@ fun MainScreen(
                 )
             }
             else -> {
+                val context = LocalContext.current;
                 MiniAppList(
                     blockchainApps = uiState.blockchainApps,
                     regularApps = uiState.regularApps,
                     activeBlockchainId = uiState.activeBlockchainId,
                     onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
                     onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) },
-                    onAddMoreClick = { viewModel.handleIntent(MainContract.MainIntent.ClickAddMore) }
+                    onAddMoreClick = { viewModel.handleIntent(MainContract.MainIntent.ClickAddMore) },
+                    onPasswordChanged = { input -> password = input },
+                    onPasswordSubmit = { pw ->
+                        android.util.Log.d("MainScreen", "현재 비밀번호: $pw");
+                        viewModel.sendPasswordToService(pw);
+                    }
                 )
             }
         }
@@ -126,9 +135,12 @@ private fun MiniAppList(
     activeBlockchainId: String?,
     onBlockchainClick: (MiniApp) -> Unit,
     onAppClick: (MiniApp) -> Unit,
-    onAddMoreClick: () -> Unit
+    onAddMoreClick: () -> Unit,
+    onPasswordChanged: (String) -> Unit,
+    onPasswordSubmit: (String) -> Unit
 ) {
     val strings = LocalStrings.current
+    var password by remember { mutableStateOf("") }
     
     Column(
         modifier = Modifier
@@ -241,6 +253,36 @@ private fun MiniAppList(
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 비밀번호 입력란
+        OutlinedTextField(
+            value = password,
+            onValueChange = {
+                password = it
+                onPasswordChanged(it)
+            },
+            label = { Text("비밀번호 입력") },
+            placeholder = { Text("비밀번호를 입력하세요") },
+            singleLine = true,
+//            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // 버튼 추가
+        Button(
+            onClick = { onPasswordSubmit(password) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        ) {
+            Text("비밀번호 로그 출력")
         }
     }
 }
