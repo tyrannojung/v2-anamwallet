@@ -175,7 +175,7 @@ class MainBridgeService : Service() {
             return KeyStoreManager.generateWalletJson(password, Address, privateKey);
         }
 
-        override fun decrypt(KeyStoreFileJson: String): Map<String, String> {
+        override fun decryptKeystore(KeyStoreFileJson: String): Map<String, String> {
             return KeyStoreManager.decrypt(password, KeyStoreFileJson);
         }
 
