@@ -3,6 +3,7 @@
 window.App = {
   onLaunch() {
     console.log('비트코인 지갑 미니앱 시작');
+
   },
   onShow() {
     console.log('비트코인 지갑 미니앱 표시');

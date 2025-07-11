@@ -6,7 +6,6 @@
     <title>비트코인 지갑</title>
     <link rel="stylesheet" href="../../app.css" />
     <link rel="stylesheet" href="index.css" />
-    <script src="../../app.js"></script>
   </head>
   <body>
     <div class="container">
@@ -91,11 +90,14 @@
       </div>
     </div>
 
+    <script src="../../app.js"></script>
+
     <!-- 실제 bitcoinjs-lib + bech32 라이브러리 로드 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bitcoinjs-lib/0.2.0/bitcoinjs-min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bech32@2.0.0/index.js"></script>
-    
-    <script>
+
+
+    <!-- <script>
       // 라이브러리 로드 확인
       window.addEventListener('load', function() {
         console.log('Page fully loaded');
@@ -118,9 +120,15 @@
         } else {
           console.error('❌ bech32 library failed to load');
         }
+        // 지갑 저장 함수 확인
+        console.log('✅ Window Load Complete');
+        console.log('All functions ready:', typeof window.saveWalletToLocalStorage === 'function');
       });
-    </script>
-    
+    </script> -->
+    <!-- 메인 지갑 로직 -->
     <script src="index.js"></script>
+    <script>
+      console.log("saveWalletToLocalStorage type:", typeof window.saveWalletToLocalStorage);
+    </script>
   </body>
 </html>

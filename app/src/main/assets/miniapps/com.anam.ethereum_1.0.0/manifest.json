@@ -1,0 +1,12 @@
+{
+  "app_id": "com.anam.ethereum",
+  "type": "blockchain",
+  "name": "Ethereum",
+  "version": "1.0.0",
+  "icon": "assets/icons/app_icon.png",
+  "pages": [
+    "pages/index/index",
+    "pages/send/send",
+    "pages/receive/receive"
+  ]
+}

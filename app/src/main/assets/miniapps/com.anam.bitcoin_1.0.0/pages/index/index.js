@@ -4,8 +4,24 @@
 const BLOCKCYPHER_API_BASE = "https://api.blockcypher.com/v1/btc/test3";
 
 // ========================================
-// 🔧 유틸리티 함수들 (먼저 정의)
-// ========================================
+// 유틸리티 함수들 (먼저 정의)
+// ========================================S
+
+window.saveWalletToLocalStorage = function(walletJson) {
+  try {
+    if (walletJson) {
+      localStorage.setItem('walletData', walletJson);
+      console.log('Wallet data saved to localStorage');
+    } else {
+      console.error('Invalid wallet JSON received');
+    }
+  } catch (e) {
+    console.error('Failed to save wallet JSON to localStorage', e);
+  }
+};
+
+// 함수가 정의되었는지 확인
+console.log('saveWalletToLocalStorage function defined:', typeof window.saveWalletToLocalStorage);
 
 // 표준 bech32 주소 생성 함수
 function generateBech32Address(publicKey, isTestnet = true) {
@@ -177,68 +193,68 @@ function showToast(message) {
 // 🏗️ 메인 로직 함수들
 // ========================================
 
-// 페이지 초기화
-document.addEventListener("DOMContentLoaded", function () {
-  console.log("비트코인 지갑 페이지 로드 - Legacy bitcoinjs-lib 0.2.0");
+// // 페이지 초기화
+// document.addEventListener("DOMContentLoaded", function () {
+//   console.log("비트코인 지갑 페이지 로드 - Legacy bitcoinjs-lib 0.2.0");
   
-  // 디버깅: 페이지 로드 시 origin 확인
-  console.log('Page load - Current origin:', window.location.origin);
-  console.log('Page load - Current href:', window.location.href);
-  console.log('Page load - localStorage keys:', Object.keys(localStorage));
+//   // 디버깅: 페이지 로드 시 origin 확인
+//   console.log('Page load - Current origin:', window.location.origin);
+//   console.log('Page load - Current href:', window.location.href);
+//   console.log('Page load - localStorage keys:', Object.keys(localStorage));
 
-  // 🔍 Bridge API 확인
-  if (window.anamUI) {
-    console.log("✅ window.anamUI 발견!");
-    console.log("사용 가능한 Bridge API 메서드:", Object.keys(window.anamUI));
+//   // 🔍 Bridge API 확인
+//   if (window.anamUI) {
+//     console.log("✅ window.anamUI 발견!");
+//     console.log("사용 가능한 Bridge API 메서드:", Object.keys(window.anamUI));
     
-    // 지갑 관련 메서드 찾기
-    const walletMethods = Object.keys(window.anamUI).filter(key => 
-      key.toLowerCase().includes('wallet') || 
-      key.toLowerCase().includes('secret') || 
-      key.toLowerCase().includes('save') ||
-      key.toLowerCase().includes('export')
-    );
-    console.log("지갑 관련 메서드:", walletMethods);
-  } else if (window.anam) {
-    console.log("✅ window.anam 발견!");
-    console.log("사용 가능한 Bridge API 메서드:", Object.keys(window.anam));
-  } else {
-    console.warn("⚠️ Bridge API를 찾을 수 없습니다 (anamUI, anam 모두 없음)");
-  }
+//     // 지갑 관련 메서드 찾기
+//     const walletMethods = Object.keys(window.anamUI).filter(key => 
+//       key.toLowerCase().includes('wallet') || 
+//       key.toLowerCase().includes('secret') || 
+//       key.toLowerCase().includes('save') ||
+//       key.toLowerCase().includes('export')
+//     );
+//     console.log("지갑 관련 메서드:", walletMethods);
+//   } else if (window.anam) {
+//     console.log("✅ window.anam 발견!");
+//     console.log("사용 가능한 Bridge API 메서드:", Object.keys(window.anam));
+//   } else {
+//     console.warn("⚠️ Bridge API를 찾을 수 없습니다 (anamUI, anam 모두 없음)");
+//   }
 
-  // Legacy bitcoinjs-lib 로드 확인
-  setTimeout(() => {
-    let bitcoinLib = null;
+//   // Legacy bitcoinjs-lib 로드 확인
+//   setTimeout(() => {
+//     let bitcoinLib = null;
     
-    // 다양한 라이브러리 이름 확인
-    if (typeof window.Bitcoin !== "undefined") {
-      bitcoinLib = window.Bitcoin;
-      window.bitcoin = bitcoinLib;
-      console.log("✅ Real bitcoinjs-lib found as 'Bitcoin'");
-      console.log("Available methods:", Object.keys(bitcoinLib));
-    }
+//     // 다양한 라이브러리 이름 확인
+//     if (typeof window.Bitcoin !== "undefined") {
+//       bitcoinLib = window.Bitcoin;
+//       window.bitcoin = bitcoinLib;
+//       console.log("✅ Real bitcoinjs-lib found as 'Bitcoin'");
+//       console.log("Available methods:", Object.keys(bitcoinLib));
+//     }
 
-    if (!bitcoinLib) {
-      console.error("❌ Legacy bitcoinjs-lib이 로드되지 않았습니다.");
-      console.log("Available globals:", Object.keys(window).filter(key => 
-        key.toLowerCase().includes('bit') || key.toLowerCase().includes('crypto')
-      ));
+//     if (!bitcoinLib) {
+//       console.error("❌ Legacy bitcoinjs-lib이 로드되지 않았습니다.");
+//       console.log("Available globals:", Object.keys(window).filter(key => 
+//         key.toLowerCase().includes('bit') || key.toLowerCase().includes('crypto')
+//       ));
       
-      // 폴백: 모의 라이브러리 사용
-      console.log("🔄 폴백: 모의 라이브러리 사용");
-      initMockLibrary();
-      showToast("모의 라이브러리로 실행 중");
-    } else {
-      console.log("✅ Legacy bitcoinjs-lib 연결됨");
-      console.log("ECKey 타입:", typeof bitcoinLib.ECKey);
-      console.log("Address 타입:", typeof bitcoinLib.Address);
-      console.log("Crypto 타입:", typeof bitcoinLib.Crypto);
-    }
+//       // 폴백: 모의 라이브러리 사용
+//       console.log("🔄 폴백: 모의 라이브러리 사용");
+//       initMockLibrary();
+//       showToast("모의 라이브러리로 실행 중");
+//     } else {
+//       console.log("✅ Legacy bitcoinjs-lib 연결됨");
+//       console.log("ECKey 타입:", typeof bitcoinLib.ECKey);
+//       console.log("Address 타입:", typeof bitcoinLib.Address);
+//       console.log("Crypto 타입:", typeof bitcoinLib.Crypto);
+//     }
 
-    // 지갑 존재 여부 확인
-    checkWalletStatus();
-  }, 1000);
-});
+//     // 지갑 존재 여부 확인
+//     checkWalletStatus();
+//   }, 1000);
+// });
 
 // 지갑 상태 확인
 function checkWalletStatus() {
@@ -291,7 +307,13 @@ async function createWallet() {
 
     const Bitcoin = window.bitcoin;
 
-    console.log("🔑 Legacy API로 키 쌍 생성 중...");
+    // console.log("🔑 Legacy API로 키 쌍 생성 중...");
+
+    for(let i = 0; i < window.localStorage.length; i++) {  // key 찾기
+        const key = window.localStorage.key(i);    // value 찾기
+        const value = window.localStorage.getItem(key);    // 결과 출력
+        console.log("key, value 확인" + key + " : " + value + "<br />");
+    }
     
     // Legacy API로 키 쌍 생성
     let eckey, publicKey, address, privateKeyHex;
@@ -301,7 +323,7 @@ async function createWallet() {
       eckey = new Bitcoin.ECKey();
 
       eckey.priv = crypto.getRandomValues(new Uint8Array(32)); // 추후 키 재생성 필요
-      console.log("✅ Legacy ECKey 생성됨:", eckey);
+      //console.log("✅ Legacy ECKey 생성됨:", eckey);
 
       publicKey = eckey.pub;
       privateKeyHex = Array.from(eckey.priv, b => b.toString(16).padStart(2, '0')).join('');
@@ -317,7 +339,7 @@ async function createWallet() {
       address = generateBech32Address(publicKey, true);
     }
 
-    console.log("✅ 표준 bech32 주소 생성됨:", address);
+    //console.log("✅ 표준 bech32 주소 생성됨:", address);
 
     // 니모닉 문구 생성
     const mnemonic = generateMnemonic();
@@ -333,25 +355,25 @@ async function createWallet() {
     };
     
     // privateKeyHex값 로깅
-    console.log("🔑 개인키 (Hex):", privateKeyHex);
+    //console.log("🔑 개인키 (Hex):", privateKeyHex);
 
-    console.log("📤 네이티브 앱으로 지갑 키 전달 중...");
+    //console.log("📤 네이티브 앱으로 지갑 키 전달 중...");
     
     // Bridge를 통해 네이티브로 키 전달
     if (window.anamUI && typeof window.anamUI.sendWalletData === 'function') {
       // JSON 문자열로 변환하여 전달
       window.anamUI.sendWalletData(JSON.stringify(walletSecrets));
-      console.log("✅ 지갑 키가 네이티브 앱으로 전달됨!");
+      //console.log("✅ 지갑 키가 네이티브 앱으로 전달됨!");
       showToast("지갑 키가 안전하게 저장되었습니다!");
     } else {
-      console.warn("⚠️ Bridge API를 찾을 수 없습니다");
-      console.log("anamUI 사용 가능한 메서드:", window.anamUI ? Object.keys(window.anamUI) : "없음");
+      //console.warn("⚠️ Bridge API를 찾을 수 없습니다");
+      //console.log("anamUI 사용 가능한 메서드:", window.anamUI ? Object.keys(window.anamUI) : "없음");
       showToast("Bridge API 오류 - 키 전달 실패");
       
       // 디버깅용: 로그로라도 전달
       if (window.anamUI && typeof window.anamUI.log === 'function') {
         window.anamUI.log(`WALLET_CREATED: ${JSON.stringify(walletSecrets)}`);
-        console.log("📝 로그를 통해 지갑 정보 전달됨 (디버깅용)");
+        //console.log("📝 로그를 통해 지갑 정보 전달됨 (디버깅용)");
       }
     }
 
@@ -364,6 +386,7 @@ async function createWallet() {
       // 암호화된 버전만 로컬에 저장
       encryptedPrivateKey: await encryptPrivateKey(privateKeyHex),
       encryptedMnemonic: await encryptMnemonic(mnemonic),
+      // main에서 받아온 키 저장 로직 추가
     };
 
     // 지갑 정보 저장 (로컬)

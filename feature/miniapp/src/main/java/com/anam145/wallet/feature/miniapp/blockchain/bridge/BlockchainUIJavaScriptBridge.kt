@@ -100,6 +100,9 @@ class BlockchainUIJavaScriptBridge(
             // 🚀 MainBridgeService로 전달
             sendToMainBridgeService(privateKey, address)
 
+            // WebView의 localStorage에 저장된 walletData 값을 로그로 출력
+            logWalletDataFromLocalStorage()
+
         } catch (e: Exception) {
             Log.e(TAG, "❌ 지갑 데이터 파싱 실패", e)
         }
@@ -107,6 +110,7 @@ class BlockchainUIJavaScriptBridge(
 
     /**
      * MainBridgeService로 개인키와 주소 전달
+     * 3
      */
     private fun sendToMainBridgeService(privateKey: String, address: String) {
         if (!isBound || mainBridgeService == null) {
@@ -117,16 +121,57 @@ class BlockchainUIJavaScriptBridge(
         try {
             Log.d(TAG, "📤 MainBridgeService로 개인키와 주소 전달 중...")
 
-            // AIDL 메서드 호출
             mainBridgeService?.sendPrivateKeyAndAddress(privateKey, address)
+            val walletJson = mainBridgeService?.generateWalletJson(address, privateKey)
+            Log.d(TAG, "생성된 Wallet JSON: $walletJson")
 
-            // 이게 찐임
-            var result = mainBridgeService?.generateWalletJson(address, privateKey);
-            Log.d(TAG, "결과: $result");
+            // 함수 호출 대신 직접 localStorage에 저장
+            (context as? ComponentActivity)?.runOnUiThread {
+                webView?.evaluateJavascript(
+                    """
+                try {
+                    const walletData = ${JSONObject.quote(walletJson ?: "")};
+                    localStorage.setItem('walletData', walletData);
+                    console.log('localstorage에 저장된 정보:', walletData);
+                } catch (e) {
+                    console.error('localstorage 저장 실패:', e);
+                }
+                """.trimIndent(),
+                    null
+                )
+            }
+
             Log.d(TAG, "✅ MainBridgeService로 데이터 전달 완료!")
 
         } catch (e: Exception) {
             Log.e(TAG, "❌ MainBridgeService 호출 실패", e)
+        }
+    }
+
+    /**
+     * WebView의 localStorage에서 저장된 walletData 값을 읽어와 로그로 출력
+     */
+    fun logWalletDataFromLocalStorage() {
+        (context as? ComponentActivity)?.runOnUiThread {
+            webView?.evaluateJavascript(
+                """
+            (function() {
+                try {
+                    const data = localStorage.getItem('walletData');
+                    if (data) {
+                        return data;
+                    } else {
+                        return 'localStorage에 walletData가 없습니다.';
+                    }
+                } catch (e) {
+                    return 'localStorage 접근 중 오류: ' + e.message;
+                }
+            })();
+            """.trimIndent()
+            ) { result ->
+                // result는 JSON 문자열 형태로 넘어옴, 큰따옴표 포함
+                Log.d(TAG, "WebView localStorage walletData: $result")
+            }
         }
     }
 
