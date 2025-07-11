@@ -45,6 +45,7 @@ android {
 
 dependencies {
     implementation(project(":core:ui"))
+    implementation(project(":core:common"))
     
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -63,7 +64,15 @@ dependencies {
     // Lifecycle
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
-    
+
+    //roomDB
+    ksp("androidx.room:room-compiler:2.7.2")
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    testImplementation(libs.androidx.room.testing)
+    implementation(libs.androidx.room.paging)
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,4 +80,7 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 }
