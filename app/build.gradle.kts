@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
     implementation(project(":core:data"))
+    implementation(project(":core:security"))
     
     // Feature modules
     implementation(project(":feature:main"))
@@ -54,6 +55,7 @@ dependencies {
     implementation(project(":feature:identity"))
     implementation(project(":feature:settings"))
     implementation(project(":feature:miniapp"))
+    implementation(project(":feature:auth"))
     
     // AndroidX
     implementation(libs.androidx.core.ktx)

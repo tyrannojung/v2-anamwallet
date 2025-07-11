@@ -1,0 +1,435 @@
+package com.anam145.wallet.feature.auth.ui.setup
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.anam145.wallet.core.ui.theme.AnamWalletTheme
+import com.anam145.wallet.core.ui.theme.AnamSuccess
+import com.anam145.wallet.core.ui.theme.AnamError
+import com.anam145.wallet.core.ui.theme.AnamWarning
+import com.anam145.wallet.core.ui.theme.Typography
+import com.anam145.wallet.core.ui.theme.CocogooseFamily
+
+/**
+ * 비밀번호 설정 화면
+ */
+@Composable
+fun SetupPasswordScreen(
+    onNavigateToMain: () -> Unit,
+    viewModel: SetupPasswordViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    
+    LaunchedEffect(viewModel) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is SetupPasswordContract.Effect.NavigateToMain -> onNavigateToMain()
+                is SetupPasswordContract.Effect.ShowToast -> {
+                    // Toast 처리
+                }
+            }
+        }
+    }
+    
+    SetupPasswordContent(
+        uiState = uiState,
+        onIntent = viewModel::handleIntent
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SetupPasswordContent(
+    uiState: SetupPasswordContract.State,
+    onIntent: (SetupPasswordContract.Intent) -> Unit
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+    val passwordFocusRequester = remember { FocusRequester() }
+    val scrollState = rememberScrollState()
+    
+    LaunchedEffect(Unit) {
+        passwordFocusRequester.requestFocus()
+    }
+    
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(40.dp))
+            
+            // 아이콘
+            Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // 타이틀
+            Text(
+                text = "비밀번호 설정",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            // 설명
+            Text(
+                text = "지갑을 보호할 비밀번호를 설정하세요.\n이 비밀번호는 앱 접근 시 필요합니다.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            // 비밀번호 입력
+            OutlinedTextField(
+                value = uiState.password,
+                onValueChange = { onIntent(SetupPasswordContract.Intent.UpdatePassword(it)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(passwordFocusRequester),
+                label = { Text("비밀번호") },
+                placeholder = { Text("최소 8자 이상 입력") },
+                visualTransformation = if (uiState.isPasswordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                ),
+                trailingIcon = {
+                    IconButton(
+                        onClick = { onIntent(SetupPasswordContract.Intent.TogglePasswordVisibility) }
+                    ) {
+                        Icon(
+                            imageVector = if (uiState.isPasswordVisible) {
+                                Icons.Default.VisibilityOff
+                            } else {
+                                Icons.Default.Visibility
+                            },
+                            contentDescription = if (uiState.isPasswordVisible) {
+                                "비밀번호 숨기기"
+                            } else {
+                                "비밀번호 보기"
+                            }
+                        )
+                    }
+                },
+                isError = uiState.passwordError != null,
+                supportingText = {
+                    AnimatedVisibility(
+                        visible = uiState.passwordError != null,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        Text(
+                            text = uiState.passwordError ?: "",
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
+                shape = MaterialTheme.shapes.medium
+            )
+            
+            // 비밀번호 강도 표시
+            if (uiState.password.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                PasswordStrengthIndicator(
+                    strength = uiState.passwordStrength,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // 비밀번호 확인
+            OutlinedTextField(
+                value = uiState.confirmPassword,
+                onValueChange = { onIntent(SetupPasswordContract.Intent.UpdateConfirmPassword(it)) },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("비밀번호 확인") },
+                placeholder = { Text("비밀번호를 다시 입력하세요") },
+                visualTransformation = if (uiState.isConfirmPasswordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                        onIntent(SetupPasswordContract.Intent.SetupPassword)
+                    }
+                ),
+                trailingIcon = {
+                    Row {
+                        // 일치 여부 표시
+                        if (uiState.confirmPassword.isNotEmpty() && 
+                            uiState.password == uiState.confirmPassword) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "비밀번호 일치",
+                                tint = AnamSuccess,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        
+                        IconButton(
+                            onClick = { onIntent(SetupPasswordContract.Intent.ToggleConfirmPasswordVisibility) }
+                        ) {
+                            Icon(
+                                imageVector = if (uiState.isConfirmPasswordVisible) {
+                                    Icons.Default.VisibilityOff
+                                } else {
+                                    Icons.Default.Visibility
+                                },
+                                contentDescription = if (uiState.isConfirmPasswordVisible) {
+                                    "비밀번호 숨기기"
+                                } else {
+                                    "비밀번호 보기"
+                                }
+                            )
+                        }
+                    }
+                },
+                isError = uiState.confirmPasswordError != null,
+                supportingText = {
+                    AnimatedVisibility(
+                        visible = uiState.confirmPasswordError != null,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        Text(
+                            text = uiState.confirmPasswordError ?: "",
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
+                shape = MaterialTheme.shapes.medium
+            )
+            
+            // 에러 메시지
+            AnimatedVisibility(
+                visible = uiState.errorMessage != null,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Text(
+                        text = uiState.errorMessage ?: "",
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            // 설정 버튼
+            Button(
+                onClick = { onIntent(SetupPasswordContract.Intent.SetupPassword) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                enabled = uiState.password.isNotEmpty() && 
+                         uiState.confirmPassword.isNotEmpty() && 
+                         !uiState.isLoading,
+                shape = MaterialTheme.shapes.medium
+            ) {
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = "비밀번호 설정",
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // 주의사항
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+                ),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "주의사항",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "• 비밀번호는 안전한 곳에 보관하세요\n" +
+                              "• 비밀번호를 잊으면 지갑에 접근할 수 없습니다\n" +
+                              "• 앱을 재설치하면 모든 데이터가 삭제됩니다",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+}
+
+@Composable
+private fun PasswordStrengthIndicator(
+    strength: SetupPasswordContract.PasswordStrength,
+    modifier: Modifier = Modifier
+) {
+    val color by animateColorAsState(
+        targetValue = when (strength) {
+            SetupPasswordContract.PasswordStrength.NONE -> Color.Transparent
+            SetupPasswordContract.PasswordStrength.WEAK -> AnamError
+            SetupPasswordContract.PasswordStrength.MEDIUM -> AnamWarning
+            SetupPasswordContract.PasswordStrength.STRONG -> AnamSuccess
+        },
+        label = "strength_color"
+    )
+    
+    val text = when (strength) {
+        SetupPasswordContract.PasswordStrength.NONE -> ""
+        SetupPasswordContract.PasswordStrength.WEAK -> "약함"
+        SetupPasswordContract.PasswordStrength.MEDIUM -> "보통"
+        SetupPasswordContract.PasswordStrength.STRONG -> "강함"
+    }
+    
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // 강도 바
+        repeat(3) { index ->
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(4.dp)
+                    .padding(horizontal = 2.dp)
+            ) {
+                LinearProgressIndicator(
+                    progress = { 1f },
+                    modifier = Modifier.fillMaxSize(),
+                    color = if (index < when (strength) {
+                        SetupPasswordContract.PasswordStrength.NONE -> 0
+                        SetupPasswordContract.PasswordStrength.WEAK -> 1
+                        SetupPasswordContract.PasswordStrength.MEDIUM -> 2
+                        SetupPasswordContract.PasswordStrength.STRONG -> 3
+                    }) color else MaterialTheme.colorScheme.surfaceVariant,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.width(8.dp))
+        
+        // 강도 텍스트
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            color = color
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SetupPasswordScreenPreview() {
+    AnamWalletTheme {
+        SetupPasswordContent(
+            uiState = SetupPasswordContract.State(
+                password = "password123",
+                confirmPassword = "password123",
+                passwordStrength = SetupPasswordContract.PasswordStrength.MEDIUM
+            ),
+            onIntent = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SetupPasswordScreenDarkPreview() {
+    AnamWalletTheme {
+        SetupPasswordContent(
+            uiState = SetupPasswordContract.State(
+                password = "pass",
+                passwordStrength = SetupPasswordContract.PasswordStrength.WEAK,
+                passwordError = "비밀번호는 최소 8자 이상이어야 합니다"
+            ),
+            onIntent = {}
+        )
+    }
+}

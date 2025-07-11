@@ -83,6 +83,15 @@ sealed class AnamNavRoute(
     
     /** 학생증 상세 화면 */
     data object StudentCardDetail : AnamNavRoute("student_card")
+    
+    // ========== 인증 화면들 ==========
+    // 로그인 및 비밀번호 설정 화면들
+    
+    /** 로그인 화면 - 비밀번호 입력 */
+    data object Login : AnamNavRoute("auth/login")
+    
+    /** 비밀번호 설정 화면 - 최초 설정 */
+    data object SetupPassword : AnamNavRoute("auth/setup")
 
     
     companion object {
@@ -100,6 +109,8 @@ sealed class AnamNavRoute(
                 Identity.route -> Identity
                 Settings.route -> Settings
                 StudentCardDetail.route -> StudentCardDetail
+                Login.route -> Login
+                SetupPassword.route -> SetupPassword
                 else -> {
                     // 파라미터가 있는 route 처리
                     when {
