@@ -4,6 +4,7 @@ import android.util.Base64
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.anam145.wallet.core.security.data.util.ScryptConstants
 import com.google.gson.Gson
 import com.lambdaworks.crypto.SCrypt
 import kotlinx.coroutines.flow.first
@@ -24,7 +25,6 @@ class VerifyAppPasswordUseCase @Inject constructor(
         private val PASSWORD_HASH_KEY = stringPreferencesKey("app_password_hash")
         private val PASSWORD_SALT_KEY = stringPreferencesKey("app_password_salt")
         private val SCRYPT_PARAMS_KEY = stringPreferencesKey("scrypt_params")
-        private const val DKLEN = 32
     }
     
     /**
@@ -53,7 +53,7 @@ class VerifyAppPasswordUseCase @Inject constructor(
             params.n,
             params.r,
             params.p,
-            DKLEN
+            ScryptConstants.DKLEN
         )
         
         // 비교

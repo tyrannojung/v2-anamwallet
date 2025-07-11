@@ -1,6 +1,7 @@
 package com.anam145.wallet.core.security.domain.usecase
 
 import com.anam145.wallet.core.security.data.util.CryptoUtils
+import com.anam145.wallet.core.security.data.util.ScryptConstants
 import com.anam145.wallet.core.security.model.CipherParams
 import com.anam145.wallet.core.security.model.Crypto
 import com.anam145.wallet.core.security.model.KeyStoreFile
@@ -26,14 +27,6 @@ class GenerateKeystoreUseCase @Inject constructor(
     private val gson: Gson
 ) {
     companion object {
-        // SCrypt 파라미터 (모바일 최적화)
-        // 기본값: 100ms 목표로 설정
-        private const val N_DEFAULT = 1 shl 14  // 16384 (기존 262144에서 감소)
-        private const val N_LIGHT = 1 shl 12   // 4096 (빠른 버전)
-        private const val R = 8
-        private const val P = 1
-        private const val DKLEN = 32
-        
         // 암호화 설정
         private const val CIPHER_ALGORITHM = "AES/CTR/NoPadding"
         private const val AES_KEY_SIZE = 16  // AES-128
@@ -57,11 +50,11 @@ class GenerateKeystoreUseCase @Inject constructor(
         val salt = CryptoUtils.generateRandomBytes(32)
         
         // 2. SCrypt로 파생키 생성
-        val n = if (useLightMode) N_LIGHT else N_DEFAULT
+        val n = if (useLightMode) ScryptConstants.N_LIGHT else ScryptConstants.N
         val derivedKey = SCrypt.scrypt(
             password.toByteArray(StandardCharsets.UTF_8),
             salt,
-            n, R, P, DKLEN
+            n, ScryptConstants.R, ScryptConstants.P, ScryptConstants.DKLEN
         )
         
         // 3. 암호화 키 추출 (파생키의 앞 16바이트)
@@ -104,7 +97,7 @@ class GenerateKeystoreUseCase @Inject constructor(
         iv: ByteArray,
         salt: ByteArray,
         mac: ByteArray,
-        n: Int = N_DEFAULT
+        n: Int = ScryptConstants.N
     ): KeyStoreFile {
         return KeyStoreFile(
             address = address,
@@ -118,10 +111,10 @@ class GenerateKeystoreUseCase @Inject constructor(
                 ),
                 kdf = "scrypt",
                 kdfparams = ScryptKdfParams(
-                    dklen = DKLEN,
+                    dklen = ScryptConstants.DKLEN,
                     n = n,
-                    r = R,
-                    p = P,
+                    r = ScryptConstants.R,
+                    p = ScryptConstants.P,
                     salt = CryptoUtils.toHexStringNoPrefix(salt)
                 ),
                 mac = CryptoUtils.toHexStringNoPrefix(mac)

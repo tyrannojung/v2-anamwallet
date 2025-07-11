@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.anam145.wallet.core.security.data.util.ScryptConstants
 import com.google.gson.Gson
 import com.lambdaworks.crypto.SCrypt
 import java.nio.charset.StandardCharsets
@@ -24,12 +25,6 @@ class SaveAppPasswordUseCase @Inject constructor(
         private val PASSWORD_HASH_KEY = stringPreferencesKey("app_password_hash")
         private val PASSWORD_SALT_KEY = stringPreferencesKey("app_password_salt")
         private val SCRYPT_PARAMS_KEY = stringPreferencesKey("scrypt_params")
-        
-        // SCrypt 파라미터 (모바일 최적화)
-        private const val N = 16384  // 2^14 (기존 262144에서 감소)
-        private const val R = 8
-        private const val P = 1
-        private const val DKLEN = 32
     }
     
     /**
@@ -47,13 +42,16 @@ class SaveAppPasswordUseCase @Inject constructor(
         val hash = SCrypt.scrypt(
             password.toByteArray(StandardCharsets.UTF_8),
             salt,
-            N, R, P, DKLEN
+            ScryptConstants.N, 
+            ScryptConstants.R, 
+            ScryptConstants.P, 
+            ScryptConstants.DKLEN
         )
         
         // DataStore에 저장
         val encodedSalt = Base64.encodeToString(salt, Base64.NO_WRAP)
         val encodedHash = Base64.encodeToString(hash, Base64.NO_WRAP)
-        val scryptParams = ScryptParams(N, R, P)
+        val scryptParams = ScryptParams(ScryptConstants.N, ScryptConstants.R, ScryptConstants.P)
         
         dataStore.edit { preferences ->
             preferences[PASSWORD_HASH_KEY] = encodedHash

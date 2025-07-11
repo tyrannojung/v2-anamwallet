@@ -49,6 +49,8 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:data"))
     implementation(project(":core:ui"))
+    implementation(project(":core:security"))
+    implementation(project(":feature:auth"))
     
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -73,6 +75,7 @@ dependencies {
     
     // JSON parsing
     implementation(libs.kotlinx.serialization.json)
+    implementation("com.google.code.gson:gson:2.10.1")
     
     // WebView
     implementation("androidx.webkit:webkit:1.11.0")
