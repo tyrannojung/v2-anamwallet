@@ -9,7 +9,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -192,5 +194,99 @@ class MiniAppFileManager @Inject constructor(
     fun getMiniAppBasePath(appId: String): String {
         val appDir = File(context.filesDir, "${MiniAppConstants.MINIAPP_INSTALL_DIR}/$appId")
         return "${appDir.absolutePath}/"  // anam-android와 동일하게 trailing slash 추가
+    }
+    
+    /**
+     * 미니앱 제거
+     * @param appId 제거할 앱 ID
+     * @return 제거 결과
+     */
+    suspend fun uninstallMiniApp(appId: String): MiniAppResult<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val appDir = File(context.filesDir, "${MiniAppConstants.MINIAPP_INSTALL_DIR}/$appId")
+            
+            if (!appDir.exists()) {
+                Log.w(TAG, "App directory not found for uninstall: $appId")
+                return@withContext MiniAppResult.Error.MiniAppNotFound(appId)
+            }
+            
+            // 재귀적으로 디렉토리 삭제
+            val deleted = appDir.deleteRecursively()
+            
+            if (deleted) {
+                Log.d(TAG, "Successfully uninstalled miniapp: $appId")
+                return@withContext MiniAppResult.Success(Unit)
+            } else {
+                Log.e(TAG, "Failed to delete app directory: $appId")
+                return@withContext MiniAppResult.Error.UninstallFailed(appId)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error uninstalling miniapp: $appId", e)
+            return@withContext MiniAppResult.Error.UnknownError(e.message ?: "Uninstall failed")
+        }
+    }
+    
+    /**
+     * InputStream으로부터 미니앱 설치
+     * @param appId 설치할 앱 ID
+     * @param inputStream ZIP 파일 스트림
+     * @return 설치 결과
+     */
+    suspend fun installFromInputStream(
+        appId: String, 
+        inputStream: InputStream
+    ): MiniAppResult<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val appDir = File(context.filesDir, "${MiniAppConstants.MINIAPP_INSTALL_DIR}/$appId")
+            appDir.mkdirs()
+            
+            // 임시 ZIP 파일 생성
+            val tempZip = File(context.cacheDir, "$appId.zip")
+            inputStream.use { input ->
+                FileOutputStream(tempZip).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            
+            // ZIP 압축 해제
+            ZipInputStream(FileInputStream(tempZip)).use { zip ->
+                var entry = zip.nextEntry
+                
+                while (entry != null) {
+                    // Mac 관련 파일 필터링
+                    if (entry.name.startsWith("__MACOSX/") || entry.name.contains("/.DS_Store") || entry.name == ".DS_Store") {
+                        Log.d(TAG, "Skipping Mac file: ${entry.name}")
+                        zip.closeEntry()
+                        entry = zip.nextEntry
+                        continue
+                    }
+                    
+                    val file = File(appDir, entry.name)
+                    
+                    if (entry.isDirectory) {
+                        file.mkdirs()
+                    } else {
+                        file.parentFile?.mkdirs()
+                        FileOutputStream(file).use { output ->
+                            zip.copyTo(output)
+                            output.fd.sync()
+                        }
+                    }
+                    
+                    zip.closeEntry()
+                    entry = zip.nextEntry
+                }
+            }
+            
+            
+            // 임시 파일 삭제
+            tempZip.delete()
+            
+            Log.d(TAG, "Successfully installed miniapp from stream: $appId")
+            return@withContext MiniAppResult.Success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to install from stream: $appId", e)
+            return@withContext MiniAppResult.Error.InstallationFailed(appId, e)
+        }
     }
 }

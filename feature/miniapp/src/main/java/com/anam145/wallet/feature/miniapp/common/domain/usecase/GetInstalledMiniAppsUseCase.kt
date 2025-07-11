@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetInstalledMiniAppsUseCase @Inject constructor(
     private val repository: MiniAppRepository
 ) {
-    suspend operator fun invoke(): MiniAppResult<List<MiniApp>> {
+    suspend operator fun invoke(): MiniAppResult<Map<String, MiniApp>> {
         return repository.getInstalledMiniApps()
     }
 }

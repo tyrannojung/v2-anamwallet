@@ -269,7 +269,8 @@ class BlockchainViewModel @Inject constructor(
         _uiState.value.manifest?.let { manifest ->
             val blockchainId = _uiState.value.blockchainId
             val mainPage = manifest.resolveEntryPoint()
-            val url = "https://$blockchainId.miniapp.local/$mainPage"
+            // WebView는 도메인을 소문자로 변환하므로 일치시킴
+            val url = "https://${blockchainId.lowercase()}.miniapp.local/$mainPage"
 
             Log.d(TAG, "loadUrlInWebView: mainPage=$mainPage, resolvedFrom=${manifest.mainPage ?: manifest.pages}, url=$url")
 

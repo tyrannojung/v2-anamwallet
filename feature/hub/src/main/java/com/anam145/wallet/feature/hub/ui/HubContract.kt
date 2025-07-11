@@ -1,6 +1,6 @@
 package com.anam145.wallet.feature.hub.ui
 
-import com.anam145.wallet.core.common.model.MiniApp
+import com.anam145.wallet.feature.hub.domain.usecase.HubMiniApp
 
 interface HubContract {
     /**
@@ -15,8 +15,9 @@ interface HubContract {
      */
 
     data class HubState(
-        val installedMiniApp: List<MiniApp> = emptyList(),
-        val unInstalledMiniApp: List<MiniApp> = emptyList(),
+        val isLoading: Boolean = false,
+        val hubApps: List<HubMiniApp> = emptyList(),
+        val error: String? = null
     )
 
 
@@ -33,27 +34,9 @@ interface HubContract {
      * - when 문에서 else 브랜치 불필요
      */
     sealed interface HubIntent {
-        data class InstallMiniApp(val miniApp: MiniApp) : HubIntent
-        data class UninstallMiniApp(val miniApp: MiniApp) : HubIntent
-        data object RefreshUninstalledMiniApp : HubIntent
-        data class ClickMiniApp(val miniApp: MiniApp) : HubIntent
+        data class InstallMiniApp(val appId: String) : HubIntent
+        data class UninstallMiniApp(val appId: String) : HubIntent
+        data object RefreshMiniApps : HubIntent
     }
-
-    /**
-     * 부수효과(Side Effect)
-     *
-     * Effect = "한 번만 발생하는 시스템 동작"
-     * - 화면 전환, 토스트, 다이얼로그 등
-     * - 화면 회전 시 반복되면 안 됨
-     * - Channel을 통해 전달되어 한 번만 소비됨
-     *
-     * 이 화면에서는 주로 네비게이션 Effect만 있음
-     * (설정 변경은 State로 처리되므로 Effect 불필요)
-     */
-    sealed interface HubEffect {
-        data object NavigateToManifestView : HubEffect
-    }
-
-
 
 }

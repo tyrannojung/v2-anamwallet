@@ -18,8 +18,10 @@ object MiniAppAssetLoader {
      * @return 설정이 완료된 WebViewAssetLoader
      */
     fun create(appId: String, baseDir: File): WebViewAssetLoader {
+        // WebView는 도메인을 소문자로 변환하므로, appId도 소문자로 변환
+        val domain = "${appId.lowercase()}.miniapp.local"
         return WebViewAssetLoader.Builder()
-            .setDomain("$appId.miniapp.local")
+            .setDomain(domain)
             .addPathHandler("/", InternalStoragePathHandler(baseDir))
             .build()
     }

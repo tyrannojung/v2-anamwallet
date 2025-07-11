@@ -296,7 +296,8 @@ class BlockchainService : Service() {
                     val mainPage = manifest.resolveEntryPoint()
                     
                     handler.post {
-                        val httpsUrl = "https://$blockchainId.miniapp.local/$mainPage"
+                        // WebView는 도메인을 소문자로 변환하므로 일치시킴
+                        val httpsUrl = "https://${blockchainId.lowercase()}.miniapp.local/$mainPage"
                         Log.d(TAG, "Loading blockchain app: $httpsUrl")
                         webView.loadUrl(httpsUrl)
                     }

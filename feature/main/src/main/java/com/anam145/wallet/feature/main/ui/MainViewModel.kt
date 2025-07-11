@@ -13,6 +13,7 @@ import com.anam145.wallet.feature.miniapp.common.domain.usecase.ObserveBlockchai
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.SwitchBlockchainUseCase
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.GetActiveBlockchainUseCase
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.SetActiveBlockchainUseCase
+import com.anam145.wallet.feature.miniapp.common.domain.usecase.ObserveAppChangesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,7 +52,8 @@ class MainViewModel @Inject constructor(
     private val observeBlockchainServiceUseCase: ObserveBlockchainServiceUseCase,
     private val switchBlockchainUseCase: SwitchBlockchainUseCase,
     private val getActiveBlockchainUseCase: GetActiveBlockchainUseCase,
-    private val setActiveBlockchainUseCase: SetActiveBlockchainUseCase
+    private val setActiveBlockchainUseCase: SetActiveBlockchainUseCase,
+    private val observeAppChangesUseCase: ObserveAppChangesUseCase
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(MainContract.MainState())
@@ -84,6 +86,9 @@ class MainViewModel @Inject constructor(
         
         // 앱 초기화 및 로드
         initializeAndLoad()
+        
+        // 앱 변경 이벤트 구독 (설치/삭제 시 자동 새로고침)
+        observeAppChanges()
     }
 
     fun handleIntent(intent: MainContract.MainIntent) {
@@ -138,16 +143,17 @@ class MainViewModel @Inject constructor(
             
             when (val result = getInstalledMiniAppsUseCase()) {
                 is MiniAppResult.Success -> {
-                    val miniApps = result.data
-                    val blockchainApps = miniApps.filter { it.type == MiniAppType.BLOCKCHAIN }
-                    val regularApps = miniApps.filter { it.type == MiniAppType.APP }
+                    val miniAppsMap = result.data
+                    val miniAppsList = miniAppsMap.values.toList()
+                    val blockchainApps = miniAppsList.filter { it.type == MiniAppType.BLOCKCHAIN }
+                    val regularApps = miniAppsList.filter { it.type == MiniAppType.APP }
                     
                     // 저장된 활성 블록체인 ID 복원 또는 첫 번째 블록체인 선택
                     // 이 시점에서는 UI 상태만 설정하고, 실제 블록체인 활성화는
                     // observeBlockchainService()에서 서비스 연결 후 자동으로 처리됨
                     val savedActiveId = getActiveBlockchainUseCase().first()
                     val activeId = when {
-                        savedActiveId != null && blockchainApps.any { it.appId == savedActiveId } -> savedActiveId
+                        savedActiveId != null && miniAppsMap.containsKey(savedActiveId) && miniAppsMap[savedActiveId]?.type == MiniAppType.BLOCKCHAIN -> savedActiveId
                         blockchainApps.isNotEmpty() -> blockchainApps.first().appId
                         else -> null
                     }
@@ -182,6 +188,12 @@ class MainViewModel @Inject constructor(
                             "유효하지 않은 매니페스트: ${result.appId}"
                         is MiniAppResult.Error.AppNotFound ->
                             "앱을 찾을 수 없습니다: ${result.appId}"
+                        is MiniAppResult.Error.MiniAppNotFound ->
+                            "미니앱을 찾을 수 없습니다: ${result.appId}"
+                        is MiniAppResult.Error.UninstallFailed ->
+                            "앱 삭제 실패: ${result.appId}"
+                        is MiniAppResult.Error.UnknownError ->
+                            "알 수 없는 오류: ${result.message}"
                         is MiniAppResult.Error.Unknown ->
                             "알 수 없는 오류: ${result.cause.message}"
                     }
@@ -282,6 +294,21 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 미니앱 변경 이벤트를 구독하여 자동으로 새로고침
+     * 
+     * MiniAppScanner에서 clearCache()가 호출될 때마다
+     * (앱 설치/삭제 시) 이벤트를 받아 앱 목록을 새로고침합니다.
+     * 이를 통해 5분 캐시를 유지하면서도 변경사항은 즉시 반영됩니다.
+     */
+    private fun observeAppChanges() {
+        viewModelScope.launch {
+            observeAppChangesUseCase().collect {
+                // 앱 변경 이벤트를 받으면 목록 새로고침
+                loadMiniApps()
+            }
+        }
+    }
 
     private fun handleAppClick(miniApp: MiniApp) {
         viewModelScope.launch {

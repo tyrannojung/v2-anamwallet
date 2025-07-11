@@ -60,6 +60,9 @@ fun MainScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val strings = LocalStrings.current
+    
+    // Hub에서 돌아올 때만 새로고침하도록 제거
+    // 캐시가 이미 install/uninstall 시 clearCache()로 처리됨
 
     // key = 이 작업을 다시 실행할 조건
     LaunchedEffect(key1 = viewModel) {

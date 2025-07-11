@@ -46,6 +46,7 @@ android {
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:common"))
+    implementation(project(":feature:miniapp"))
     
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -55,6 +56,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     
     // Hilt
     implementation(libs.hilt.android)
@@ -64,15 +66,7 @@ dependencies {
     // Lifecycle
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
-
-    //roomDB
-    ksp("androidx.room:room-compiler:2.7.2")
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    testImplementation(libs.androidx.room.testing)
-    implementation(libs.androidx.room.paging)
-
-
+    
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -83,4 +77,5 @@ dependencies {
 
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.coil.compose)
 }
