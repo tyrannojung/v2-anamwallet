@@ -35,6 +35,7 @@ object CryptoUtils {
     
     /**
      * 16진수 문자열을 바이트 배열로 변환
+     * @throws IllegalArgumentException 입력이 유효하지 않은 16진수 문자열인 경우
      */
     @JvmStatic
     fun hexStringToByteArray(input: String): ByteArray {
@@ -42,6 +43,16 @@ object CryptoUtils {
             input.substring(2)
         } else {
             input
+        }
+        
+        // 홀수 길이 검증
+        require(cleanInput.length % 2 == 0) {
+            "Hex string must have even length: ${cleanInput.length}"
+        }
+        
+        // 16진수 문자 검증
+        require(cleanInput.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }) {
+            "Invalid hex string: contains non-hexadecimal characters"
         }
         
         val len = cleanInput.length

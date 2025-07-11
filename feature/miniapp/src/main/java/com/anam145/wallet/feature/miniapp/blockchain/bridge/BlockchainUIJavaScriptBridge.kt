@@ -32,17 +32,33 @@ class BlockchainUIJavaScriptBridge(
         private const val TAG = "BlockchainUIBridge"
     }
     
+    private var isServiceBound = false
+    
     init {
-        bindToMainBridgeService()
+        // Service 바인딩을 나중으로 연기
     }
     
     fun setWebView(webView: WebView) {
         this.webView = webView
+        // WebView가 설정된 후에 Service 바인딩 시도
+        if (!isServiceBound) {
+            bindToMainBridgeService()
+        }
     }
     
     private fun bindToMainBridgeService() {
-        val intent = Intent(context, MainBridgeService::class.java)
-        context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        try {
+            val intent = Intent(context, MainBridgeService::class.java)
+            val bound = context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+            if (!bound) {
+                Log.e(TAG, "Failed to bind to MainBridgeService")
+            } else {
+                Log.d(TAG, "Binding to MainBridgeService initiated")
+                isServiceBound = true
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error binding to MainBridgeService", e)
+        }
     }
     
     private val serviceConnection = object : ServiceConnection {
@@ -216,7 +232,10 @@ class BlockchainUIJavaScriptBridge(
     
     fun destroy() {
         try {
-            context.unbindService(serviceConnection)
+            if (isServiceBound) {
+                context.unbindService(serviceConnection)
+                isServiceBound = false
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error unbinding service", e)
         }

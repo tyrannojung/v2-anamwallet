@@ -127,5 +127,12 @@ class WebAppJavaScriptBridge(
         } ?: Log.e(TAG, "Context is not ComponentActivity")
     }
     
-    
+    /**
+     * JavaScript Bridge 정리
+     * WebView 참조를 제거하여 메모리 누수를 방지합니다.
+     */
+    fun destroy() {
+        Log.d(TAG, "Destroying JavaScript Bridge")
+        webView = null
+    }
 }

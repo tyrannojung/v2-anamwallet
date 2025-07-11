@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.anam145.wallet.core.security.data.repository.SecurityRepositoryImpl
 import com.anam145.wallet.core.security.data.util.KdfParamsTypeAdapter
+import com.anam145.wallet.core.security.domain.repository.SecurityRepository
 import com.anam145.wallet.core.security.model.KdfParams
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,23 +31,30 @@ private val Context.securityDataStore: DataStore<Preferences> by preferencesData
  */
 @Module
 @InstallIn(SingletonComponent::class)
-object SecurityModule {
+abstract class SecurityModule {
     
-    @Provides
-    @Singleton
-    fun provideGson(): Gson {
-        return GsonBuilder()
-            .registerTypeAdapter(KdfParams::class.java, KdfParamsTypeAdapter())
-            .setPrettyPrinting()
-            .create()
-    }
+    @Binds
+    abstract fun bindSecurityRepository(
+        securityRepositoryImpl: SecurityRepositoryImpl
+    ): SecurityRepository
     
-    @Provides
-    @Singleton
-    @Named("security")
-    fun provideSecurityDataStore(
-        @ApplicationContext context: Context
-    ): DataStore<Preferences> {
-        return context.securityDataStore
+    companion object {
+        @Provides
+        @Singleton
+        fun provideGson(): Gson {
+            return GsonBuilder()
+                .registerTypeAdapter(KdfParams::class.java, KdfParamsTypeAdapter())
+                .setPrettyPrinting()
+                .create()
+        }
+        
+        @Provides
+        @Singleton
+        @Named("security")
+        fun provideSecurityDataStore(
+            @ApplicationContext context: Context
+        ): DataStore<Preferences> {
+            return context.securityDataStore
+        }
     }
 }
