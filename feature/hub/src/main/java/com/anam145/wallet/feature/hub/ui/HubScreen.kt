@@ -37,31 +37,6 @@ fun HubScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "Hub",
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                },
-                actions = {
-                    IconButton(
-                        onClick = { viewModel.handleIntent(HubContract.HubIntent.RefreshMiniApps) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Refresh"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        }
     ) { paddingValues ->
         Box(
             modifier = modifier
@@ -90,6 +65,9 @@ fun HubScreen(
                         },
                         onUninstallClick = { appId ->
                             viewModel.handleIntent(HubContract.HubIntent.UninstallMiniApp(appId))
+                        },
+                        onRefresh = {
+                            viewModel.handleIntent(HubContract.HubIntent.RefreshMiniApps)
                         }
                     )
                 }
@@ -103,7 +81,8 @@ private fun HubAppsList(
     apps: List<HubMiniApp>,
     loadingAppIds: Set<String>,
     onInstallClick: (String) -> Unit,
-    onUninstallClick: (String) -> Unit
+    onUninstallClick: (String) -> Unit,
+    onRefresh: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -112,13 +91,29 @@ private fun HubAppsList(
     ) {
         // Blockchain 섹션
         item {
-            Text(
-                text = "Blockchain Apps",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Blockchain Modules",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+                IconButton(
+                    onClick = { onRefresh() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Refresh",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
         
         items(
