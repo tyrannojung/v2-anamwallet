@@ -84,7 +84,7 @@ fun HubScreen(
                 else -> {
                     HubAppsList(
                         apps = uiState.hubApps,
-                        isLoading = uiState.isLoading,
+                        loadingAppIds = uiState.loadingAppIds,
                         onInstallClick = { appId ->
                             viewModel.handleIntent(HubContract.HubIntent.InstallMiniApp(appId))
                         },
@@ -101,7 +101,7 @@ fun HubScreen(
 @Composable
 private fun HubAppsList(
     apps: List<HubMiniApp>,
-    isLoading: Boolean,
+    loadingAppIds: Set<String>,
     onInstallClick: (String) -> Unit,
     onUninstallClick: (String) -> Unit
 ) {
@@ -127,7 +127,7 @@ private fun HubAppsList(
         ) { app ->
             HubAppCard(
                 app = app,
-                isLoading = isLoading,
+                isLoading = app.appId in loadingAppIds,
                 onInstallClick = { onInstallClick(app.appId) },
                 onUninstallClick = { onUninstallClick(app.appId) }
             )
@@ -152,10 +152,10 @@ private fun HubAppsList(
             ) { app ->
                 HubAppCard(
                     app = app,
-                    isLoading = isLoading,
+                    isLoading = app.appId in loadingAppIds,
                     onInstallClick = { onInstallClick(app.appId) },
-                    onUninstallClick = { onUninstallClick(app.appId) },
-                    )
+                    onUninstallClick = { onUninstallClick(app.appId) }
+                )
             }
         }
     }

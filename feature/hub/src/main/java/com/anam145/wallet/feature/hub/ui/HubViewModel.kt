@@ -46,7 +46,9 @@ class HubViewModel @Inject constructor (
         Log.d("HubViewModel", "Installing miniApp: $appId")
         viewModelScope.launch {
             operationMutex.withLock {
-                _uiState.update { it.copy(isLoading = true) }
+                _uiState.update { 
+                    it.copy(loadingAppIds = it.loadingAppIds + appId)
+                }
                 
                 when (val result = installMiniAppFromHubUseCase(appId)) {
                     is MiniAppResult.Success -> {
@@ -61,7 +63,7 @@ class HubViewModel @Inject constructor (
                         }
                         _uiState.update { 
                             it.copy(
-                                isLoading = false,
+                                loadingAppIds = it.loadingAppIds - appId,
                                 error = errorMessage
                             )
                         }
@@ -75,7 +77,9 @@ class HubViewModel @Inject constructor (
         Log.d("HubViewModel", "Uninstalling miniApp: $appId")
         viewModelScope.launch {
             operationMutex.withLock {
-                _uiState.update { it.copy(isLoading = true) }
+                _uiState.update { 
+                    it.copy(loadingAppIds = it.loadingAppIds + appId)
+                }
                 
                 when (val result = uninstallMiniAppUseCase(appId)) {
                     is MiniAppResult.Success -> {
@@ -86,7 +90,7 @@ class HubViewModel @Inject constructor (
                         Log.e("HubViewModel", "Uninstall failed: $result")
                         _uiState.update { 
                             it.copy(
-                                isLoading = false,
+                                loadingAppIds = it.loadingAppIds - appId,
                                 error = "Failed to uninstall app"
                             )
                         }
@@ -106,6 +110,7 @@ class HubViewModel @Inject constructor (
                         it.copy(
                             isLoading = false,
                             hubApps = result.data,
+                            loadingAppIds = emptySet(),  // 로딩 완료 시 초기화
                             error = null
                         )
                     }

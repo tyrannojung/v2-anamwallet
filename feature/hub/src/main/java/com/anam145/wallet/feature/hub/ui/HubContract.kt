@@ -17,6 +17,7 @@ interface HubContract {
     data class HubState(
         val isLoading: Boolean = false,
         val hubApps: List<HubMiniApp> = emptyList(),
+        val loadingAppIds: Set<String> = emptySet(),  // 현재 로딩 중인 앱 ID들
         val error: String? = null
     )
 
