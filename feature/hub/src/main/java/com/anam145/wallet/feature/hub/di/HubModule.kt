@@ -1,5 +1,6 @@
 package com.anam145.wallet.feature.hub.di
 
+<<<<<<< HEAD
 import android.content.Context
 import android.util.Log
 import androidx.room.Database
@@ -19,11 +20,18 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
+=======
+import com.anam145.wallet.feature.hub.remote.api.HubServerApi
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+>>>>>>> feature/blockchain-modular
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
+<<<<<<< HEAD
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -97,3 +105,21 @@ abstract class HubModule {
     }
 }
 
+=======
+@Module
+@InstallIn(SingletonComponent::class)
+object HubModule {
+
+    private const val HUB_BASE_URL = "https://anamhub.xyz/"
+
+    @Provides
+    @Singleton
+    fun provideHubApi(): HubServerApi {
+        return Retrofit.Builder()
+            .baseUrl(HUB_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(HubServerApi::class.java)
+    }
+}
+>>>>>>> feature/blockchain-modular

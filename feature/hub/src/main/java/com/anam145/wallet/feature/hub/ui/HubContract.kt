@@ -1,6 +1,10 @@
 package com.anam145.wallet.feature.hub.ui
 
+<<<<<<< HEAD
 import com.anam145.wallet.core.common.model.MiniApp
+=======
+import com.anam145.wallet.feature.hub.domain.usecase.HubMiniApp
+>>>>>>> feature/blockchain-modular
 
 interface HubContract {
     /**
@@ -15,8 +19,15 @@ interface HubContract {
      */
 
     data class HubState(
+<<<<<<< HEAD
         val installedMiniApp: List<MiniApp> = emptyList(),
         val unInstalledMiniApp: List<MiniApp> = emptyList(),
+=======
+        val isLoading: Boolean = false,
+        val hubApps: List<HubMiniApp> = emptyList(),
+        val loadingAppIds: Set<String> = emptySet(),  // 현재 로딩 중인 앱 ID들
+        val error: String? = null
+>>>>>>> feature/blockchain-modular
     )
 
 
@@ -33,6 +44,7 @@ interface HubContract {
      * - when 문에서 else 브랜치 불필요
      */
     sealed interface HubIntent {
+<<<<<<< HEAD
         data class InstallMiniApp(val miniApp: MiniApp) : HubIntent
         data class UninstallMiniApp(val miniApp: MiniApp) : HubIntent
         data object RefreshUninstalledMiniApp : HubIntent
@@ -56,4 +68,11 @@ interface HubContract {
 
 
 
+=======
+        data class InstallMiniApp(val appId: String) : HubIntent
+        data class UninstallMiniApp(val appId: String) : HubIntent
+        data object RefreshMiniApps : HubIntent
+    }
+
+>>>>>>> feature/blockchain-modular
 }

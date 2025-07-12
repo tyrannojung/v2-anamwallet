@@ -10,9 +10,11 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import com.anam145.wallet.core.common.model.MiniAppManifest
+import com.anam145.wallet.feature.miniapp.IKeystoreCallback
+import com.anam145.wallet.feature.miniapp.IKeystoreDecryptCallback
 import com.anam145.wallet.feature.miniapp.IMainBridgeService
 import com.anam145.wallet.feature.miniapp.common.bridge.service.MainBridgeService
-import org.json.JSONObject
+import com.google.gson.Gson
 
 /**
  * 블록체인 UI용 JavaScript Bridge
@@ -23,129 +25,58 @@ class BlockchainUIJavaScriptBridge(
     private val manifest: MiniAppManifest
 ) {
     private var webView: WebView? = null
+    private var mainBridgeService: IMainBridgeService? = null
+    private val gson = Gson()
+    
     companion object {
         private const val TAG = "BlockchainUIBridge"
     }
-    private var mainBridgeService: IMainBridgeService? = null
-    private var isBound = false
-    // MainBridgeService 연결 관리
+    
+    private var isServiceBound = false
+    
+    init {
+        // Service 바인딩을 나중으로 연기
+    }
+    
+    fun setWebView(webView: WebView) {
+        this.webView = webView
+        // WebView가 설정된 후에 Service 바인딩 시도
+        if (!isServiceBound) {
+            bindToMainBridgeService()
+        }
+    }
+    
+    private fun bindToMainBridgeService() {
+        try {
+            val intent = Intent(context, MainBridgeService::class.java)
+            val bound = context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+            if (!bound) {
+                Log.e(TAG, "Failed to bind to MainBridgeService")
+            } else {
+                Log.d(TAG, "Binding to MainBridgeService initiated")
+                isServiceBound = true
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error binding to MainBridgeService", e)
+        }
+    }
+    
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             mainBridgeService = IMainBridgeService.Stub.asInterface(service)
-            isBound = true
-            Log.d("블라블라", "✅ MainBridgeService 연결됨")
+            Log.d(TAG, "Connected to MainBridgeService")
         }
-
+        
         override fun onServiceDisconnected(name: ComponentName?) {
             mainBridgeService = null
-            isBound = false
-            Log.d("블라블라", "❌ MainBridgeService 연결 해제됨")
+            Log.d(TAG, "Disconnected from MainBridgeService")
         }
-    }
-    fun setWebView(webView: WebView) {
-        this.webView = webView
     }
     
     @JavascriptInterface
     fun log(message: String) {
         // JavaScript 로그 (필요시에만 활성화)
         // Log.d("BlockchainUI", "JS: $message")
-    }
-    init {
-        // MainBridgeService에 연결
-        connectToMainBridgeService()
-    }
-
-    /**
-     * WebView에서 지갑 데이터 수신 및 개인키/주소 추출하여 MainBridgeService로 전달
-     */
-    @android.webkit.JavascriptInterface
-    fun sendWalletData(walletDataJson: String) {
-        Log.d(TAG, "📨 WebView로부터 지갑 데이터 수신")
-
-        try {
-            val jsonObject = JSONObject(walletDataJson)
-
-            // 기존 로그 출력 (확인용)
-            Log.d("WalletReceived", "=".repeat(50))
-            Log.d("WalletReceived", "비트코인 지갑 생성 성공")
-            Log.d("WalletReceived", "=".repeat(50))
-            Log.d("WalletReceived", "블록체인: ${jsonObject.optString("blockchain", "").uppercase()}")
-            Log.d("WalletReceived", "네트워크: ${jsonObject.optString("network", "")}")
-            Log.d("WalletReceived", "주소: ${jsonObject.optString("address", "")}")
-            Log.d("WalletReceived", "니모닉: ${jsonObject.optString("mnemonic", "").take(20)}...")
-            Log.d("WalletReceived", "개인키: ${jsonObject.optString("privateKey", "").take(10)}...")
-            Log.d("WalletReceived", "생성시간: ${jsonObject.optString("createdAt", "")}")
-            Log.d("WalletReceived", "=".repeat(50))
-
-            // 개인키와 주소 추출
-            val privateKey = jsonObject.optString("privateKey", "")
-            val address = jsonObject.optString("address", "")
-
-            // 추출된 데이터 검증
-            if (privateKey.isEmpty()) {
-                Log.e(TAG, "❌ 개인키가 비어있습니다!")
-                return
-            }
-
-            if (address.isEmpty()) {
-                Log.e(TAG, "❌ 주소가 비어있습니다!")
-                return
-            }
-
-            Log.d(TAG, "✅ 개인키와 주소 추출 성공")
-            Log.d(TAG, "   - 개인키 길이: ${privateKey.length}")
-            Log.d(TAG, "   - 주소: $address")
-
-            // 🚀 MainBridgeService로 전달
-            sendToMainBridgeService(privateKey, address)
-
-        } catch (e: Exception) {
-            Log.e(TAG, "❌ 지갑 데이터 파싱 실패", e)
-        }
-    }
-
-    /**
-     * MainBridgeService로 개인키와 주소 전달
-     */
-    private fun sendToMainBridgeService(privateKey: String, address: String) {
-        if (!isBound || mainBridgeService == null) {
-            Log.e(TAG, "❌ MainBridgeService가 연결되지 않음 - 데이터 전달 실패")
-            return
-        }
-
-        try {
-            Log.d(TAG, "📤 MainBridgeService로 개인키와 주소 전달 중...")
-
-            // AIDL 메서드 호출
-            mainBridgeService?.sendPrivateKeyAndAddress(privateKey, address)
-
-            // 이게 찐임
-            var result = mainBridgeService?.generateWalletJson(address, privateKey);
-            Log.d(TAG, "결과: $result");
-            Log.d(TAG, "✅ MainBridgeService로 데이터 전달 완료!")
-
-        } catch (e: Exception) {
-            Log.e(TAG, "❌ MainBridgeService 호출 실패", e)
-        }
-    }
-
-    /**
-     * MainBridgeService에 연결
-     */
-    private fun connectToMainBridgeService() {
-        try {
-            val intent = Intent(context, MainBridgeService::class.java)
-            val bindResult = context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-
-            if (bindResult) {
-                Log.d(TAG, "🔗 MainBridgeService 연결 시도 중...")
-            } else {
-                Log.e(TAG, "❌ MainBridgeService 연결 실패")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "MainBridgeService 연결 중 오류", e)
-        }
     }
     
     @JavascriptInterface
@@ -188,5 +119,125 @@ class BlockchainUIJavaScriptBridge(
                 web.loadUrl(fullUrl)
             } ?: Log.e("BlockchainUI", "WebView is null, cannot navigate")
         } ?: Log.e("BlockchainUI", "Context is not ComponentActivity")
+    }
+    
+    @JavascriptInterface
+    fun createKeystore(privateKey: String, address: String) {
+        Log.d(TAG, "createKeystore called: address=$address")
+        
+        if (privateKey.isBlank()) {
+            sendKeystoreError("Private key is required")
+            return
+        }
+        
+        if (address.isBlank()) {
+            sendKeystoreError("Address is required")
+            return
+        }
+        
+        val service = mainBridgeService
+        if (service == null) {
+            sendKeystoreError("Service not connected")
+            return
+        }
+        
+        try {
+            service.createKeystore(privateKey, address, object : IKeystoreCallback.Stub() {
+                override fun onSuccess(keystoreJson: String) {
+                    Log.d(TAG, "Keystore created successfully")
+                    sendKeystoreResult(true, keystoreJson)
+                }
+                
+                override fun onError(errorMessage: String) {
+                    Log.e(TAG, "Keystore creation failed: $errorMessage")
+                    sendKeystoreResult(false, errorMessage)
+                }
+            })
+        } catch (e: Exception) {
+            Log.e(TAG, "Error calling createKeystore", e)
+            sendKeystoreError(e.message ?: "Unknown error")
+        }
+    }
+    
+    private fun sendKeystoreResult(success: Boolean, data: String) {
+        (context as? ComponentActivity)?.runOnUiThread {
+            webView?.let { web ->
+                val escapedData = gson.toJson(data)
+                val script = if (success) {
+                    "window.dispatchEvent(new CustomEvent('keystoreCreated', { detail: { success: true, keystore: $escapedData } }));"
+                } else {
+                    "window.dispatchEvent(new CustomEvent('keystoreCreated', { detail: { success: false, error: $escapedData } }));"
+                }
+                web.evaluateJavascript(script, null)
+            }
+        }
+    }
+    
+    private fun sendKeystoreError(error: String) {
+        sendKeystoreResult(false, error)
+    }
+    
+    @JavascriptInterface
+    fun decryptKeystore(keystoreJson: String) {
+        Log.d(TAG, "decryptKeystore called")
+        
+        if (keystoreJson.isBlank()) {
+            sendDecryptError("Keystore JSON is required")
+            return
+        }
+        
+        val service = mainBridgeService
+        if (service == null) {
+            sendDecryptError("Service not connected")
+            return
+        }
+        
+        try {
+            service.decryptKeystore(keystoreJson, object : IKeystoreDecryptCallback.Stub() {
+                override fun onSuccess(address: String, privateKey: String) {
+                    Log.d(TAG, "Keystore decrypted successfully")
+                    sendDecryptResult(true, address, privateKey, null)
+                }
+                
+                override fun onError(errorMessage: String) {
+                    Log.e(TAG, "Keystore decryption failed: $errorMessage")
+                    sendDecryptResult(false, null, null, errorMessage)
+                }
+            })
+        } catch (e: Exception) {
+            Log.e(TAG, "Error calling decryptKeystore", e)
+            sendDecryptError(e.message ?: "Unknown error")
+        }
+    }
+    
+    private fun sendDecryptResult(success: Boolean, address: String?, privateKey: String?, error: String?) {
+        (context as? ComponentActivity)?.runOnUiThread {
+            webView?.let { web ->
+                val script = if (success) {
+                    val addressJson = gson.toJson(address)
+                    val privateKeyJson = gson.toJson(privateKey)
+                    "window.dispatchEvent(new CustomEvent('keystoreDecrypted', { detail: { success: true, address: $addressJson, privateKey: $privateKeyJson } }));"
+                } else {
+                    val errorJson = gson.toJson(error)
+                    "window.dispatchEvent(new CustomEvent('keystoreDecrypted', { detail: { success: false, error: $errorJson } }));"
+                }
+                web.evaluateJavascript(script, null)
+            }
+        }
+    }
+    
+    private fun sendDecryptError(error: String) {
+        sendDecryptResult(false, null, null, error)
+    }
+    
+    fun destroy() {
+        try {
+            if (isServiceBound) {
+                context.unbindService(serviceConnection)
+                isServiceBound = false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error unbinding service", e)
+        }
     }
 }

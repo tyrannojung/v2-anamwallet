@@ -8,6 +8,7 @@ import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppScanner
 import com.anam145.wallet.feature.miniapp.common.domain.repository.MiniAppRepository
 import com.anam145.wallet.core.common.result.MiniAppResult
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.SharedFlow
 import javax.inject.Inject
 
 class MiniAppRepositoryImpl @Inject constructor(
@@ -44,7 +45,7 @@ class MiniAppRepositoryImpl @Inject constructor(
         }
     }
     
-    override suspend fun getInstalledMiniApps(): MiniAppResult<List<MiniApp>> {
+    override suspend fun getInstalledMiniApps(): MiniAppResult<Map<String, MiniApp>> {
         // 직접 scanner의 MiniAppResult를 반환
         return scanner.scanInstalledApps()
     }
@@ -60,5 +61,9 @@ class MiniAppRepositoryImpl @Inject constructor(
     
     override suspend fun clearCache() {
         scanner.clearCache()
+    }
+    
+    override fun observeAppChanges(): SharedFlow<Unit> {
+        return scanner.appsChangedEvent
     }
 }

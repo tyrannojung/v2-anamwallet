@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -29,6 +30,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.anam145.wallet.feature.main.ui.MainViewModel
 import com.anam145.wallet.feature.main.ui.MainContract
+import com.anam145.wallet.core.security.domain.usecase.VerifyAppPasswordUseCase
+import com.anam145.wallet.feature.auth.domain.PasswordManager
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 // Hilt가 의존성을 주입하는 시작점
 @AndroidEntryPoint
@@ -36,6 +44,15 @@ class MainActivity : ComponentActivity() {
     
     // Main 화면의 ViewModel (스플래시 상태도 관리)
     private val mainViewModel: MainViewModel by viewModels()
+    
+    @Inject
+    lateinit var verifyAppPasswordUseCase: VerifyAppPasswordUseCase
+    
+    @Inject
+    lateinit var passwordManager: PasswordManager
+    
+    private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
+    val authState: StateFlow<AuthState> = _authState
     
     override fun onCreate(savedInstanceState: Bundle?) {
         // Splash Screen 설치 (super.onCreate 전에 호출!)
@@ -81,9 +98,32 @@ class MainActivity : ComponentActivity() {
         }
         
         enableEdgeToEdge()
-        setContent {
-            AnamWalletApp()
+        
+        // 인증 상태 확인
+        lifecycleScope.launch {
+            _authState.value = AuthState.Loading
+            
+            // 앱 시작 시 항상 비밀번호 초기화 (재인증 필요)
+            passwordManager.clearPassword()
+            
+            val hasPassword = verifyAppPasswordUseCase.hasPassword()
+            
+            _authState.value = when {
+                !hasPassword -> AuthState.NoPassword
+                else -> AuthState.NotAuthenticated
+            }
         }
+        
+        setContent {
+            val authStateValue by authState.collectAsStateWithLifecycle()
+            AnamWalletApp(authState = authStateValue)
+        }
+    }
+    
+    sealed class AuthState {
+        object Loading : AuthState()
+        object NoPassword : AuthState()
+        object NotAuthenticated : AuthState()
     }
 }
 
@@ -94,7 +134,9 @@ class MainActivity : ComponentActivity() {
  * NavHost를 포함한 Scaffold를 구성.
  */
 @Composable
-fun AnamWalletApp() {
+fun AnamWalletApp(
+    authState: MainActivity.AuthState = MainActivity.AuthState.Loading
+) {
     // 테마 ViewModel
     // hiltViewModel() → ViewModel 인스턴스 생성
     val themeViewModel: ThemeViewModel = hiltViewModel()
@@ -149,41 +191,78 @@ fun AnamWalletApp() {
                 it.appId == mainUiState.activeBlockchainId 
             }
             
+            // 시작 화면 결정
+            val startDestination = when (authState) {
+                MainActivity.AuthState.Loading -> AnamNavRoute.Main.route
+                MainActivity.AuthState.NoPassword -> AnamNavRoute.SetupPassword.route
+                MainActivity.AuthState.NotAuthenticated -> AnamNavRoute.Login.route
+            }
+            
+            // 인증 상태가 변경되면 자동으로 네비게이션
+            LaunchedEffect(authState) {
+                when (authState) {
+                    MainActivity.AuthState.NoPassword -> {
+                        navController.navigate(AnamNavRoute.SetupPassword.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                    MainActivity.AuthState.NotAuthenticated -> {
+                        navController.navigate(AnamNavRoute.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                    MainActivity.AuthState.Loading -> {
+                        // 로딩 중에는 아무것도 하지 않음
+                    }
+                }
+            }
+            
+            // 인증 화면에서는 바텀 네비게이션 숨기기
+            val showBottomBar = currentRoute !in listOf(
+                AnamNavRoute.Login.route,
+                AnamNavRoute.SetupPassword.route
+            )
+            
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
-                    // 상단 헤더
-                    Header(
-                        // LocalStrings로 언어별 타이틀 제공
-                        title = when (currentNavRoute) {
-                            AnamNavRoute.Main -> strings.headerTitleMain
-                            AnamNavRoute.Hub -> strings.headerTitleHub
-                            AnamNavRoute.Browser -> strings.headerTitleBrowser
-                            AnamNavRoute.Identity -> strings.headerTitleIdentity
-                            AnamNavRoute.Settings -> strings.headerTitleSettings
-                            else -> strings.headerTitle
-                        },
-                        showBlockchainStatus = currentRoute == AnamNavRoute.Main.route,
-                        activeBlockchainName = activeBlockchain?.name,
-                        onBlockchainClick = if (activeBlockchain != null) {
-                            {
-                                mainViewModel.handleIntent(
-                                    MainContract.MainIntent.ClickBlockchainApp(activeBlockchain)
-                                )
-                            }
-                        } else null
-                    )
+                    // 상단 헤더 (인증 화면에서는 숨김)
+                    if (showBottomBar) {
+                        Header(
+                            // LocalStrings로 언어별 타이틀 제공
+                            title = when (currentNavRoute) {
+                                AnamNavRoute.Main -> strings.headerTitleMain
+                                AnamNavRoute.Hub -> strings.headerTitleHub
+                                AnamNavRoute.Browser -> strings.headerTitleBrowser
+                                AnamNavRoute.Identity -> strings.headerTitleIdentity
+                                AnamNavRoute.Settings -> strings.headerTitleSettings
+                                else -> strings.headerTitle
+                            },
+                            showBlockchainStatus = currentRoute == AnamNavRoute.Main.route,
+                            activeBlockchainName = activeBlockchain?.name,
+                            onBlockchainClick = if (activeBlockchain != null) {
+                                {
+                                    mainViewModel.handleIntent(
+                                        MainContract.MainIntent.ClickBlockchainApp(activeBlockchain)
+                                    )
+                                }
+                            } else null
+                        )
+                    }
                 },
                 bottomBar = {
-                    // Bottom Navigation Bar
-                    AnamBottomNavigation(navController = navController)
+                    // Bottom Navigation Bar (인증 화면에서는 숨김)
+                    if (showBottomBar) {
+                        AnamBottomNavigation(navController = navController)
+                    }
                 }
             ) { innerPadding ->
                 // Navigation Host - 모든 화면들을 관리
                 AnamNavHost(
                     navController = navController,
                     mainViewModel = mainViewModel,
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier.padding(innerPadding),
+                    startDestination = startDestination
                 )
             }
         }

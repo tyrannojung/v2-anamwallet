@@ -26,6 +26,7 @@ include(":app")
 include(":core:common")
 include(":core:ui")
 include(":core:data")
+include(":core:security")
 
 // Feature modules  
 include(":feature:main")
@@ -34,4 +35,5 @@ include(":feature:browser")
 include(":feature:identity")
 include(":feature:settings")
 include(":feature:miniapp")
+include(":feature:auth")
  

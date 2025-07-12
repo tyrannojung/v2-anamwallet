@@ -10,6 +10,7 @@ import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +35,14 @@ fun BlockchainWebView(
 
     // JavaScript Bridge 생성
     val bridge = remember { BlockchainUIJavaScriptBridge(context, blockchainId, manifest) }
+    
+    // Bridge 정리를 위한 DisposableEffect
+    DisposableEffect(bridge) {
+        onDispose {
+            // Composable이 dispose될 때 bridge 정리
+            bridge.destroy()
+        }
+    }
     
     AndroidView(
         factory = { ctx ->

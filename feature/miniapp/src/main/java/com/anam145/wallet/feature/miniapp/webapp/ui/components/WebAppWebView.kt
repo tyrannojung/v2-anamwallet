@@ -3,6 +3,7 @@ package com.anam145.wallet.feature.miniapp.webapp.ui.components
 import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +32,14 @@ fun WebAppWebView(
             manifest = manifest,
             onTransactionRequest = onTransactionRequest
         )
+    }
+    
+    // Bridge 정리를 위한 DisposableEffect
+    DisposableEffect(jsBridge) {
+        onDispose {
+            // Composable이 dispose될 때 bridge 정리
+            jsBridge.destroy()
+        }
     }
     
     AndroidView(

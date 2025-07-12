@@ -48,6 +48,7 @@ object WebViewFactory {
             // WebViewClient 설정
             webViewClient = createWebViewClient(assetLoader)
             
+            
             // JavaScript Bridge 추가
             jsBridge?.let {
                 @Suppress("JavascriptInterface")
@@ -81,6 +82,7 @@ object WebViewFactory {
             ): android.webkit.WebResourceResponse? {
                 return assetLoader.shouldInterceptRequest(url.toUri())
             }
+            
         }
     }
 }

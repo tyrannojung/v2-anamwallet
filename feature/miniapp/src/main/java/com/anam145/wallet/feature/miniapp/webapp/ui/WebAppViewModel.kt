@@ -119,7 +119,8 @@ class WebAppViewModel @Inject constructor(
         _uiState.value.manifest?.let { manifest ->
             val appId = _uiState.value.appId
             val mainPage = manifest.resolveEntryPoint()
-            val url = "https://$appId.miniapp.local/$mainPage"
+            // WebView는 도메인을 소문자로 변환하므로 일치시킴
+            val url = "https://${appId.lowercase()}.miniapp.local/$mainPage"
 
             _uiState.update { it.copy(webUrl = url) }
         }

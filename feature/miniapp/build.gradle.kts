@@ -49,7 +49,8 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:data"))
     implementation(project(":core:ui"))
-//    implementation(project(":feature:main"))
+    implementation(project(":core:security"))
+    implementation(project(":feature:auth"))
     
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -74,12 +75,10 @@ dependencies {
     
     // JSON parsing
     implementation(libs.kotlinx.serialization.json)
+    implementation("com.google.code.gson:gson:2.10.1")
     
     // WebView
     implementation("androidx.webkit:webkit:1.11.0")
-
-    // KeyStoreManager
-    implementation("org.web3j:crypto:5.0.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

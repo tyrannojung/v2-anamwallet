@@ -8,17 +8,27 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.os.RemoteException
 import android.util.Log
-import com.anam145.wallet.feature.miniapp.common.Utils.KeyStoreManager;
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import com.anam145.wallet.core.security.domain.usecase.DecryptKeystoreUseCase
+import com.anam145.wallet.core.security.domain.usecase.GenerateKeystoreUseCase
+import com.anam145.wallet.feature.auth.domain.PasswordManager
 import com.anam145.wallet.feature.miniapp.IBlockchainCallback
 import com.anam145.wallet.feature.miniapp.IBlockchainService
+import com.anam145.wallet.feature.miniapp.IKeystoreCallback
+import com.anam145.wallet.feature.miniapp.IKeystoreDecryptCallback
 import com.anam145.wallet.feature.miniapp.IMainBridgeService
 import com.anam145.wallet.feature.miniapp.blockchain.service.BlockchainService
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.json.JSONObject
+import javax.inject.Inject
 
 /**
  * 메인 브릿지 서비스 - 메인 프로세스에서 실행
- *
+ * 
  * 일반 웹앱(정부24 등)과 블록체인 서비스 간의 브릿지 역할을 합니다.
  * 웹앱 프로세스(:app)에서의 요청을 받아 블록체인 프로세스(:blockchain)로 전달합니다.
  */
@@ -29,17 +39,20 @@ class MainBridgeService : Service() {
         private const val TAG = "MainBridgeService"
     }
     
+    @Inject
+    lateinit var passwordManager: PasswordManager
+    
+    @Inject
+    lateinit var generateKeystoreUseCase: GenerateKeystoreUseCase
+    
+    @Inject
+    lateinit var decryptKeystoreUseCase: DecryptKeystoreUseCase
+    
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    
     private var blockchainService: IBlockchainService? = null
     private var isBlockchainServiceBound = false
-
-
-    // 저장된 개인키와 주소
-    private var storedPrivateKey: String = ""
-    private var storedAddress: String = ""
-
-    //main에서 받을 password
-    private var password: String = ""
-
+    
     // 블록체인 서비스 연결
     private val blockchainServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -57,6 +70,7 @@ class MainBridgeService : Service() {
     
     // AIDL 인터페이스 구현
     private val binder = object : IMainBridgeService.Stub() {
+        
         override fun requestTransaction(requestJson: String, callback: IBlockchainCallback) {
             Log.d(TAG, "Transaction request received: $requestJson")
             
@@ -152,42 +166,91 @@ class MainBridgeService : Service() {
         override fun isReady(): Boolean {
             return isBlockchainServiceBound && blockchainService != null
         }
-
-        override fun sendPrivateKeyAndAddress(privateKey: String, address: String) {
-            Log.d(TAG, "지갑 정보 저장: 개인키, 주소")
-            storedPrivateKey = privateKey
-            storedAddress = address
-            Log.d(TAG, "저장 완료 - 개인키 길이: ${privateKey.length}, 주소 길이: ${address.length}")
-        }
-
-        override fun updatePassword(password: String): Boolean {
-            return try {
-                Log.d("해치웠나", "비밀번호 받아오기 해치웠나?")
-                this@MainBridgeService.password = password
-                true // 성공적으로 저장했을 때
-            } catch (e: Exception) {
-                Log.e("MainBridgeService", "비밀번호 저장 실패: ${e.message}")
-                false // 예외가 발생하면 실패 처리
+        
+        override fun createKeystore(
+            privateKey: String,
+            address: String,
+            callback: IKeystoreCallback
+        ) {
+            Log.d(TAG, "createKeystore called for address: $address")
+            
+            serviceScope.launch {
+                try {
+                    // 1. 비밀번호 가져오기
+                    val password = passwordManager.getPassword()
+                    if (password == null) {
+                        callback.onError("Not authenticated. Please login first.")
+                        return@launch
+                    }
+                    
+                    // 2. 키스토어 생성
+                    val result = generateKeystoreUseCase(
+                        password = password,
+                        address = address,
+                        privateKey = privateKey
+                    )
+                    
+                    result.fold(
+                        onSuccess = { keystoreJson ->
+                            Log.d(TAG, "Keystore created successfully")
+                            callback.onSuccess(keystoreJson)
+                        },
+                        onFailure = { error ->
+                            Log.e(TAG, "Failed to create keystore", error)
+                            callback.onError(error.message ?: "Failed to create keystore")
+                        }
+                    )
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error in createKeystore", e)
+                    try {
+                        callback.onError(e.message ?: "Unknown error")
+                    } catch (callbackError: RemoteException) {
+                        Log.e(TAG, "Failed to send error callback", callbackError)
+                    }
+                }
             }
         }
-        override fun generateWalletJson(Address: String, privateKey: String): String {
-            Log.d("뭐노", password);
-            return KeyStoreManager.generateWalletJson(password, Address, privateKey);
-        }
-
-        override fun decryptKeystore(KeyStoreFileJson: String): Map<String, String> {
-            return KeyStoreManager.decrypt(password, KeyStoreFileJson);
-        }
-
-
-        override fun getPrivateKey(): String {
-            Log.d(TAG, "개인키 조회")
-            return storedPrivateKey
-        }
-
-        override fun getAddress(): String {
-            Log.d(TAG, "주소 조회")
-            return storedAddress
+        
+        override fun decryptKeystore(
+            keystoreJson: String,
+            callback: IKeystoreDecryptCallback
+        ) {
+            Log.d(TAG, "decryptKeystore called")
+            
+            serviceScope.launch {
+                try {
+                    // 1. 비밀번호 가져오기
+                    val password = passwordManager.getPassword()
+                    if (password == null) {
+                        callback.onError("Not authenticated. Please login first.")
+                        return@launch
+                    }
+                    
+                    // 2. 키스토어 복호화
+                    val result = decryptKeystoreUseCase(
+                        password = password,
+                        keystoreJson = keystoreJson
+                    )
+                    
+                    result.fold(
+                        onSuccess = { credentials ->
+                            Log.d(TAG, "Keystore decrypted successfully")
+                            callback.onSuccess(credentials.address, credentials.privateKey)
+                        },
+                        onFailure = { error ->
+                            Log.e(TAG, "Failed to decrypt keystore", error)
+                            callback.onError(error.message ?: "Failed to decrypt keystore")
+                        }
+                    )
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error in decryptKeystore", e)
+                    try {
+                        callback.onError(e.message ?: "Unknown error")
+                    } catch (callbackError: RemoteException) {
+                        Log.e(TAG, "Failed to send error callback", callbackError)
+                    }
+                }
+            }
         }
     }
     
@@ -207,6 +270,9 @@ class MainBridgeService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "MainBridgeService destroyed")
+        
+        // 코루틴 스코프 취소
+        serviceScope.cancel()
         
         // 블록체인 서비스 연결 해제
         if (isBlockchainServiceBound) {

@@ -2,6 +2,8 @@
 package com.anam145.wallet.feature.miniapp;
 
 import com.anam145.wallet.feature.miniapp.IBlockchainCallback;
+import com.anam145.wallet.feature.miniapp.IKeystoreCallback;
+import com.anam145.wallet.feature.miniapp.IKeystoreDecryptCallback;
 
 /**
  * 메인 브릿지 서비스와 통신하기 위한 AIDL 인터페이스
@@ -34,18 +36,21 @@ interface IMainBridgeService {
      * @return 준비 상태
      */
     boolean isReady();
-
+    
     /**
-     * 개인키와 주소를 전달하는 메서드
-     *
-     * @param privateKey 지갑의 개인키
+     * 키스토어 생성 요청
+     * 
+     * @param privateKey 개인키 (16진수 문자열)
      * @param address 지갑 주소
+     * @param callback 결과 콜백
      */
-    void sendPrivateKeyAndAddress(String privateKey, String address);
-
-    boolean updatePassword(String password);
-    String generateWalletJson(String Address, String privateKey);
-    Map<String, String> decryptKeystore(String KeyStoreFileJson);
-    String getPrivateKey();
-    String getAddress();
+    void createKeystore(String privateKey, String address, IKeystoreCallback callback);
+    
+    /**
+     * 키스토어 복호화 요청
+     * 
+     * @param keystoreJson 암호화된 키스토어 (JSON 문자열)
+     * @param callback 결과 콜백
+     */
+    void decryptKeystore(String keystoreJson, IKeystoreDecryptCallback callback);
 }

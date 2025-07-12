@@ -72,6 +72,27 @@ sealed interface MiniAppResult<out T> {
         data class AppNotFound(val appId: String) : Error
         
         /**
+         * 미니앱을 찾을 수 없음
+         * 
+         * @property appId 찾을 수 없는 미니앱의 ID
+         */
+        data class MiniAppNotFound(val appId: String) : Error
+        
+        /**
+         * 제거 실패
+         * 
+         * @property appId 제거 실패한 앱의 ID
+         */
+        data class UninstallFailed(val appId: String) : Error
+        
+        /**
+         * 알 수 없는 에러
+         * 
+         * @property message 에러 메시지
+         */
+        data class UnknownError(val message: String) : Error
+        
+        /**
          * 알 수 없는 에러
          * 
          * @property cause 에러 원인
