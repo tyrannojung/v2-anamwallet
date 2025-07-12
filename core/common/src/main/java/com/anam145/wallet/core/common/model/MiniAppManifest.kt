@@ -1,16 +1,11 @@
 package com.anam145.wallet.core.common.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
 /**
  * 미니앱 매니페스트 정보
  * manifest.json 파일의 내용을 담는 데이터 클래스
  */
-
-@Entity("mini_app_manifest")
 data class MiniAppManifest(
-    @PrimaryKey val appId: String,
+    val appId: String,
     val type: String,  // "app" or "blockchain"
     val name: String,
     val version: String,

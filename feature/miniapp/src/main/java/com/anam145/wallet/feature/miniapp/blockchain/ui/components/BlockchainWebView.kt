@@ -1,10 +1,6 @@
 package com.anam145.wallet.feature.miniapp.blockchain.ui.components
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
 import android.util.Log
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
@@ -16,13 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.anam145.wallet.core.common.model.MiniAppManifest
-import com.anam145.wallet.feature.miniapp.IMainBridgeService
-import com.anam145.wallet.feature.miniapp.common.bridge.service.MainBridgeService
 import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
 import com.anam145.wallet.feature.miniapp.common.webview.WebViewFactory
 import com.anam145.wallet.feature.miniapp.blockchain.bridge.BlockchainUIJavaScriptBridge
 import java.io.File
-import org.json.JSONObject
 
 @Composable
 fun BlockchainWebView(
@@ -32,7 +25,7 @@ fun BlockchainWebView(
     onWebViewCreated: (WebView) -> Unit
 ) {
     val context = LocalContext.current
-
+    
     // JavaScript Bridge 생성
     val bridge = remember { BlockchainUIJavaScriptBridge(context, blockchainId, manifest) }
     

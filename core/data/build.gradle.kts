@@ -52,5 +52,4 @@ dependencies {
     
     // 기타 필수 라이브러리
     implementation(libs.androidx.core.ktx)
-
 }

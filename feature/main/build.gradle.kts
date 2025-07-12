@@ -75,19 +75,4 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-    // Gson
-    implementation("com.google.code.gson:gson:2.10.1")
-
-    // Web3J
-    implementation("org.web3j:crypto:5.0.0")
-//
-//    //Json
-//    implementation ("com.googlecode.json-simple:json-simple:1.1.1")
-//    implementation ("org.json:json:20240303")
-//
-    implementation("com.fasterxml.jackson.core:jackson-core:2.17.0")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.0")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.17.0")
-
 }
