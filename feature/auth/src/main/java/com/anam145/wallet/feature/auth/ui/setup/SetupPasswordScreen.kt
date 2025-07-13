@@ -331,8 +331,7 @@ private fun SetupPasswordContent(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "• 비밀번호는 안전한 곳에 보관하세요\n" +
-                              "• 비밀번호를 잊으면 지갑에 접근할 수 없습니다\n" +
+                        text = "• 비밀번호를 잊으면 지갑에 접근할 수 없습니다\n" +
                               "• 앱을 재설치하면 모든 데이터가 삭제됩니다",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
