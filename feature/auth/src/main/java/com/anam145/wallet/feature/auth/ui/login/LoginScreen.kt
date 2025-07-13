@@ -31,6 +31,9 @@ import com.anam145.wallet.core.ui.R
 import com.anam145.wallet.core.ui.theme.AnamWalletTheme
 import com.anam145.wallet.core.ui.theme.Typography
 import com.anam145.wallet.core.ui.theme.CocogooseFamily
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.anam145.wallet.feature.auth.R as AuthR
 
 /**
  * 로그인 화면
@@ -86,28 +89,12 @@ private fun LoginContent(
         ) {
             Spacer(modifier = Modifier.height(80.dp))
             
-            // 앱 로고/아이콘 - 물결 모양의 ANAM 아이디어를 표현
-            Card(
-                modifier = Modifier.size(100.dp),
-                shape = androidx.compose.foundation.shape.CircleShape,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "A",
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            fontSize = 48.sp,
-                            fontFamily = CocogooseFamily
-                        ),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
+            // 앱 로고/아이콘
+            Image(
+                painter = painterResource(id = AuthR.drawable.logo),
+                contentDescription = "ANAM Logo",
+                modifier = Modifier.size(100.dp)
+            )
             
             Spacer(modifier = Modifier.height(32.dp))
             

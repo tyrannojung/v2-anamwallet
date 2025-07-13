@@ -39,6 +39,9 @@ import com.anam145.wallet.core.ui.theme.AnamError
 import com.anam145.wallet.core.ui.theme.AnamWarning
 import com.anam145.wallet.core.ui.theme.Typography
 import com.anam145.wallet.core.ui.theme.CocogooseFamily
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.anam145.wallet.feature.auth.R as AuthR
 
 /**
  * 비밀번호 설정 화면
@@ -97,12 +100,11 @@ private fun SetupPasswordContent(
         ) {
             Spacer(modifier = Modifier.height(40.dp))
             
-            // 아이콘
-            Icon(
-                imageVector = Icons.Default.Lock,
-                contentDescription = null,
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.primary
+            // 앱 로고
+            Image(
+                painter = painterResource(id = AuthR.drawable.logo),
+                contentDescription = "ANAM Logo",
+                modifier = Modifier.size(100.dp)
             )
             
             Spacer(modifier = Modifier.height(24.dp))
