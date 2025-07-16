@@ -17,8 +17,8 @@ val LocalStrings = compositionLocalOf { Strings() }
  */
 data class Strings(
     // Header
-    val headerTitle: String = "Haeundae Wallet",
-    val headerTitleMain: String = "Haeundae Wallet",
+    val headerTitle: String = "Busan Wallet",
+    val headerTitleMain: String = "Busan Wallet",
     val headerTitleHub: String = "허브",
     val headerTitleBrowser: String = "웹뷰",
     val headerTitleIdentity: String = "NFT 컬렉션",  // 부산일보 버전
@@ -48,7 +48,7 @@ data class Strings(
     val settingsFaqDescription: String = "FAQ 확인하기",
     
     val settingsAppInfo: String = "앱 소개",
-    val settingsAppInfoDescription: String = "Haeundae Wallet에 대해 알아보기",
+    val settingsAppInfoDescription: String = "Busan Wallet에 대해 알아보기",
     val settingsLicense: String = "라이선스",
     val settingsLicenseDescription: String = "오픈소스 라이선스 정보",
     
@@ -80,8 +80,8 @@ data class Strings(
  */
 val EnglishStrings = Strings(
     // Header
-    headerTitle = "Haeundae Wallet",
-    headerTitleMain = "Haeundae Wallet",
+    headerTitle = "Busan Wallet",
+    headerTitleMain = "Busan Wallet",
     headerTitleHub = "Hub",
     headerTitleBrowser = "WebView",
     headerTitleIdentity = "NFT Collection",  // 부산일보 버전
@@ -111,7 +111,7 @@ val EnglishStrings = Strings(
     settingsFaqDescription = "Check frequently asked questions",
     
     settingsAppInfo = "App Info",
-    settingsAppInfoDescription = "Learn about Haeundae Wallet",
+    settingsAppInfoDescription = "Learn about Busan Wallet",
     settingsLicense = "License",
     settingsLicenseDescription = "Open source license information",
     

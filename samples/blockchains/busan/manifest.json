@@ -1,7 +1,7 @@
 {
-  "app_id": "com.anam.haeundea",
+  "app_id": "com.anam.busan",
   "type": "blockchain",
-  "name": "Haeundea",
+  "name": "BusanNet",
   "version": "1.0.0",
   "icon": "assets/icons/app_icon.png",
   "pages": ["pages/index/index", "pages/send/send", "pages/receive/receive"]

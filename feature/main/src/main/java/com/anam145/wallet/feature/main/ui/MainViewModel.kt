@@ -143,7 +143,7 @@ class MainViewModel @Inject constructor(
                         .sortedBy { app ->
                             // 해운대, 이더리움, 솔라나 순서로 정렬
                             when (app.appId) {
-                                "com.anam.haeundea" -> 0
+                                "com.anam.busan" -> 0
                                 "com.anam.ethereum" -> 1
                                 "com.anam.solana" -> 2
                                 else -> 99 // 다른 블록체인은 뒤에 배치
