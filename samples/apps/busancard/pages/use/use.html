@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>부산카드 - 사용</title>
+    <link rel="stylesheet" href="../../app.css" />
+    <link rel="stylesheet" href="use.css" />
+    <script src="../../app.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- 헤더 -->
+      <header class="header">
+        <button class="back-btn" onclick="goBack()">
+          <span>←</span>
+        </button>
+        <h1 class="page-title">카드 사용하기</h1>
+        <div class="header-spacer"></div>
+      </header>
+
+      <!-- 카드와 QR 섹션 -->
+      <div class="payment-section">
+        <!-- 실물 카드 -->
+        <div class="card-container">
+          <div class="physical-card">
+            <img 
+              src="../../assets/images/busan-card.png" 
+              alt="부산카드" 
+              class="card-image"
+              onerror="showCardPlaceholder()"
+            />
+            <div class="card-placeholder" id="card-placeholder" style="display: none;">
+              <div class="placeholder-text">부산카드</div>
+              <div class="placeholder-number">•••• •••• •••• 1234</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR 코드 -->
+        <div class="qr-container">
+          <h3 class="qr-title">결제 QR 코드</h3>
+          <div class="qr-wrapper">
+            <img 
+              src="../../assets/images/payment-qr.png" 
+              alt="결제 QR 코드" 
+              class="qr-image"
+              onerror="showQRPlaceholder()"
+            />
+            <div class="qr-placeholder" id="qr-placeholder" style="display: none;">
+              <div class="qr-pattern">
+                <div class="qr-box"></div>
+                <div class="qr-box"></div>
+                <div class="qr-box"></div>
+                <div class="qr-box"></div>
+                <div class="qr-box"></div>
+                <div class="qr-box"></div>
+                <div class="qr-box"></div>
+                <div class="qr-box"></div>
+                <div class="qr-box"></div>
+              </div>
+              <p class="qr-text">QR 코드</p>
+            </div>
+          </div>
+          <div class="qr-info">
+            <p class="info-text">가맹점에서 스캔하여 결제</p>
+            <p class="info-subtext">유효시간: 5분</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 액션 버튼 -->
+      <div class="action-section">
+        <button class="refresh-btn" onclick="refreshQR()">
+          <span class="refresh-icon">↻</span>
+          QR 코드 새로고침
+        </button>
+      </div>
+    </div>
+
+    <script src="use.js"></script>
+  </body>
+</html>

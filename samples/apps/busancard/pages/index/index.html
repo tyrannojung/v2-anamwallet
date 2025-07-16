@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>부산카드</title>
+    <link rel="stylesheet" href="../../app.css" />
+    <link rel="stylesheet" href="index.css" />
+    <script src="../../app.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- 헤더 제거 -->
+
+      <!-- 잔고 섹션 -->
+      <div class="balance-section">
+        <div class="balance-header">
+          <h2 class="balance-title">부산카드 잔액</h2>
+        </div>
+        <div class="balance-display">
+          <div class="balance-main">
+            <span class="currency-symbol">$</span>
+            <span class="balance-amount">850.00</span>
+          </div>
+          <div class="balance-sub">₩1,234,567</div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="action-buttons">
+          <button class="action-btn charge-btn" onclick="navigateToCharge()">
+            <span class="btn-text">충전하기</span>
+          </button>
+          <button class="action-btn use-btn" onclick="navigateToUse()">
+            <span class="btn-text">사용하기</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 사용내역 섹션 -->
+      <div class="history-section">
+        <h2 class="section-title">카드 사용내역</h2>
+        <div class="history-list" id="history-list">
+          <div class="history-loading">
+            <div class="spinner"></div>
+            <p>사용내역을 불러오는 중...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="index.js"></script>
+  </body>
+</html>

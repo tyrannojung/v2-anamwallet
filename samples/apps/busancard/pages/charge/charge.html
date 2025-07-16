@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>부산카드 - 충전</title>
+    <link rel="stylesheet" href="../../app.css" />
+    <link rel="stylesheet" href="charge.css" />
+    <script src="../../app.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- 헤더 -->
+      <header class="header">
+        <button class="back-btn" onclick="goBack()">
+          <span>←</span>
+        </button>
+        <h1 class="page-title">충전하기</h1>
+        <div class="header-spacer"></div>
+      </header>
+
+      <!-- 블록체인 잔액 정보 -->
+      <div class="balance-card">
+        <h2 class="balance-title">현재 블록체인 잔액</h2>
+        <div class="blockchain-info" id="blockchain-balance">
+          <div class="loading">잔액 정보를 불러오는 중...</div>
+        </div>
+      </div>
+
+      <!-- 충전 폼 -->
+      <div class="charge-form">
+        <div class="form-group">
+          <label class="form-label">충전 금액 (USD)</label>
+          <div class="input-wrapper">
+            <span class="currency-symbol">$</span>
+            <input 
+              type="number" 
+              id="charge-amount" 
+              class="form-input" 
+              placeholder="0.00"
+              min="1"
+              max="1000"
+              step="0.01"
+              oninput="calculateCharge()"
+            />
+          </div>
+        </div>
+
+        <!-- 충전 예상 정보 -->
+        <div class="charge-info" id="charge-info" style="display: none;">
+          <div class="info-row">
+            <span class="info-label">필요 ETH</span>
+            <span class="info-value" id="estimated-eth">0 ETH</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">네트워크 수수료</span>
+            <span class="info-value fee" id="blockchain-fee">0 ETH</span>
+          </div>
+          <div class="info-row total">
+            <span class="info-label">총 필요 ETH</span>
+            <span class="info-value" id="total-amount">0 ETH</span>
+          </div>
+        </div>
+
+        <!-- 충전 버튼 -->
+        <button 
+          class="charge-btn" 
+          id="charge-btn" 
+          onclick="processCharge()"
+          disabled
+        >
+          충전하기
+        </button>
+
+        <!-- 안내 메시지 -->
+        <div class="notice">
+          <p>• 최소 충전 금액: $1</p>
+          <p>• 최대 충전 금액: $1,000</p>
+          <p>• 환율은 실시간으로 변동될 수 있습니다</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="charge.js"></script>
+  </body>
+</html>

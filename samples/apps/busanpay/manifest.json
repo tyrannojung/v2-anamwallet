@@ -1,8 +1,0 @@
-{
-  "app_id": "com.busan.pay",
-  "type": "app",
-  "name": "부산페이",
-  "version": "1.0.0",
-  "icon": "assets/icons/app_icon.png",
-  "pages": ["pages/index/index"]
-}

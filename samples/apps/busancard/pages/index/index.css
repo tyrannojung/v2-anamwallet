@@ -1,0 +1,257 @@
+/* Container */
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+/* Balance Section */
+.balance-section {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 25px;
+  margin-top: 20px;
+}
+
+/* Balance Header */
+.balance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.balance-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #495057;
+  margin: 0;
+}
+
+.balance-status {
+  background: #28a745;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Balance Display */
+.balance-display {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.balance-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.currency-symbol {
+  font-size: 32px;
+  font-weight: 600;
+  color: #495057;
+  margin-right: 8px;
+}
+
+.balance-amount {
+  font-size: 42px;
+  font-weight: 700;
+  color: #212529;
+  letter-spacing: -1px;
+}
+
+.balance-sub {
+  font-size: 16px;
+  color: #6c757d;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.action-btn {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px 24px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.charge-btn {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.charge-btn:hover {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+.use-btn {
+  background: white;
+  color: #007bff;
+  border-color: #007bff;
+}
+
+.use-btn:hover {
+  background: #f8f9fa;
+}
+
+.btn-text {
+  font-size: 15px;
+}
+
+/* History Section */
+.history-section {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 20px;
+}
+
+.history-list {
+  max-height: 400px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Chrome, Safari, Opera */
+.history-list::-webkit-scrollbar {
+  display: none;
+}
+
+.history-date {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6c757d;
+  margin: 16px 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-details {
+  flex: 1;
+}
+
+.history-merchant {
+  font-size: 15px;
+  font-weight: 500;
+  color: #212529;
+  margin-bottom: 2px;
+}
+
+.history-time {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.history-amount {
+  text-align: right;
+}
+
+.amount-main {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.amount-sub {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.amount-plus {
+  color: #28a745;
+}
+
+.amount-minus {
+  color: #212529;
+}
+
+/* Loading State */
+.history-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #7f8c8d;
+  padding: 40px 0;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
+  }
+  
+  .payment-card {
+    padding: 25px;
+  }
+  
+  .balance-krw {
+    font-size: 28px;
+  }
+  
+  .action-buttons {
+    gap: 12px;
+  }
+}

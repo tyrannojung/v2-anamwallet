@@ -1,0 +1,285 @@
+/* Container */
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.back-btn {
+  background: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.header-spacer {
+  width: 40px;
+}
+
+/* Balance Card */
+.balance-card {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin-bottom: 25px;
+}
+
+.balance-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.blockchain-balance {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+.chain-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.chain-info {
+  flex: 1;
+}
+
+.chain-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 4px;
+}
+
+.chain-balance {
+  font-size: 20px;
+  font-weight: bold;
+  color: #667eea;
+}
+
+/* Charge Form */
+.charge-form {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-label {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currency-symbol {
+  position: absolute;
+  left: 15px;
+  font-size: 20px;
+  color: #7f8c8d;
+}
+
+.form-input {
+  width: 100%;
+  padding: 15px 15px 15px 35px;
+  font-size: 24px;
+  font-weight: 600;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  text-align: right;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Charge Info */
+.charge-info {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row.total {
+  margin-top: 10px;
+  padding-top: 20px;
+  border-top: 2px solid #667eea;
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.info-row.total .info-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.info-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.info-value.fee {
+  color: #7f8c8d;
+}
+
+.info-row.total .info-value {
+  font-size: 20px;
+  color: #667eea;
+}
+
+/* Charge Button */
+.charge-btn {
+  width: 100%;
+  padding: 18px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.charge-btn:hover:not(:disabled) {
+  background: #5a67d8;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.charge-btn:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* Notice */
+.notice {
+  background: #fef9e7;
+  border: 1px solid #f9e79f;
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.notice p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #7f6000;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  color: #7f8c8d;
+  padding: 20px;
+}
+
+/* Success Animation */
+@keyframes success-pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  animation: success-pop 0.5s ease;
+}
+
+.success-icon {
+  font-size: 60px;
+  margin-bottom: 15px;
+}
+
+.success-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: #27ae60;
+}
