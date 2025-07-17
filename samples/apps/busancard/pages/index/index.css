@@ -100,24 +100,25 @@
 }
 
 .charge-btn {
-  background: #007bff;
+  background: #667eea;
   color: white;
-  border-color: #007bff;
+  border-color: #667eea;
 }
 
 .charge-btn:hover {
-  background: #0056b3;
-  border-color: #0056b3;
+  background: #5a67d8;
+  border-color: #5a67d8;
 }
 
 .use-btn {
   background: white;
-  color: #007bff;
-  border-color: #007bff;
+  color: #667eea;
+  border-color: #667eea;
 }
 
 .use-btn:hover {
-  background: #f8f9fa;
+  background: #667eea;
+  color: white;
 }
 
 .btn-text {
