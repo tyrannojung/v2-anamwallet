@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -38,6 +39,8 @@ import androidx.compose.ui.unit.sp
  * @param showBlockchainStatus 블록체인 상태 표시 여부
  * @param activeBlockchainName 활성 블록체인 이름
  * @param onBlockchainClick 블록체인 칩 클릭 콜백
+ * @param showQrScanner QR 스캐너 버튼 표시 여부
+ * @param onQrScannerClick QR 스캐너 버튼 클릭 콜백
  */
 @Composable
 fun Header(
@@ -46,7 +49,9 @@ fun Header(
     onBackClick: (() -> Unit)? = null,
     showBlockchainStatus: Boolean = false,
     activeBlockchainName: String? = null,
-    onBlockchainClick: (() -> Unit)? = null
+    onBlockchainClick: (() -> Unit)? = null,
+    showQrScanner: Boolean = false,
+    onQrScannerClick: (() -> Unit)? = null
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -87,6 +92,20 @@ fun Header(
                         .align(Alignment.CenterStart)
                         .padding(start = if (showBackButton) 48.dp else 0.dp)
                 )
+                
+                // QR 스캐너 버튼
+                if (showQrScanner && onQrScannerClick != null) {
+                    IconButton(
+                        onClick = onQrScannerClick,
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    ) {
+                        Icon(
+                            Icons.Default.QrCodeScanner,
+                            contentDescription = "QR Scanner",
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+                }
             }
             
             // 블록체인 상태 표시 (옵션)

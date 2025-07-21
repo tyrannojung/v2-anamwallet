@@ -1,6 +1,7 @@
 package com.anam145.wallet
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -246,7 +247,12 @@ fun AnamWalletApp(
                                         MainContract.MainIntent.ClickBlockchainApp(activeBlockchain)
                                     )
                                 }
-                            } else null
+                            } else null,
+                            showQrScanner = true,
+                            onQrScannerClick = {
+                                // TODO: Navigate to QR Scanner Screen
+                                Log.d("Header", "QR Scanner clicked")
+                            }
                         )
                     }
                 },
