@@ -1,0 +1,144 @@
+/* Receive 페이지 스타일 */
+
+.receive-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+}
+
+/* 헤더 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+
+/* 내용 */
+.receive-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* QR 코드 섹션 */
+.qr-section {
+  margin-bottom: 32px;
+}
+
+.qr-container {
+  width: 240px;
+  height: 240px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.qr-container canvas {
+  border-radius: 8px;
+}
+
+/* 주소 섹션 */
+.address-section {
+  width: 100%;
+  margin-bottom: 32px;
+}
+
+.address-label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.receive-address-box {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#receive-address {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  word-break: break-all;
+  color: #333;
+  line-height: 1.4;
+}
+
+.copy-btn {
+  padding: 8px 16px;
+  background: var(--coin-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.copy-btn:hover {
+  background: var(--coin-dark);
+  transform: translateY(-1px);
+}
+
+.copy-btn:active {
+  transform: translateY(0);
+}
+
+/* Receive 정보 */
+.receive-info {
+  text-align: center;
+  max-width: 400px;
+}
+
+.receive-info p {
+  font-size: 14px;
+  color: #666;
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.coin-name {
+  color: var(--coin-primary);
+  font-weight: 600;
+}
+
+.receive-warning {
+  font-size: 13px !important;
+  color: #ff6b6b !important;
+  margin-top: 12px !important;
+  font-weight: 500;
+}
+
+
+/* 반응형 디자인 */
+@media (max-width: 600px) {
+  .receive-content {
+    padding: 16px;
+  }
+  
+  .qr-container {
+    width: 200px;
+    height: 200px;
+    padding: 16px;
+  }
+}

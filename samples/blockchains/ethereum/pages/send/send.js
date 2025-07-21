@@ -12,8 +12,12 @@ document.addEventListener("DOMContentLoaded", function () {
   loadWalletInfo();
 
   // Ethereum 어댑터 초기화
-  adapter = new EthereumAdapter(CoinConfig);
-  console.log("Ethereum adapter 초기화 완료");
+  adapter = window.getAdapter();
+  
+  if (!adapter) {
+    console.error("EthereumAdapter가 초기화되지 않았습니다");
+    showToast("Ethereum 어댑터 초기화 실패");
+  }
 
   // UI 초기화
   updateUI();
@@ -130,3 +134,7 @@ async function confirmSend() {
     showToast("트랜잭션 실패: " + error.message);
   }
 }
+
+// HTML onclick을 위한 전역 함수 등록
+window.goBack = goBack;
+window.confirmSend = confirmSend;

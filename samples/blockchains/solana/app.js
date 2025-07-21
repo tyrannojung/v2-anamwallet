@@ -588,6 +588,10 @@ if (typeof module !== "undefined" && module.exports) {
 // 앱 초기화
 // ================================================================
 
+// Solana Adapter 인스턴스 생성 및 등록
+const solanaAdapter = new SolanaAdapter(CoinConfig);
+window.setAdapter(solanaAdapter);
+
 // 앱 시작 시 호출
 if (window.App && window.App.onLaunch) {
   window.App.onLaunch({});

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Bundle Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Bitcoin Bundle Test</h1>
+    <div id="output"></div>
+    
+    <script src="./assets/bitcoin-bundle.iife.js"></script>
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message, type = 'info') {
+            const p = document.createElement('p');
+            p.className = type;
+            p.textContent = message;
+            output.appendChild(p);
+        }
+        
+        // 1. 번들 로드 확인
+        if (window.BitcoinJS) {
+            log('✅ BitcoinJS 번들이 성공적으로 로드되었습니다!', 'success');
+            
+            // 사용 가능한 모듈 확인
+            log('사용 가능한 모듈:', 'info');
+            Object.keys(window.BitcoinJS).forEach(key => {
+                log(`  - ${key}`, 'info');
+            });
+            
+            // 2. 니모닉 생성 테스트
+            try {
+                const mnemonic = window.BitcoinJS.generateMnemonic();
+                log(`✅ 니모닉 생성 성공: ${mnemonic.split(' ').slice(0, 4).join(' ')}...`, 'success');
+            } catch (e) {
+                log(`❌ 니모닉 생성 실패: ${e.message}`, 'error');
+            }
+            
+            // 3. 지갑 생성 테스트
+            try {
+                const bitcoin = window.BitcoinJS;
+                const network = bitcoin.networks.testnet;
+                const mnemonic = bitcoin.generateMnemonic();
+                const hdWallet = bitcoin.hdWalletFromMnemonic(mnemonic, network);
+                const account = bitcoin.generateAddress(hdWallet, 0, network);
+                
+                log(`✅ 지갑 생성 성공!`, 'success');
+                log(`  주소: ${account.address}`, 'info');
+                log(`  개인키: ${account.privateKey.substring(0, 10)}...`, 'info');
+            } catch (e) {
+                log(`❌ 지갑 생성 실패: ${e.message}`, 'error');
+            }
+            
+        } else {
+            log('❌ BitcoinJS 번들을 찾을 수 없습니다!', 'error');
+            log('window 객체 확인:', 'info');
+            log(JSON.stringify(Object.keys(window).filter(k => k.toLowerCase().includes('bitcoin')), null, 2), 'info');
+        }
+    </script>
+</body>
+</html>

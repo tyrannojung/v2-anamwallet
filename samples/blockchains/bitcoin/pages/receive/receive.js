@@ -28,8 +28,9 @@ function loadWalletInfo() {
     currentWallet = JSON.parse(walletData);
     console.log("지갑 로드 완료:", currentWallet.address);
   } else {
-    showToast("지갑이 없습니다");
-    goBack();
+    console.log("지갑이 없습니다");
+    // showToast("지갑이 없습니다");
+    // goBack();
   }
 }
 
@@ -57,7 +58,7 @@ function updateUI() {
 // QR 코드 생성
 function generateQRCode() {
   const qrContainer = document.getElementById('qr-code');
-  qrContainer.innerHTML = ''; // 기존 QR 코드 제거
+  qrContainer.innerHTML = '';
   
   try {
     // QRCode.js 라이브러리 사용
@@ -83,7 +84,8 @@ function goBack() {
   } else if (window.anam && window.anam.navigateTo) {
     window.anam.navigateTo('pages/index/index');
   } else {
-    console.error("navigateTo API not available");
+    // 개발 환경: 일반 HTML 페이지 이동
+    window.location.href = '../index/index.html';
   }
 }
 
@@ -104,3 +106,4 @@ function copyAddress() {
 // HTML onclick을 위한 전역 함수 등록
 window.goBack = goBack;
 window.copyAddress = copyAddress;
+

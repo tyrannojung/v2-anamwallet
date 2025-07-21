@@ -11,12 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
   // 지갑 정보 로드
   loadWalletInfo();
 
-  // Solana 어댑터 초기화
+  // Bitcoin 어댑터 초기화
   adapter = window.getAdapter();
   
   if (!adapter) {
-    console.error("SolanaAdapter가 초기화되지 않았습니다");
-    showToast("Solana 어댑터 초기화 실패");
+    console.error("BitcoinAdapter가 초기화되지 않았습니다");
+    showToast("Bitcoin 어댑터 초기화 실패");
   }
 
   // UI 초기화
@@ -32,8 +32,9 @@ function loadWalletInfo() {
     currentWallet = JSON.parse(walletData);
     console.log("지갑 로드 완료:", currentWallet.address);
   } else {
-    showToast("지갑이 없습니다");
-    goBack();
+    console.log("지갑이 없습니다");
+    // showToast("지갑이 없습니다");
+    // goBack();
   }
 }
 
@@ -102,9 +103,9 @@ async function confirmSend() {
   try {
     showToast("트랜잭션 전송 중...");
 
-    // Solana는 고정 수수료 사용 (getGasPrice 미구현)
-    // 기본 수수료: 5000 lamports = 0.000005 SOL
-    const fee = "0.000005";
+    // 수수료 가져오기
+    const gasPrice = await adapter.getGasPrice();
+    const fee = gasPrice[feeLevel];
 
     // 트랜잭션 전송
     const txParams = {
@@ -114,10 +115,9 @@ async function confirmSend() {
       privateKey: currentWallet.privateKey,
     };
 
-    // 수수료 관련 파라미터 추가
+    // Bitcoin은 feeRate를 사용 (sat/vByte)
     if (feeLevel && fee) {
-      txParams.fee = fee;
-      txParams.feePreference = feeLevel;
+      txParams.feeRate = parseInt(fee);
     }
 
     const result = await adapter.sendTransaction(txParams);

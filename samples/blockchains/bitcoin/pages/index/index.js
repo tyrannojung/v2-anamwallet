@@ -13,9 +13,15 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Bridge API 사용 가능");
   }
 
-  // Solana 어댑터 초기화
+  // Bitcoin 어댑터 초기화
   adapter = window.getAdapter();
-  console.log("Solana adapter 초기화 완료");
+  
+  if (!adapter) {
+    console.error(
+      "BitcoinAdapter가 초기화되지 않았습니다."
+    );
+    showToast("Bitcoin 어댑터 초기화 실패");
+  }
 
   // UI 테마 적용
   applyTheme();
@@ -259,7 +265,7 @@ async function updateBalance() {
     // TODO: 실시간 가격 API 연동 필요
     document.getElementById("fiat-value").textContent = "";
   } catch (error) {
-    console.error("잔액 조회 실패:", error);
+    // console.error("잔액 조회 실패:", error);
   }
 }
 

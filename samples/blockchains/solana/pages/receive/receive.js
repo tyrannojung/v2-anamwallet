@@ -102,3 +102,7 @@ function copyAddress() {
     });
 }
 
+// HTML onclick을 위한 전역 함수 등록
+window.goBack = goBack;
+window.copyAddress = copyAddress;
+

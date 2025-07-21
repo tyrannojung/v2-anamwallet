@@ -15,8 +15,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Ethereum 어댑터 초기화
-  adapter = new EthereumAdapter(CoinConfig);
-  console.log("Ethereum adapter 초기화 완료");
+  adapter = window.getAdapter();
+  
+  if (!adapter) {
+    console.error("EthereumAdapter가 초기화되지 않았습니다");
+    showToast("Ethereum 어댑터 초기화 실패");
+  }
 
   // UI 테마 적용
   applyTheme();
@@ -267,10 +271,8 @@ async function updateBalance() {
 
     document.getElementById("balance-display").textContent = formattedBalance;
 
-    // TODO: 실제 환율 API 호출
-    const fiatPrice = 100; // 임시 가격
-    const fiatValue = (parseFloat(formattedBalance) * fiatPrice).toFixed(2);
-    document.getElementById("fiat-value").textContent = `≈ $${fiatValue}`;
+    // TODO: 실시간 가격 API 연동 필요
+    document.getElementById("fiat-value").textContent = "";
   } catch (error) {
     console.error("잔액 조회 실패:", error);
   }
@@ -423,4 +425,9 @@ async function handleTransactionRequest(event) {
 }
 
 // HTML onclick을 위한 전역 함수 등록
+window.createWallet = createWallet;
+window.importFromMnemonic = importFromMnemonic;
+window.importFromPrivateKey = importFromPrivateKey;
+window.navigateToSend = navigateToSend;
+window.navigateToReceive = navigateToReceive;
 window.resetWallet = resetWallet;
