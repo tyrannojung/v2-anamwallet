@@ -84,6 +84,9 @@ sealed class AnamNavRoute(
     /** 학생증 상세 화면 */
     data object StudentCardDetail : AnamNavRoute("student_card")
     
+    /** QR 스캐너 화면 - QR 코드 스캔 */
+    data object QrScanner : AnamNavRoute("qr_scanner")
+    
     // ========== 인증 화면들 ==========
     // 로그인 및 비밀번호 설정 화면들
     
@@ -109,6 +112,7 @@ sealed class AnamNavRoute(
                 Identity.route -> Identity
                 Settings.route -> Settings
                 StudentCardDetail.route -> StudentCardDetail
+                QrScanner.route -> QrScanner
                 Login.route -> Login
                 SetupPassword.route -> SetupPassword
                 else -> {

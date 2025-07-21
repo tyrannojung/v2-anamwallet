@@ -56,6 +56,7 @@ dependencies {
     implementation(project(":feature:settings"))
     implementation(project(":feature:miniapp"))
     implementation(project(":feature:auth"))
+    implementation(project(":feature:qrscanner"))
     
     // AndroidX
     implementation(libs.androidx.core.ktx)

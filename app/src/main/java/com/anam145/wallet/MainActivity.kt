@@ -1,7 +1,6 @@
 package com.anam145.wallet
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -250,8 +249,7 @@ fun AnamWalletApp(
                             } else null,
                             showQrScanner = true,
                             onQrScannerClick = {
-                                // TODO: Navigate to QR Scanner Screen
-                                Log.d("Header", "QR Scanner clicked")
+                                navController.navigate(AnamNavRoute.QrScanner.route)
                             }
                         )
                     }

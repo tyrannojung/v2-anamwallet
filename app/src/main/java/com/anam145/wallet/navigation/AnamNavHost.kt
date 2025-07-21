@@ -17,6 +17,7 @@ import com.anam145.wallet.feature.miniapp.webapp.WebAppActivity
 import com.anam145.wallet.feature.miniapp.blockchain.BlockchainActivity
 import com.anam145.wallet.feature.auth.ui.login.LoginScreen
 import com.anam145.wallet.feature.auth.ui.setup.SetupPasswordScreen
+import com.anam145.wallet.feature.qrscanner.QrScannerScreen
 
 /**
  * ANAM Wallet의 메인 Navigation Host
@@ -122,6 +123,11 @@ fun AnamNavHost(
         // 학생증 상세 화면
         composable(route = AnamNavRoute.StudentCardDetail.route) {
             // TODO: StudentCardDetailScreen()
+        }
+        
+        // QR 스캐너 화면
+        composable(route = AnamNavRoute.QrScanner.route) {
+            QrScannerScreen()
         }
         
         // ========== 인증 화면들 ==========
