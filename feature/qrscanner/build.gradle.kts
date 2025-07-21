@@ -47,6 +47,18 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+
+    // CameraX 라이브러리
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
+    // ML Kit Barcode Scanning
+    implementation(libs.google.mlkit.barcode.scanning)
+
+    // 권한 처리를 위한 Accompanist
+    implementation(libs.accompanist.permissions)
     
     // Hilt
     implementation(libs.hilt.android)
