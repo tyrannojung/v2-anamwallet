@@ -211,9 +211,7 @@ class CoinAdapter {
 // 전역 앱 상태 관리
 const AppState = {
   isInitialized: false,
-  currentPage: null,
   walletData: null,
-  networkStatus: "online",
   config: CoinConfig,
   adapter: null, // 실제 구현체에서 설정
 };

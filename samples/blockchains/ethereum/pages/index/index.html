@@ -6,14 +6,13 @@
     <title>Coin 지갑</title>
     <link rel="stylesheet" href="../../app.css" />
     <link rel="stylesheet" href="index.css" />
-    <script src="../../app.js"></script>
   </head>
   <body>
     <div class="container">
       <!-- 지갑 생성 화면 -->
       <div id="wallet-creation" class="wallet-screen" style="display: none;">
         <div class="creation-content">
-          <div class="coin-logo-large">Ω</div>
+          <img src="../../assets/icons/app_icon.png" alt="Coin Logo" class="coin-logo-large" />
           <h1 class="creation-title">Coin 지갑</h1>
           <p class="creation-description">안전한 Coin 지갑을 생성하세요</p>
           
@@ -65,7 +64,7 @@
         <header class="header">
           <div class="header-content">
             <div class="logo">
-              <div class="coin-logo">Ω</div>
+              <img src="../../assets/icons/app_icon.png" alt="Coin Logo" class="coin-logo" />
               <span class="logo-text">Coin</span>
             </div>
             <button class="reset-wallet-btn" onclick="resetWallet()" title="지갑 초기화">
@@ -116,10 +115,8 @@
     <!-- Ethers.js 라이브러리 -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     
-    <!-- 설정 및 어댑터 -->
-    <script src="../../config.js"></script>
-    <script src="../../coin-adapter.js"></script>
-    <script src="../../ethereum-adapter.js"></script>
+    <!-- 앱 공통 코드 -->
+    <script src="../../app.js"></script>
     
     <!-- 메인 로직 -->
     <script src="index.js"></script>

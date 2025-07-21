@@ -47,7 +47,7 @@ async function updateUI() {
   if (currentWallet && adapter) {
     try {
       const balance = await adapter.getBalance(currentWallet.address);
-      const formattedBalance = adapter.formatBalance(balance);
+      const formattedBalance = window.formatBalance(balance);
       document.getElementById('available-balance').textContent = formattedBalance;
     } catch (error) {
       console.error("잔액 조회 실패:", error);
@@ -129,21 +129,4 @@ async function confirmSend() {
     console.error("트랜잭션 실패:", error);
     showToast("트랜잭션 실패: " + error.message);
   }
-}
-
-// 토스트 메시지 표시
-function showToast(message) {
-  const existing = document.querySelector(".toast");
-  if (existing) {
-    existing.remove();
-  }
-
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
 }

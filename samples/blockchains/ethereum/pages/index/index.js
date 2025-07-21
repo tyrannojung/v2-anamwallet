@@ -44,11 +44,6 @@ function applyTheme() {
   root.style.setProperty("--coin-primary", CoinConfig.theme.primaryColor);
   root.style.setProperty("--coin-secondary", CoinConfig.theme.secondaryColor);
 
-  // 로고 심볼 변경
-  document.querySelectorAll(".coin-logo, .coin-logo-large").forEach((el) => {
-    el.textContent = CoinConfig.theme.logoSymbol;
-  });
-
   // 텍스트 변경
   document.querySelectorAll(".logo-text").forEach((el) => {
     el.textContent = CoinConfig.theme.logoText;
@@ -250,7 +245,7 @@ function displayWalletInfo() {
   const addressDisplay = document.getElementById("address-display");
 
   // 주소 축약 표시
-  const shortAddress = adapter.shortenAddress(address);
+  const shortAddress = window.shortenAddress(address);
   addressDisplay.textContent = shortAddress;
   addressDisplay.title = address; // 전체 주소는 툴팁으로
 
@@ -268,7 +263,7 @@ async function updateBalance() {
 
   try {
     const balance = await adapter.getBalance(currentWallet.address);
-    const formattedBalance = adapter.formatBalance(balance);
+    const formattedBalance = window.formatBalance(balance);
 
     document.getElementById("balance-display").textContent = formattedBalance;
 
@@ -425,23 +420,6 @@ async function handleTransactionRequest(event) {
       );
     }
   }
-}
-
-// 토스트 메시지 표시
-function showToast(message) {
-  const existing = document.querySelector(".toast");
-  if (existing) {
-    existing.remove();
-  }
-
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
 }
 
 // HTML onclick을 위한 전역 함수 등록

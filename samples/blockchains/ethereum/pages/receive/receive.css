@@ -1,14 +1,5 @@
 /* Receive 페이지 스타일 */
 
-:root {
-  /* 코인별로 변경 가능한 테마 색상 */
-  --coin-primary: #4338CA;      /* 메인 색상 */
-  --coin-secondary: #6366F1;    /* 보조 색상 */
-  --coin-dark: #312E81;         /* 어두운 색상 */
-  --coin-light: #E0E7FF;        /* 밝은 색상 */
-  --coin-gradient: linear-gradient(135deg, var(--coin-primary) 0%, var(--coin-secondary) 100%);
-}
-
 .receive-screen {
   min-height: 100vh;
   display: flex;
@@ -16,41 +7,11 @@
   background: #f8f9fa;
 }
 
-/* 헤더 */
+/* 헤더 레이아웃 */
 .header {
-  background: white;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.back-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  margin: -8px;
-  color: #666;
-  transition: color 0.3s;
-}
-
-.back-btn:hover {
-  color: #333;
-}
-
-.header-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-}
-
-.coin-symbol {
-  color: var(--coin-primary);
 }
 
 /* 내용 */
@@ -164,33 +125,6 @@
   color: #ff6b6b !important;
   margin-top: 12px !important;
   font-weight: 500;
-}
-
-/* 토스트 메시지 */
-.toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: white;
-  padding: 16px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translate(-50%, 100px);
-    opacity: 0;
-  }
-  to {
-    transform: translate(-50%, 0);
-    opacity: 1;
-  }
 }
 
 /* 반응형 디자인 */

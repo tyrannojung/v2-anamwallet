@@ -100,20 +100,3 @@ function copyAddress() {
       showToast("복사에 실패했습니다");
     });
 }
-
-// 토스트 메시지 표시
-function showToast(message) {
-  const existing = document.querySelector(".toast");
-  if (existing) {
-    existing.remove();
-  }
-
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
-}
