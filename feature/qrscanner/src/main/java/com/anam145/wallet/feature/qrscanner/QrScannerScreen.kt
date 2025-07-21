@@ -13,8 +13,7 @@ import com.anam145.wallet.core.ui.language.LocalStrings
 /**
  * QR 스캐너 화면
  * 
- * QR 코드를 스캔하여 다양한 기능을 수행하는 화면입니다.
- * 지갑 주소, 트랜잭션 정보, DID 연결 등을 처리합니다.
+ * QR 코드를 스캔하여 다양한 기능을 수행하는 화면.
  */
 @Composable
 fun QrScannerScreen(
