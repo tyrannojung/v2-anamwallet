@@ -60,6 +60,7 @@ data class Strings(
     val hubScreenTitle: String = "허브 화면",
     val browserScreenTitle: String = "브라우저 화면",
     val identityScreenTitle: String = "디지털 신분증 화면",
+    val qrScannerScreenTitle: String = "QR 스캐너 화면",
     
     // Main Screen
     val mainSectionBlockchain: String = "블록체인",
@@ -122,6 +123,7 @@ val EnglishStrings = Strings(
     hubScreenTitle = "Hub Screen",
     browserScreenTitle = "Browser Screen",
     identityScreenTitle = "Digital ID Screen",
+    qrScannerScreenTitle = "QR Scanner Screen",
     
     // Main Screen
     mainSectionBlockchain = "Blockchain",

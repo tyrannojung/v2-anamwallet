@@ -36,4 +36,4 @@ include(":feature:identity")
 include(":feature:settings")
 include(":feature:miniapp")
 include(":feature:auth")
- 
+include(":feature:qrscanner")
