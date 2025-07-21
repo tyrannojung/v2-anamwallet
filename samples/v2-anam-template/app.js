@@ -4,41 +4,46 @@
 
 // Coin 설정
 const CoinConfig = {
-  // 기본 정보
-  name: "Solana",
-  symbol: "SOL",
-  decimals: 9,
+  // name: "COIN_NAME", // 예: "Bitcoin"
+  // symbol: "SYMBOL", // 예: "BTC"
+  // decimals: 18,
+  name: "Bitcoin",
+  symbol: "BTC",
+  decimals: 18,
 
   // 네트워크 설정
   network: {
     // QuickNode RPC 엔드포인트
-    rpcEndpoint: "https://methodical-few-slug.solana-testnet.quiknode.pro/ced6f6658c56f53433e198c2124918a0e6dd6b0d",
+    rpcEndpoint: "https://YOUR-ENDPOINT.NETWORK.quiknode.pro/YOUR-TOKEN/",
     // 네트워크 이름
     networkName: "testnet", // 예: "mainnet", "testnet"
-    // Solana는 chainId 대신 cluster 사용
-    cluster: "testnet",
+    // 체인 ID (EVM 체인의 경우)
+    chainId: 1,
   },
 
   // UI 테마 설정
   theme: {
-    primaryColor: "#14F195", // 메인 색상 (Solana Green)
-    secondaryColor: "#9945FF", // 보조 색상 (Solana Purple)
-    logoText: "Solana", // 로고 텍스트
-    logoSymbol: "◎", // Solana 로고 심볼
+    // primaryColor: "#4338CA", // 메인 색상
+    // secondaryColor: "#6366F1", // 보조 색상
+    // logoText: "COIN", // 로고 텍스트
+
+    primaryColor: "#F7931A", // 비트코인 오렌지
+    secondaryColor: "#4D4D4D", // 비트코인 그레이
+    logoText: "COIN", // 로고 텍스트
   },
 
   // 주소 설정
   address: {
     // 주소 형식 정규식 (검증용)
-    regex: /^[1-9A-HJ-NP-Za-km-z]{32,44}$/,
+    regex: /^0x[a-fA-F0-9]{40}$/,
     // 주소 표시 형식
-    displayFormat: "...", // Base58 형식
+    displayFormat: "0x...", // 예: "0x...", "bc1...", etc.
   },
 
   // 트랜잭션 설정
   transaction: {
     // 기본 가스비/수수료
-    defaultFee: "0.000005", // 5000 lamports
+    defaultFee: "0.0001",
     // 최소 전송 금액
     minAmount: "0.000001",
     // 확인 대기 시간 (ms)
@@ -49,8 +54,8 @@ const CoinConfig = {
   options: {
     // 니모닉 지원 여부
     supportsMnemonic: true,
-    // 토큰 지원 여부 (SPL 토큰)
-    supportsTokens: true,
+    // 토큰 지원 여부
+    supportsTokens: false,
     // QR 코드 지원
     supportsQRCode: true,
   },
@@ -197,7 +202,6 @@ class CoinAdapter {
   async estimateFee(txParams) {
     throw new Error("estimateFee() 메서드를 구현해야 합니다.");
   }
-
 }
 
 // ================================================================
@@ -275,21 +279,21 @@ window.App = {
 
   loadWalletData() {
     try {
-      const stored = localStorage.getItem('walletData');
+      const stored = localStorage.getItem("walletData");
       if (stored) {
         AppState.walletData = JSON.parse(stored);
       }
     } catch (e) {
-      console.error('지갑 데이터 로드 실패:', e);
+      console.error("지갑 데이터 로드 실패:", e);
     }
   },
 
   saveWalletData(data) {
     try {
       AppState.walletData = data;
-      localStorage.setItem('walletData', JSON.stringify(data));
+      localStorage.setItem("walletData", JSON.stringify(data));
     } catch (e) {
-      console.error('지갑 데이터 저장 실패:', e);
+      console.error("지갑 데이터 저장 실패:", e);
     }
   },
 
@@ -379,223 +383,3 @@ window.shortenAddress = (address, chars = 4) => {
   if (!address) return "";
   return `${address.slice(0, chars + 2)}...${address.slice(-chars)}`;
 };
-
-// ================================================================
-// Solana Adapter 구현
-// ================================================================
-
-// Solana 어댑터 구현
-class SolanaAdapter extends CoinAdapter {
-  constructor(config) {
-    super(config);
-    this.connection = null;
-    this.solanaWeb3 = window.solanaWeb3;
-  }
-
-  // RPC 연결 초기화
-  async initProvider() {
-    if (!this.connection) {
-      this.connection = new this.solanaWeb3.Connection(
-        this.config.network.rpcEndpoint,
-        'confirmed'
-      );
-    }
-    return this.connection;
-  }
-
-  // 새 지갑 생성
-  async generateWallet() {
-    // 니모닉 생성
-    const mnemonic = this.solanaWeb3.generateMnemonic();
-    
-    // 니모닉으로부터 키페어 생성
-    const keypair = this.solanaWeb3.keypairFromMnemonic(mnemonic);
-    
-    return {
-      address: keypair.publicKey.toString(),
-      privateKey: Array.from(keypair.secretKey, byte => byte.toString(16).padStart(2, '0')).join(''),
-      mnemonic: mnemonic,
-      publicKey: keypair.publicKey.toString()
-    };
-  }
-
-  // 니모닉으로 지갑 복구
-  async importFromMnemonic(mnemonic) {
-    try {
-      // 니모닉 유효성 검사
-      if (!this.solanaWeb3.bip39.validateMnemonic(mnemonic)) {
-        throw new Error('유효하지 않은 니모닉입니다');
-      }
-      
-      // 니모닉으로부터 키페어 복구
-      const keypair = this.solanaWeb3.keypairFromMnemonic(mnemonic);
-      
-      return {
-        address: keypair.publicKey.toString(),
-        privateKey: Array.from(keypair.secretKey, byte => byte.toString(16).padStart(2, '0')).join(''),
-        mnemonic: mnemonic,
-        publicKey: keypair.publicKey.toString()
-      };
-    } catch (error) {
-      throw new Error(error.message || '니모닉 복구에 실패했습니다');
-    }
-  }
-
-  // 개인키로 지갑 가져오기
-  async importFromPrivateKey(privateKey) {
-    try {
-      // Hex string을 Uint8Array로 변환
-      const secretKey = Uint8Array.from(
-        privateKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16))
-      );
-      
-      const keypair = this.solanaWeb3.Keypair.fromSecretKey(secretKey);
-      
-      return {
-        address: keypair.publicKey.toString(),
-        privateKey: privateKey,
-        publicKey: keypair.publicKey.toString()
-      };
-    } catch (error) {
-      throw new Error('유효하지 않은 개인키입니다');
-    }
-  }
-
-  // 잔액 조회
-  async getBalance(address) {
-    try {
-      await this.initProvider();
-      const publicKey = new this.solanaWeb3.PublicKey(address);
-      const balance = await this.connection.getBalance(publicKey);
-      return balance.toString();
-    } catch (error) {
-      console.error('잔액 조회 실패:', error);
-      return "0";
-    }
-  }
-
-  // 잔액 포맷팅 (lamports to SOL)
-  formatBalance(balance) {
-    const sol = parseInt(balance) / this.solanaWeb3.LAMPORTS_PER_SOL;
-    return sol.toFixed(4);
-  }
-
-  // 주소 축약
-  shortenAddress(address) {
-    if (!address || address.length < 8) return address;
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
-  }
-
-  // 주소 유효성 검사
-  isValidAddress(address) {
-    try {
-      new this.solanaWeb3.PublicKey(address);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  // 트랜잭션 전송
-  async sendTransaction(params) {
-    const { to, amount, privateKey } = params;
-    
-    if (!this.isValidAddress(to)) {
-      throw new Error('유효하지 않은 주소입니다');
-    }
-
-    try {
-      await this.initProvider();
-      
-      // 개인키로 키페어 복구
-      const secretKey = Uint8Array.from(
-        privateKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16))
-      );
-      const fromKeypair = this.solanaWeb3.Keypair.fromSecretKey(secretKey);
-      
-      // 트랜잭션 생성
-      const transaction = new this.solanaWeb3.Transaction().add(
-        this.solanaWeb3.SystemProgram.transfer({
-          fromPubkey: fromKeypair.publicKey,
-          toPubkey: new this.solanaWeb3.PublicKey(to),
-          lamports: Math.floor(parseFloat(amount) * this.solanaWeb3.LAMPORTS_PER_SOL)
-        })
-      );
-      
-      // 트랜잭션 전송
-      const signature = await this.solanaWeb3.sendAndConfirmTransaction(
-        this.connection,
-        transaction,
-        [fromKeypair]
-      );
-      
-      console.log('Solana 트랜잭션 전송 완료:', signature);
-      
-      return {
-        hash: signature,
-        signature: signature,
-      };
-    } catch (error) {
-      console.error('트랜잭션 전송 실패:', error);
-      throw new Error(error.message || '트랜잭션 전송에 실패했습니다');
-    }
-  }
-
-  // 블록 번호 조회 (Solana는 slot 사용)
-  async getBlockNumber() {
-    try {
-      await this.initProvider();
-      const slot = await this.connection.getSlot();
-      return slot;
-    } catch (error) {
-      console.error('Slot 조회 실패:', error);
-      return 0;
-    }
-  }
-
-  // ================================================================
-  // 미구현 메서드 (Abstract)
-  // ================================================================
-
-  /**
-   * 트랜잭션 상태 조회 - 미구현
-   * @param {string} txHash - 트랜잭션 해시
-   * @returns {Promise<{status: string, confirmations: number}>}
-   */
-  async getTransactionStatus(txHash) {
-    throw new Error("getTransactionStatus() 메서드는 아직 구현되지 않았습니다.");
-  }
-
-  /**
-   * 현재 네트워크 수수료 조회 - 미구현
-   * @returns {Promise<{low: string, medium: string, high: string}>}
-   */
-  async getGasPrice() {
-    throw new Error("getGasPrice() 메서드는 아직 구현되지 않았습니다.");
-  }
-
-  /**
-   * 트랜잭션 수수료 예상 - 미구현
-   * @param {Object} txParams - 트랜잭션 파라미터
-   * @returns {Promise<string>} - 예상 수수료
-   */
-  async estimateFee(txParams) {
-    throw new Error("estimateFee() 메서드는 아직 구현되지 않았습니다.");
-  }
-}
-
-// 어댑터 내보내기
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = SolanaAdapter;
-} else {
-  window.SolanaAdapter = SolanaAdapter;
-}
-
-// ================================================================
-// 앱 초기화
-// ================================================================
-
-// 앱 시작 시 호출
-if (window.App && window.App.onLaunch) {
-  window.App.onLaunch({});
-}

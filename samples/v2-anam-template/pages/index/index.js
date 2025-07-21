@@ -13,9 +13,15 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Bridge API 사용 가능");
   }
 
-  // Solana 어댑터 초기화
-  adapter = new SolanaAdapter(CoinConfig);
-  console.log("Solana adapter 초기화 완료");
+  // 코인별 어댑터 구현 및 초기화
+
+  // 임시로 에러 표시
+  if (!adapter) {
+    console.error(
+      "CoinAdapter가 구현되지 않았습니다. 각 코인에 맞게 구현해주세요."
+    );
+    showToast("CoinAdapter 구현이 필요합니다");
+  }
 
   // UI 테마 적용
   applyTheme();

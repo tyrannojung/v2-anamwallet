@@ -11,9 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
   // 지갑 정보 로드
   loadWalletInfo();
 
-  // Solana 어댑터 초기화
-  adapter = new SolanaAdapter(CoinConfig);
-  console.log("Solana adapter 초기화 완료");
+  // 어댑터 초기화
+
+  if (!adapter) {
+    console.error("CoinAdapter가 구현되지 않았습니다");
+    showToast("CoinAdapter 구현이 필요합니다");
+  }
 
   // UI 초기화
   updateUI();
@@ -28,8 +31,9 @@ function loadWalletInfo() {
     currentWallet = JSON.parse(walletData);
     console.log("지갑 로드 완료:", currentWallet.address);
   } else {
-    showToast("지갑이 없습니다");
-    goBack();
+    console.log("지갑이 없습니다");
+    // showToast("지갑이 없습니다");
+    // goBack();
   }
 }
 
@@ -98,9 +102,9 @@ async function confirmSend() {
   try {
     showToast("트랜잭션 전송 중...");
 
-    // Solana는 고정 수수료 사용 (getGasPrice 미구현)
-    // 기본 수수료: 5000 lamports = 0.000005 SOL
-    const fee = "0.000005";
+    // 수수료 가져오기
+    const gasPrice = await adapter.getGasPrice();
+    const fee = gasPrice[feeLevel];
 
     // 트랜잭션 전송
     const txParams = {

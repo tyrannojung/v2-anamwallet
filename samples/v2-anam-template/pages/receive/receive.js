@@ -28,8 +28,9 @@ function loadWalletInfo() {
     currentWallet = JSON.parse(walletData);
     console.log("지갑 로드 완료:", currentWallet.address);
   } else {
-    showToast("지갑이 없습니다");
-    goBack();
+    console.log("지갑이 없습니다");
+    // showToast("지갑이 없습니다");
+    // goBack();
   }
 }
 
