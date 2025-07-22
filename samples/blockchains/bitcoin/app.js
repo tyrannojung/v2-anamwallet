@@ -4,12 +4,6 @@
 
 // Bitcoin 네트워크 설정
 const BITCOIN_NETWORKS = {
-  testnet: {
-    name: 'testnet',
-    apiBaseUrl: 'https://mempool.space/testnet/api',
-    explorerUrl: 'https://mempool.space/testnet',
-    faucetUrl: 'https://coinfaucet.eu/en/btc-testnet/',
-  },
   testnet4: {
     name: 'testnet4',
     apiBaseUrl: 'https://mempool.space/testnet4/api',
@@ -25,7 +19,7 @@ const BITCOIN_NETWORKS = {
 };
 
 // 현재 네트워크 설정
-const CURRENT_NETWORK = 'testnet4'; // 'testnet', 'testnet4' 또는 'mainnet'
+const CURRENT_NETWORK = 'testnet4'; // 'testnet4' 또는 'mainnet'
 
 // Coin 설정
 const CoinConfig = {
@@ -424,7 +418,7 @@ class BitcoinAdapter extends CoinAdapter {
         throw new Error("bitcoinjs-lib가 로드되지 않았습니다.");
       }
       
-      const network = (this.config.network.networkName === 'testnet' || this.config.network.networkName === 'testnet4')
+      const network = this.config.network.networkName === 'testnet4'
         ? bitcoin.networks.testnet 
         : bitcoin.networks.bitcoin;
       
@@ -460,7 +454,7 @@ class BitcoinAdapter extends CoinAdapter {
         throw new Error("bitcoinjs-lib가 로드되지 않았습니다.");
       }
       
-      const network = (this.config.network.networkName === 'testnet' || this.config.network.networkName === 'testnet4')
+      const network = this.config.network.networkName === 'testnet4'
         ? bitcoin.networks.testnet 
         : bitcoin.networks.bitcoin;
       
@@ -491,7 +485,7 @@ class BitcoinAdapter extends CoinAdapter {
         throw new Error("bitcoinjs-lib가 로드되지 않았습니다.");
       }
       
-      const network = (this.config.network.networkName === 'testnet' || this.config.network.networkName === 'testnet4')
+      const network = this.config.network.networkName === 'testnet4'
         ? bitcoin.networks.testnet 
         : bitcoin.networks.bitcoin;
       
@@ -525,7 +519,7 @@ class BitcoinAdapter extends CoinAdapter {
    */
   async getBalance(address) {
     try {
-      const network = this.config.network.networkName || 'testnet';
+      const network = this.config.network.networkName || 'testnet4';
       const apiUrl = BITCOIN_NETWORKS[network].apiBaseUrl;
       
       const response = await fetch(`${apiUrl}/address/${address}`);
@@ -553,7 +547,7 @@ class BitcoinAdapter extends CoinAdapter {
    */
   async getUTXOs(address) {
     try {
-      const network = this.config.network.networkName || 'testnet';
+      const network = this.config.network.networkName || 'testnet4';
       const apiUrl = BITCOIN_NETWORKS[network].apiBaseUrl;
         
       const response = await fetch(`${apiUrl}/address/${address}/utxo`);
@@ -572,7 +566,7 @@ class BitcoinAdapter extends CoinAdapter {
    */
   async getFeeEstimates() {
     try {
-      const network = this.config.network.networkName || 'testnet';
+      const network = this.config.network.networkName || 'testnet4';
       const apiUrl = BITCOIN_NETWORKS[network].apiBaseUrl;
         
       const response = await fetch(`${apiUrl}/v1/fees/recommended`);
@@ -592,7 +586,7 @@ class BitcoinAdapter extends CoinAdapter {
     
     try {
       const bitcoin = window.BitcoinJS;
-      const btcNetwork = (this.config.network.networkName === 'testnet' || this.config.network.networkName === 'testnet4')
+      const btcNetwork = this.config.network.networkName === 'testnet4'
         ? bitcoin.networks.testnet 
         : bitcoin.networks.bitcoin;
       
@@ -661,7 +655,7 @@ class BitcoinAdapter extends CoinAdapter {
       const tx = psbt.extractTransaction();
       const rawTx = tx.toHex();
       
-      const networkName = this.config.network.networkName || 'testnet';
+      const networkName = this.config.network.networkName || 'testnet4';
       const apiUrl = BITCOIN_NETWORKS[networkName].apiBaseUrl;
         
       const broadcastResponse = await fetch(`${apiUrl}/tx`, {
@@ -689,7 +683,7 @@ class BitcoinAdapter extends CoinAdapter {
    */
   async getTransactionStatus(txHash) {
     try {
-      const network = this.config.network.networkName || 'testnet';
+      const network = this.config.network.networkName || 'testnet4';
       const apiUrl = BITCOIN_NETWORKS[network].apiBaseUrl;
         
       const response = await fetch(`${apiUrl}/tx/${txHash}/status`);
