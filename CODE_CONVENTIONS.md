@@ -305,33 +305,33 @@ Text(text = strings.welcomeMessage)
 
 ## MiniApp vs WebApp vs Blockchain Naming Convention
 
-### MiniApp (공통 개념)
-- 모든 미니 애플리케이션의 통칭
-- 매니페스트, 파일 관리 등 공통 기능
-- 예: `MiniAppManifest`, `MiniAppFileManager`
+### MiniApp (Common Concept)
+- Collective term for all mini applications
+- Common features like manifest, file management
+- Examples: `MiniAppManifest`, `MiniAppFileManager`
 
-### WebApp (일반 웹앱)
-- 정부24 같은 일반 웹 애플리케이션
-- :app 프로세스에서 실행
-- 예: `WebAppActivity`, `WebAppService`
+### WebApp (General Web Apps)
+- General web applications like Government24
+- Runs in :app process
+- Examples: `WebAppActivity`, `WebAppService`
 
-### Blockchain (블록체인 앱)
-- 이더리움, 메타마스크 같은 블록체인 애플리케이션
-- :blockchain 프로세스에서 실행
-- 활성화 상태 관리 필요
-- 예: `BlockchainUIActivity`, `BlockchainService`
+### Blockchain (Blockchain Apps)
+- Blockchain applications like Ethereum, MetaMask
+- Runs in :blockchain process
+- Requires active state management
+- Examples: `BlockchainUIActivity`, `BlockchainService`
 
 ## Multi-Process Architecture
 
 ### Process Separation
-- **:main process**: 메인 프로세스 (대부분의 앱 기능)
-- **:app process**: WebApp 전용 프로세스
-- **:blockchain process**: Blockchain 전용 프로세스
+- **:main process**: Main process (most app features)
+- **:app process**: WebApp dedicated process
+- **:blockchain process**: Blockchain dedicated process
 
 ### IPC Communication
-- AIDL을 통한 프로세스 간 통신
-- `IWebAppService`: WebApp → Blockchain 통신
-- `IBlockchainService`: Blockchain 서비스 인터페이스
+- Inter-process communication via AIDL
+- `IWebAppService`: WebApp → Blockchain communication
+- `IBlockchainService`: Blockchain service interface
 
 ## 📦 Tech Stack
 
