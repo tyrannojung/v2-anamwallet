@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.anam145.wallet.core.ui.language.LocalStrings
 
 /**
  * ANAM Wallet 공통 헤더 컴포넌트
@@ -144,8 +145,9 @@ private fun BlockchainStatusChip(
                 .padding(horizontal = 12.dp),
             contentAlignment = Alignment.Center
         ) {
+            val strings = LocalStrings.current
             Text(
-                text = "🔗 $blockchainName 활성화됨",
+                text = "🔗 $blockchainName ${strings.activated}",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
