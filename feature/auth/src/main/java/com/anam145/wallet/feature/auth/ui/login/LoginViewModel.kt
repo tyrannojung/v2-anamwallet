@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.anam145.wallet.core.security.domain.usecase.VerifyAppPasswordUseCase
 import com.anam145.wallet.feature.auth.domain.PasswordManager
+import com.anam145.wallet.feature.auth.domain.model.AuthError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,8 +44,7 @@ class LoginViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 password = password,
-                passwordError = null,
-                errorMessage = null
+                error = null
             )
         }
     }
@@ -61,13 +61,13 @@ class LoginViewModel @Inject constructor(
         // 비밀번호 검증 (최소 8자)
         if (password.length < 8) {
             _uiState.update { state ->
-                state.copy(passwordError = "비밀번호는 최소 8자 이상이어야 합니다")
+                state.copy(error = AuthError.PasswordTooShort)
             }
             return
         }
         
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { it.copy(isLoading = true, error = null) }
             
             verifyAppPasswordUseCase(password).fold(
                 onSuccess = { isValid ->
@@ -79,7 +79,7 @@ class LoginViewModel @Inject constructor(
                         _uiState.update { state ->
                             state.copy(
                                 isLoading = false,
-                                errorMessage = "비밀번호가 일치하지 않습니다"
+                                error = AuthError.PasswordMismatch
                             )
                         }
                     }
@@ -88,7 +88,7 @@ class LoginViewModel @Inject constructor(
                     _uiState.update { state ->
                         state.copy(
                             isLoading = false,
-                            errorMessage = throwable.message ?: "로그인 중 오류가 발생했습니다"
+                            error = AuthError.LoginFailed
                         )
                     }
                 }
@@ -98,7 +98,7 @@ class LoginViewModel @Inject constructor(
     
     private fun clearError() {
         _uiState.update { state ->
-            state.copy(errorMessage = null, passwordError = null)
+            state.copy(error = null)
         }
     }
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.anam145.wallet.core.security.domain.usecase.SaveAppPasswordUseCase
 import com.anam145.wallet.feature.auth.domain.PasswordManager
+import com.anam145.wallet.feature.auth.domain.model.AuthError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +49,7 @@ class SetupPasswordViewModel @Inject constructor(
                 password = password,
                 passwordStrength = strength,
                 passwordError = null,
-                errorMessage = null
+                error = null
             )
         }
     }
@@ -58,7 +59,7 @@ class SetupPasswordViewModel @Inject constructor(
             state.copy(
                 confirmPassword = confirmPassword,
                 confirmPasswordError = null,
-                errorMessage = null
+                error = null
             )
         }
     }
@@ -84,14 +85,14 @@ class SetupPasswordViewModel @Inject constructor(
         
         if (password.length < 8) {
             _uiState.update { state ->
-                state.copy(passwordError = "비밀번호는 최소 8자 이상이어야 합니다")
+                state.copy(passwordError = AuthError.PasswordTooShort)
             }
             hasError = true
         }
         
         if (password != confirmPassword) {
             _uiState.update { state ->
-                state.copy(confirmPasswordError = "비밀번호가 일치하지 않습니다")
+                state.copy(confirmPasswordError = AuthError.PasswordMismatch)
             }
             hasError = true
         }
@@ -99,7 +100,7 @@ class SetupPasswordViewModel @Inject constructor(
         if (hasError) return
         
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { it.copy(isLoading = true, error = null) }
             
             saveAppPasswordUseCase(password).fold(
                 onSuccess = {
@@ -111,7 +112,7 @@ class SetupPasswordViewModel @Inject constructor(
                     _uiState.update { state ->
                         state.copy(
                             isLoading = false,
-                            errorMessage = throwable.message ?: "비밀번호 설정 중 오류가 발생했습니다"
+                            error = AuthError.PasswordSetupFailed
                         )
                     }
                 }
@@ -122,7 +123,7 @@ class SetupPasswordViewModel @Inject constructor(
     private fun clearError() {
         _uiState.update { state ->
             state.copy(
-                errorMessage = null,
+                error = null,
                 passwordError = null,
                 confirmPasswordError = null
             )

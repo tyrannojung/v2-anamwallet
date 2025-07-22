@@ -34,6 +34,22 @@ import com.anam145.wallet.core.ui.theme.CocogooseFamily
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import com.anam145.wallet.feature.auth.R as AuthR
+import com.anam145.wallet.core.ui.language.LocalStrings
+import com.anam145.wallet.feature.auth.domain.model.AuthError
+
+/**
+ * AuthError를 문자열로 변환
+ */
+@Composable
+private fun AuthError.toMessage(): String {
+    val strings = LocalStrings.current
+    return when (this) {
+        AuthError.PasswordTooShort -> strings.authErrorPasswordTooShort
+        AuthError.PasswordMismatch -> strings.authErrorPasswordMismatch
+        AuthError.LoginFailed -> strings.authErrorLoginFailed
+        AuthError.PasswordSetupFailed -> strings.authErrorPasswordSetupFailed
+    }
+}
 
 /**
  * 로그인 화면
@@ -70,6 +86,7 @@ private fun LoginContent(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
+    val strings = LocalStrings.current
     
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -109,7 +126,7 @@ private fun LoginContent(
             
             // 서브타이틀
             Text(
-                text = "비밀번호를 입력하여 지갑에 접근하세요",
+                text = strings.loginTitle,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -124,8 +141,8 @@ private fun LoginContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
-                label = { Text("비밀번호") },
-                placeholder = { Text("최소 8자 이상") },
+                label = { Text(strings.loginPasswordLabel) },
+                placeholder = { Text(strings.loginPasswordPlaceholder) },
                 visualTransformation = if (uiState.isPasswordVisible) {
                     VisualTransformation.None
                 } else {
@@ -152,22 +169,22 @@ private fun LoginContent(
                                 Icons.Default.Visibility
                             },
                             contentDescription = if (uiState.isPasswordVisible) {
-                                "비밀번호 숨기기"
+                                strings.loginPasswordHide
                             } else {
-                                "비밀번호 보기"
+                                strings.loginPasswordShow
                             }
                         )
                     }
                 },
-                isError = uiState.passwordError != null || uiState.errorMessage != null,
+                isError = uiState.error != null,
                 supportingText = {
                     AnimatedVisibility(
-                        visible = uiState.passwordError != null || uiState.errorMessage != null,
+                        visible = uiState.error != null,
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
                         Text(
-                            text = uiState.passwordError ?: uiState.errorMessage ?: "",
+                            text = uiState.error?.toMessage() ?: "",
                             color = MaterialTheme.colorScheme.error
                         )
                     }
@@ -198,7 +215,7 @@ private fun LoginContent(
                     )
                 } else {
                     Text(
-                        text = "잠금 해제",
+                        text = strings.loginUnlockButton,
                         style = MaterialTheme.typography.labelLarge
                     )
                 }
@@ -208,7 +225,7 @@ private fun LoginContent(
             
             // 하단 정보
             Text(
-                text = "비밀번호를 잊으셨나요? 앱을 재설치해야 합니다.",
+                text = strings.loginForgotPassword,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -239,7 +256,7 @@ private fun LoginScreenDarkPreview() {
         LoginContent(
             uiState = LoginContract.State(
                 password = "",
-                errorMessage = "비밀번호가 일치하지 않습니다"
+                error = AuthError.PasswordMismatch
             ),
             onIntent = {}
         )

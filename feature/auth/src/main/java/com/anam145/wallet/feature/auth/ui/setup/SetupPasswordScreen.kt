@@ -42,6 +42,22 @@ import com.anam145.wallet.core.ui.theme.CocogooseFamily
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import com.anam145.wallet.feature.auth.R as AuthR
+import com.anam145.wallet.core.ui.language.LocalStrings
+import com.anam145.wallet.feature.auth.domain.model.AuthError
+
+/**
+ * AuthError를 문자열로 변환
+ */
+@Composable
+private fun AuthError.toMessage(): String {
+    val strings = LocalStrings.current
+    return when (this) {
+        AuthError.PasswordTooShort -> strings.authErrorPasswordTooShort
+        AuthError.PasswordMismatch -> strings.authErrorPasswordMismatch
+        AuthError.LoginFailed -> strings.authErrorLoginFailed
+        AuthError.PasswordSetupFailed -> strings.authErrorPasswordSetupFailed
+    }
+}
 
 /**
  * 비밀번호 설정 화면
@@ -80,6 +96,7 @@ private fun SetupPasswordContent(
     val focusManager = LocalFocusManager.current
     val passwordFocusRequester = remember { FocusRequester() }
     val scrollState = rememberScrollState()
+    val strings = LocalStrings.current
     
     LaunchedEffect(Unit) {
         passwordFocusRequester.requestFocus()
@@ -111,7 +128,7 @@ private fun SetupPasswordContent(
             
             // 타이틀
             Text(
-                text = "비밀번호 설정",
+                text = strings.setupPasswordTitle,
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -120,7 +137,7 @@ private fun SetupPasswordContent(
             
             // 설명
             Text(
-                text = "지갑을 보호할 비밀번호를 설정하세요.\n이 비밀번호는 앱 접근 시 필요합니다.",
+                text = strings.setupPasswordDescription,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -135,8 +152,8 @@ private fun SetupPasswordContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(passwordFocusRequester),
-                label = { Text("비밀번호") },
-                placeholder = { Text("최소 8자 이상 입력") },
+                label = { Text(strings.setupPasswordLabel) },
+                placeholder = { Text(strings.setupPasswordPlaceholder) },
                 visualTransformation = if (uiState.isPasswordVisible) {
                     VisualTransformation.None
                 } else {
@@ -160,9 +177,9 @@ private fun SetupPasswordContent(
                                 Icons.Default.Visibility
                             },
                             contentDescription = if (uiState.isPasswordVisible) {
-                                "비밀번호 숨기기"
+                                strings.loginPasswordHide
                             } else {
-                                "비밀번호 보기"
+                                strings.loginPasswordShow
                             }
                         )
                     }
@@ -175,7 +192,7 @@ private fun SetupPasswordContent(
                         exit = fadeOut()
                     ) {
                         Text(
-                            text = uiState.passwordError ?: "",
+                            text = uiState.passwordError?.toMessage() ?: "",
                             color = MaterialTheme.colorScheme.error
                         )
                     }
@@ -199,8 +216,8 @@ private fun SetupPasswordContent(
                 value = uiState.confirmPassword,
                 onValueChange = { onIntent(SetupPasswordContract.Intent.UpdateConfirmPassword(it)) },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("비밀번호 확인") },
-                placeholder = { Text("비밀번호를 다시 입력하세요") },
+                label = { Text(strings.setupPasswordConfirmLabel) },
+                placeholder = { Text(strings.setupPasswordConfirmPlaceholder) },
                 visualTransformation = if (uiState.isConfirmPasswordVisible) {
                     VisualTransformation.None
                 } else {
@@ -223,7 +240,7 @@ private fun SetupPasswordContent(
                             uiState.password == uiState.confirmPassword) {
                             Icon(
                                 imageVector = Icons.Default.Check,
-                                contentDescription = "비밀번호 일치",
+                                contentDescription = strings.setupPasswordMatch,
                                 tint = AnamSuccess,
                                 modifier = Modifier.size(24.dp)
                             )
@@ -239,9 +256,9 @@ private fun SetupPasswordContent(
                                     Icons.Default.Visibility
                                 },
                                 contentDescription = if (uiState.isConfirmPasswordVisible) {
-                                    "비밀번호 숨기기"
+                                    strings.loginPasswordHide
                                 } else {
-                                    "비밀번호 보기"
+                                    strings.loginPasswordShow
                                 }
                             )
                         }
@@ -255,7 +272,7 @@ private fun SetupPasswordContent(
                         exit = fadeOut()
                     ) {
                         Text(
-                            text = uiState.confirmPasswordError ?: "",
+                            text = uiState.confirmPasswordError?.toMessage() ?: "",
                             color = MaterialTheme.colorScheme.error
                         )
                     }
@@ -265,7 +282,7 @@ private fun SetupPasswordContent(
             
             // 에러 메시지
             AnimatedVisibility(
-                visible = uiState.errorMessage != null,
+                visible = uiState.error != null,
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
@@ -278,7 +295,7 @@ private fun SetupPasswordContent(
                     )
                 ) {
                     Text(
-                        text = uiState.errorMessage ?: "",
+                        text = uiState.error?.toMessage() ?: "",
                         modifier = Modifier.padding(16.dp),
                         color = MaterialTheme.colorScheme.onErrorContainer,
                         style = MaterialTheme.typography.bodyMedium
@@ -307,7 +324,7 @@ private fun SetupPasswordContent(
                     )
                 } else {
                     Text(
-                        text = "비밀번호 설정",
+                        text = strings.setupPasswordButton,
                         style = MaterialTheme.typography.labelLarge
                     )
                 }
@@ -327,14 +344,13 @@ private fun SetupPasswordContent(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "주의사항",
+                        text = strings.setupPasswordWarningTitle,
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "• 비밀번호를 잊으면 지갑에 접근할 수 없습니다\n" +
-                              "• 앱을 재설치하면 모든 데이터가 삭제됩니다",
+                        text = strings.setupPasswordWarningContent,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -361,11 +377,12 @@ private fun PasswordStrengthIndicator(
         label = "strength_color"
     )
     
+    val strings = LocalStrings.current
     val text = when (strength) {
         SetupPasswordContract.PasswordStrength.NONE -> ""
-        SetupPasswordContract.PasswordStrength.WEAK -> "약함"
-        SetupPasswordContract.PasswordStrength.MEDIUM -> "보통"
-        SetupPasswordContract.PasswordStrength.STRONG -> "강함"
+        SetupPasswordContract.PasswordStrength.WEAK -> strings.setupPasswordStrengthWeak
+        SetupPasswordContract.PasswordStrength.MEDIUM -> strings.setupPasswordStrengthMedium
+        SetupPasswordContract.PasswordStrength.STRONG -> strings.setupPasswordStrengthStrong
     }
     
     Row(
@@ -428,7 +445,7 @@ private fun SetupPasswordScreenDarkPreview() {
             uiState = SetupPasswordContract.State(
                 password = "pass",
                 passwordStrength = SetupPasswordContract.PasswordStrength.WEAK,
-                passwordError = "비밀번호는 최소 8자 이상이어야 합니다"
+                passwordError = AuthError.PasswordTooShort
             ),
             onIntent = {}
         )

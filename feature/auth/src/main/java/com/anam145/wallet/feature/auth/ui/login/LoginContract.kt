@@ -1,5 +1,7 @@
 package com.anam145.wallet.feature.auth.ui.login
 
+import com.anam145.wallet.feature.auth.domain.model.AuthError
+
 /**
  * 로그인 화면의 UI 상태 및 이벤트 정의
  */
@@ -12,8 +14,7 @@ object LoginContract {
         val password: String = "",
         val isPasswordVisible: Boolean = false,
         val isLoading: Boolean = false,
-        val errorMessage: String? = null,
-        val passwordError: String? = null
+        val error: AuthError? = null
     )
     
     /**

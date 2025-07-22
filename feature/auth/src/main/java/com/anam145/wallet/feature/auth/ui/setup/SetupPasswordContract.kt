@@ -1,5 +1,7 @@
 package com.anam145.wallet.feature.auth.ui.setup
 
+import com.anam145.wallet.feature.auth.domain.model.AuthError
+
 /**
  * 비밀번호 설정 화면의 UI 상태 및 이벤트 정의
  */
@@ -14,9 +16,9 @@ object SetupPasswordContract {
         val isPasswordVisible: Boolean = false,
         val isConfirmPasswordVisible: Boolean = false,
         val isLoading: Boolean = false,
-        val passwordError: String? = null,
-        val confirmPasswordError: String? = null,
-        val errorMessage: String? = null,
+        val passwordError: AuthError? = null,
+        val confirmPasswordError: AuthError? = null,
+        val error: AuthError? = null,
         val passwordStrength: PasswordStrength = PasswordStrength.NONE
     )
     

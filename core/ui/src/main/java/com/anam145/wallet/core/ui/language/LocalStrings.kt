@@ -71,7 +71,38 @@ data class Strings(
     // Common
     val back: String = "뒤로가기",
     val loading: String = "로딩 중...",
-    val activated: String = "활성화됨"
+    val activated: String = "활성화됨",
+    
+    // Auth - Login Screen
+    val loginTitle: String = "비밀번호를 입력하여 지갑에 접근하세요",
+    val loginPasswordLabel: String = "비밀번호",
+    val loginPasswordPlaceholder: String = "최소 8자 이상",
+    val loginPasswordHide: String = "비밀번호 숨기기",
+    val loginPasswordShow: String = "비밀번호 보기",
+    val loginUnlockButton: String = "잠금 해제",
+    val loginForgotPassword: String = "비밀번호를 잊으셨나요? 앱을 재설치해야 합니다.",
+    val loginPasswordMismatch: String = "비밀번호가 일치하지 않습니다",
+    
+    // Auth - Setup Password Screen
+    val setupPasswordTitle: String = "비밀번호 설정",
+    val setupPasswordDescription: String = "지갑을 보호할 비밀번호를 설정하세요.\n이 비밀번호는 앱 접근 시 필요합니다.",
+    val setupPasswordLabel: String = "비밀번호",
+    val setupPasswordPlaceholder: String = "최소 8자 이상 입력",
+    val setupPasswordConfirmLabel: String = "비밀번호 확인",
+    val setupPasswordConfirmPlaceholder: String = "비밀번호를 다시 입력하세요",
+    val setupPasswordMatch: String = "비밀번호 일치",
+    val setupPasswordButton: String = "비밀번호 설정",
+    val setupPasswordWarningTitle: String = "주의사항",
+    val setupPasswordWarningContent: String = "• 비밀번호를 잊으면 지갑에 접근할 수 없습니다\n• 앱을 재설치하면 모든 데이터가 삭제됩니다",
+    val setupPasswordStrengthWeak: String = "약함",
+    val setupPasswordStrengthMedium: String = "보통",
+    val setupPasswordStrengthStrong: String = "강함",
+    
+    // Auth - Error Messages
+    val authErrorPasswordTooShort: String = "비밀번호는 최소 8자 이상이어야 합니다",
+    val authErrorPasswordMismatch: String = "비밀번호가 일치하지 않습니다",
+    val authErrorLoginFailed: String = "로그인 중 오류가 발생했습니다",
+    val authErrorPasswordSetupFailed: String = "비밀번호 설정 중 오류가 발생했습니다"
 )
 
 /**
@@ -133,7 +164,38 @@ val EnglishStrings = Strings(
     // Common
     back = "Back",
     loading = "Loading...",
-    activated = "Activated"
+    activated = "Activated",
+    
+    // Auth - Login Screen
+    loginTitle = "Enter password to access your wallet",
+    loginPasswordLabel = "Password",
+    loginPasswordPlaceholder = "At least 8 characters",
+    loginPasswordHide = "Hide password",
+    loginPasswordShow = "Show password",
+    loginUnlockButton = "Unlock",
+    loginForgotPassword = "Forgot password? You need to reinstall the app.",
+    loginPasswordMismatch = "Password does not match",
+    
+    // Auth - Setup Password Screen
+    setupPasswordTitle = "Set Password",
+    setupPasswordDescription = "Set a password to protect your wallet.\nThis password will be required to access the app.",
+    setupPasswordLabel = "Password",
+    setupPasswordPlaceholder = "Enter at least 8 characters",
+    setupPasswordConfirmLabel = "Confirm Password",
+    setupPasswordConfirmPlaceholder = "Re-enter your password",
+    setupPasswordMatch = "Password match",
+    setupPasswordButton = "Set Password",
+    setupPasswordWarningTitle = "Warning",
+    setupPasswordWarningContent = "• If you forget your password, you cannot access your wallet\n• Reinstalling the app will delete all data",
+    setupPasswordStrengthWeak = "Weak",
+    setupPasswordStrengthMedium = "Medium",
+    setupPasswordStrengthStrong = "Strong",
+    
+    // Auth - Error Messages
+    authErrorPasswordTooShort = "Password must be at least 8 characters",
+    authErrorPasswordMismatch = "Passwords do not match",
+    authErrorLoginFailed = "An error occurred during login",
+    authErrorPasswordSetupFailed = "An error occurred while setting password"
 )
 
 /**
