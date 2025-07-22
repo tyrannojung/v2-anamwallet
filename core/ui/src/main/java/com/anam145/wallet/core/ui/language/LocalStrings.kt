@@ -72,6 +72,7 @@ data class Strings(
     val back: String = "뒤로가기",
     val loading: String = "로딩 중...",
     val activated: String = "활성화됨",
+    val active: String = "활성",
     
     // Auth - Login Screen
     val loginTitle: String = "비밀번호를 입력하여 지갑에 접근하세요",
@@ -165,6 +166,7 @@ val EnglishStrings = Strings(
     back = "Back",
     loading = "Loading...",
     activated = "Activated",
+    active = "Active",
     
     // Auth - Login Screen
     loginTitle = "Enter password to access your wallet",
