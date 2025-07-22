@@ -114,9 +114,7 @@ class MiniAppScanner @Inject constructor(
                                 },
                                 // 아이콘 파일 경로 생성
                                 // 예: /data/data/.../files/miniapps/bitcoin/assets/icons/app_icon.png
-                                iconPath = fileManager.getMiniAppBasePath(appId) + MiniAppConstants.ICON_PATH,
-                                // 블록체인 타입만 잔액 표시 (현재 하드 코딩 상태)
-                                balance = if (manifest.type == MiniAppConstants.TYPE_BLOCKCHAIN) "0 ETH" else null
+                                iconPath = fileManager.getMiniAppBasePath(appId) + MiniAppConstants.ICON_PATH
                             )
                             installedAppsMap[appId] = miniApp
                         }
