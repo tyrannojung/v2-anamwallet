@@ -5,21 +5,19 @@
 // Bitcoin 네트워크 설정
 const BITCOIN_NETWORKS = {
   testnet4: {
-    name: 'testnet4',
-    apiBaseUrl: 'https://mempool.space/testnet4/api',
-    explorerUrl: 'https://mempool.space/testnet4',
-    faucetUrl: 'https://bitcoinfaucet.uo1.net/', // testnet4 faucet
+    name: "testnet4",
+    apiBaseUrl: "https://mempool.space/testnet4/api",
+    explorerUrl: "https://mempool.space/testnet4",
   },
   mainnet: {
-    name: 'mainnet', 
-    apiBaseUrl: 'https://mempool.space/api',
-    explorerUrl: 'https://mempool.space',
-    faucetUrl: null,
-  }
+    name: "mainnet",
+    apiBaseUrl: "https://mempool.space/api",
+    explorerUrl: "https://mempool.space",
+  },
 };
 
 // 현재 네트워크 설정
-const CURRENT_NETWORK = 'testnet4'; // 'testnet4' 또는 'mainnet'
+const CURRENT_NETWORK = "testnet4"; // 'testnet4' 또는 'mainnet'
 
 // Coin 설정
 const CoinConfig = {
@@ -45,7 +43,8 @@ const CoinConfig = {
   // 주소 설정
   address: {
     // 비트코인 주소 형식 정규식 (Legacy, SegWit, Native SegWit 지원)
-    regex: /^(1[a-km-zA-HJ-NP-Z1-9]{25,34}|3[a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59}|tb1[a-z0-9]{39,59})$/,
+    regex:
+      /^(1[a-km-zA-HJ-NP-Z1-9]{25,34}|3[a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59}|tb1[a-z0-9]{39,59})$/,
     // 주소 표시 형식
     displayFormat: "bc1...", // Native SegWit 형식
   },
@@ -405,7 +404,6 @@ class BitcoinAdapter extends CoinAdapter {
     // this.rpcEndpoint = config.network.rpcEndpoint;
   }
 
-
   /**
    * 새 지갑 생성 (HD 지갑)
    */
@@ -413,35 +411,37 @@ class BitcoinAdapter extends CoinAdapter {
     try {
       // bitcoinjs-lib 번들 글로벌 객체 확인
       const bitcoin = window.BitcoinJS;
-      
+
       if (!bitcoin || !bitcoin.networks) {
         throw new Error("bitcoinjs-lib가 로드되지 않았습니다.");
       }
-      
-      const network = this.config.network.networkName === 'testnet4'
-        ? bitcoin.networks.testnet 
-        : bitcoin.networks.bitcoin;
-      
+
+      const network =
+        this.config.network.networkName === "testnet4"
+          ? bitcoin.networks.testnet
+          : bitcoin.networks.bitcoin;
+
       // 랜덤 니모닉 생성 (12 단어)
       const mnemonic = bitcoin.generateMnemonic();
-      
+
       // HD 지갑 생성 (헬퍼 함수 사용)
       const hdWallet = bitcoin.hdWalletFromMnemonic(mnemonic, network);
-      
+
       // 주소 생성 (헬퍼 함수 사용)
       const account = bitcoin.generateAddress(hdWallet, 0, network);
-      
+
       return {
         address: account.address,
         privateKey: account.privateKey,
-        mnemonic: mnemonic
+        mnemonic: mnemonic,
       };
     } catch (error) {
       console.error("Bitcoin 지갑 생성 실패:", error);
-      throw new Error("Bitcoin 지갑 생성에 실패했습니다. bitcoinjs-lib가 로드되었는지 확인하세요.");
+      throw new Error(
+        "Bitcoin 지갑 생성에 실패했습니다. bitcoinjs-lib가 로드되었는지 확인하세요."
+      );
     }
   }
-  
 
   /**
    * 니모닉으로 지갑 복구
@@ -449,24 +449,25 @@ class BitcoinAdapter extends CoinAdapter {
   async importFromMnemonic(mnemonic) {
     try {
       const bitcoin = window.BitcoinJS;
-      
+
       if (!bitcoin || !bitcoin.networks) {
         throw new Error("bitcoinjs-lib가 로드되지 않았습니다.");
       }
-      
-      const network = this.config.network.networkName === 'testnet4'
-        ? bitcoin.networks.testnet 
-        : bitcoin.networks.bitcoin;
-      
+
+      const network =
+        this.config.network.networkName === "testnet4"
+          ? bitcoin.networks.testnet
+          : bitcoin.networks.bitcoin;
+
       // HD 지갑 생성 (헬퍼 함수 사용)
       const hdWallet = bitcoin.hdWalletFromMnemonic(mnemonic, network);
-      
+
       // 주소 생성 (헬퍼 함수 사용)
       const account = bitcoin.generateAddress(hdWallet, 0, network);
-      
+
       return {
         address: account.address,
-        privateKey: account.privateKey
+        privateKey: account.privateKey,
       };
     } catch (error) {
       console.error("Bitcoin 니모닉 복구 실패:", error);
@@ -480,26 +481,27 @@ class BitcoinAdapter extends CoinAdapter {
   async importFromPrivateKey(privateKey) {
     try {
       const bitcoin = window.BitcoinJS;
-      
+
       if (!bitcoin || !bitcoin.networks) {
         throw new Error("bitcoinjs-lib가 로드되지 않았습니다.");
       }
-      
-      const network = this.config.network.networkName === 'testnet4'
-        ? bitcoin.networks.testnet 
-        : bitcoin.networks.bitcoin;
-      
+
+      const network =
+        this.config.network.networkName === "testnet4"
+          ? bitcoin.networks.testnet
+          : bitcoin.networks.bitcoin;
+
       // WIF 형식의 개인키를 ECPair로 변환
       const keyPair = bitcoin.ECPair.fromWIF(privateKey, network);
-      
+
       // P2WPKH 주소 생성 (bc1...)
-      const { address } = bitcoin.payments.p2wpkh({ 
-        pubkey: keyPair.publicKey, 
-        network 
+      const { address } = bitcoin.payments.p2wpkh({
+        pubkey: keyPair.publicKey,
+        network,
       });
-      
+
       return {
-        address: address
+        address: address,
       };
     } catch (error) {
       console.error("Bitcoin 개인키 복구 실패:", error);
@@ -519,21 +521,23 @@ class BitcoinAdapter extends CoinAdapter {
    */
   async getBalance(address) {
     try {
-      const network = this.config.network.networkName || 'testnet4';
+      const network = this.config.network.networkName || "testnet4";
       const apiUrl = BITCOIN_NETWORKS[network].apiBaseUrl;
-      
+
       const response = await fetch(`${apiUrl}/address/${address}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       // chain_stats: 확인된 거래
       // mempool_stats: 미확인 거래
-      const confirmed = data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum;
-      const unconfirmed = data.mempool_stats.funded_txo_sum - data.mempool_stats.spent_txo_sum;
-      
+      const confirmed =
+        data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum;
+      const unconfirmed =
+        data.mempool_stats.funded_txo_sum - data.mempool_stats.spent_txo_sum;
+
       const totalSatoshi = confirmed + unconfirmed;
       return totalSatoshi.toString(); // satoshi 단위
     } catch (error) {
@@ -547,16 +551,16 @@ class BitcoinAdapter extends CoinAdapter {
    */
   async getUTXOs(address) {
     try {
-      const network = this.config.network.networkName || 'testnet4';
+      const network = this.config.network.networkName || "testnet4";
       const apiUrl = BITCOIN_NETWORKS[network].apiBaseUrl;
-        
+
       const response = await fetch(`${apiUrl}/address/${address}/utxo`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       return await response.json();
     } catch (error) {
-      console.error('UTXO 조회 실패:', error);
+      console.error("UTXO 조회 실패:", error);
       return [];
     }
   }
@@ -566,15 +570,21 @@ class BitcoinAdapter extends CoinAdapter {
    */
   async getFeeEstimates() {
     try {
-      const network = this.config.network.networkName || 'testnet4';
+      const network = this.config.network.networkName || "testnet4";
       const apiUrl = BITCOIN_NETWORKS[network].apiBaseUrl;
-        
+
       const response = await fetch(`${apiUrl}/v1/fees/recommended`);
       return await response.json();
       // 반환값: { fastestFee, halfHourFee, hourFee, economyFee, minimumFee }
     } catch (error) {
-      console.error('수수료 조회 실패:', error);
-      return { fastestFee: 20, halfHourFee: 10, hourFee: 5, economyFee: 2, minimumFee: 1 };
+      console.error("수수료 조회 실패:", error);
+      return {
+        fastestFee: 20,
+        halfHourFee: 10,
+        hourFee: 5,
+        economyFee: 2,
+        minimumFee: 1,
+      };
     }
   }
 
@@ -583,97 +593,98 @@ class BitcoinAdapter extends CoinAdapter {
    */
   async sendTransaction(params) {
     const { to, amount, privateKey, feeRate } = params;
-    
+
     try {
       const bitcoin = window.BitcoinJS;
-      const btcNetwork = this.config.network.networkName === 'testnet4'
-        ? bitcoin.networks.testnet 
-        : bitcoin.networks.bitcoin;
-      
+      const btcNetwork =
+        this.config.network.networkName === "testnet4"
+          ? bitcoin.networks.testnet
+          : bitcoin.networks.bitcoin;
+
       // 현재 주소 가져오기
       const keyPair = bitcoin.ECPair.fromWIF(privateKey, btcNetwork);
-      const { address: fromAddress } = bitcoin.payments.p2wpkh({ 
-        pubkey: keyPair.publicKey, 
-        network: btcNetwork 
+      const { address: fromAddress } = bitcoin.payments.p2wpkh({
+        pubkey: keyPair.publicKey,
+        network: btcNetwork,
       });
-      
+
       // 1. UTXO 조회
       const utxos = await this.getUTXOs(fromAddress);
       if (utxos.length === 0) {
-        throw new Error('사용 가능한 UTXO가 없습니다');
+        throw new Error("사용 가능한 UTXO가 없습니다");
       }
-      
+
       // 2. PSBT 생성
       const psbt = new bitcoin.Psbt({ network: btcNetwork });
-      
+
       // 3. Input 추가 (UTXO)
       let totalInput = 0;
       const amountSatoshi = Math.floor(parseFloat(amount) * 100000000);
-      
+
       for (const utxo of utxos) {
         if (totalInput >= amountSatoshi + 10000) break; // 수수료 여유분
-        
+
         psbt.addInput({
           hash: utxo.txid,
           index: utxo.vout,
           witnessUtxo: {
             script: bitcoin.address.toOutputScript(fromAddress, btcNetwork),
-            value: utxo.value
-          }
+            value: utxo.value,
+          },
         });
-        
+
         totalInput += utxo.value;
       }
-      
+
       if (totalInput < amountSatoshi) {
-        throw new Error('잔액이 부족합니다');
+        throw new Error("잔액이 부족합니다");
       }
-      
+
       // 4. Output 추가 (수신자)
       psbt.addOutput({
         address: to,
-        value: amountSatoshi
+        value: amountSatoshi,
       });
-      
+
       // 5. 거스름돈 계산 및 추가
       const estimatedSize = 250; // 대략적인 트랜잭션 크기
       const fee = estimatedSize * (feeRate || 10);
       const change = totalInput - amountSatoshi - fee;
-      
-      if (change > 546) { // dust limit
+
+      if (change > 546) {
+        // dust limit
         psbt.addOutput({
           address: fromAddress,
-          value: change
+          value: change,
         });
       }
-      
+
       // 6. 서명
       psbt.signAllInputs(keyPair);
       psbt.finalizeAllInputs();
-      
+
       // 7. 브로드캐스트
       const tx = psbt.extractTransaction();
       const rawTx = tx.toHex();
-      
-      const networkName = this.config.network.networkName || 'testnet4';
+
+      const networkName = this.config.network.networkName || "testnet4";
       const apiUrl = BITCOIN_NETWORKS[networkName].apiBaseUrl;
-        
+
       const broadcastResponse = await fetch(`${apiUrl}/tx`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: rawTx
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: rawTx,
       });
-      
+
       if (!broadcastResponse.ok) {
         const errorText = await broadcastResponse.text();
         throw new Error(`트랜잭션 브로드캐스트 실패: ${errorText}`);
       }
-      
+
       const txid = await broadcastResponse.text();
       return { hash: txid };
-      
     } catch (error) {
-      console.error('트랜잭션 전송 실패:', error);
+      console.error("트랜잭션 전송 실패:", error);
       throw error;
     }
   }
@@ -683,27 +694,27 @@ class BitcoinAdapter extends CoinAdapter {
    */
   async getTransactionStatus(txHash) {
     try {
-      const network = this.config.network.networkName || 'testnet4';
+      const network = this.config.network.networkName || "testnet4";
       const apiUrl = BITCOIN_NETWORKS[network].apiBaseUrl;
-        
+
       const response = await fetch(`${apiUrl}/tx/${txHash}/status`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const status = await response.json();
-      
+
       return {
-        status: status.confirmed ? 'confirmed' : 'pending',
+        status: status.confirmed ? "confirmed" : "pending",
         confirmations: status.confirmed ? 1 : 0, // Mempool API는 정확한 confirmations를 제공하지 않음
         blockHeight: status.block_height,
-        blockTime: status.block_time
+        blockTime: status.block_time,
       };
     } catch (error) {
-      console.error('트랜잭션 상태 조회 실패:', error);
+      console.error("트랜잭션 상태 조회 실패:", error);
       return {
-        status: 'not_found',
-        confirmations: 0
+        status: "not_found",
+        confirmations: 0,
       };
     }
   }
@@ -714,11 +725,11 @@ class BitcoinAdapter extends CoinAdapter {
   async getGasPrice() {
     try {
       const fees = await this.getFeeEstimates();
-      
+
       return {
-        low: String(fees.economyFee),      // 경제적 (1시간)
-        medium: String(fees.halfHourFee),  // 중간 (30분)
-        high: String(fees.fastestFee)      // 빠름 (10분)
+        low: String(fees.economyFee), // 경제적 (1시간)
+        medium: String(fees.halfHourFee), // 중간 (30분)
+        high: String(fees.fastestFee), // 빠름 (10분)
       };
     } catch (error) {
       console.error("수수료율 조회 실패:", error);
@@ -726,7 +737,7 @@ class BitcoinAdapter extends CoinAdapter {
       return {
         low: "5",
         medium: "10",
-        high: "20"
+        high: "20",
       };
     }
   }
@@ -739,10 +750,10 @@ class BitcoinAdapter extends CoinAdapter {
     const estimatedSize = 250;
     const feeRates = await this.getGasPrice();
     const feeRate = parseInt(feeRates.medium);
-    
+
     const feeSatoshi = estimatedSize * feeRate;
     const feeBTC = feeSatoshi / 100000000;
-    
+
     return feeBTC.toFixed(8);
   }
 }
