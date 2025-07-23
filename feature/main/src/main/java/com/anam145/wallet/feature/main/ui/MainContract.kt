@@ -30,9 +30,6 @@ interface MainContract {
         
         /** 일반 앱 클릭 */
         data class ClickRegularApp(val miniApp: MiniApp) : MainIntent
-        
-        /** 더 많은 서비스 추가 클릭 */
-        data object ClickAddMore : MainIntent
     }
     
     /**
@@ -44,9 +41,6 @@ interface MainContract {
         
         /** 웹앱 액티비티 실행 (app 프로세스) */
         data class LaunchWebAppActivity(val appId: String) : MainEffect
-        
-        /** Hub 화면으로 이동 (Navigation Component) */
-        data object NavigateToHub : MainEffect
         
         /** 에러 메시지 표시 */
         data class ShowError(val message: String) : MainEffect

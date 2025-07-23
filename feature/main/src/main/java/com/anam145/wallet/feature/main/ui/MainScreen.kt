@@ -54,7 +54,6 @@ import java.io.File
 fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
-    onNavigateToHub: () -> Unit = {},
     onNavigateToMiniApp: (String) -> Unit = {},
     onLaunchBlockchain: (String) -> Unit = {}
 ) {
@@ -68,7 +67,6 @@ fun MainScreen(
     LaunchedEffect(key1 = viewModel) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
-                is MainContract.MainEffect.NavigateToHub -> onNavigateToHub()
                 is MainContract.MainEffect.LaunchWebAppActivity -> onNavigateToMiniApp(effect.appId)
                 is MainContract.MainEffect.LaunchBlockchainActivity -> onLaunchBlockchain(effect.blockchainId)
                 is MainContract.MainEffect.ShowError -> {
@@ -114,8 +112,7 @@ fun MainScreen(
                     regularApps = uiState.regularApps,
                     activeBlockchainId = uiState.activeBlockchainId,
                     onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
-                    onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) },
-                    onAddMoreClick = { viewModel.handleIntent(MainContract.MainIntent.ClickAddMore) }
+                    onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) }
                 )
             }
         }
@@ -128,8 +125,7 @@ private fun MiniAppList(
     regularApps: List<MiniApp>,
     activeBlockchainId: String?,
     onBlockchainClick: (MiniApp) -> Unit,
-    onAppClick: (MiniApp) -> Unit,
-    onAddMoreClick: () -> Unit
+    onAppClick: (MiniApp) -> Unit
 ) {
     val strings = LocalStrings.current
     
@@ -211,38 +207,6 @@ private fun MiniAppList(
                         }
                     }
                 }
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Add More Card
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .height(80.dp)
-                .clickable { onAddMoreClick() },
-            shape = ShapeCard,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            )
-        ) {
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add More",
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = strings.mainAddMoreServices,
-                    style = MaterialTheme.typography.bodyLarge
-                )
             }
         }
     }

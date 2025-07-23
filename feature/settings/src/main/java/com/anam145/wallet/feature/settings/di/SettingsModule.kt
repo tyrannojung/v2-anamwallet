@@ -10,9 +10,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import com.anam145.wallet.feature.settings.domain.repository.ThemeRepository
 import com.anam145.wallet.feature.settings.domain.repository.LanguageRepository
-import com.anam145.wallet.feature.settings.data.ThemeRepositoryImpl
 import com.anam145.wallet.feature.settings.data.LanguageRepositoryImpl
 import dagger.Binds
 
@@ -33,14 +31,9 @@ abstract class SettingsModule {
 
     /**
      * Repository 바인딩
-     * 의미: "누군가 ThemeRepository를 요청하면, ThemeRepositoryImpl을 줘라"
-     * 왜 필요?: ViewModel은 인터페이스(ThemeRepository)만 알고, 구현체는 모름
+     * 의미: "누군가 LanguageRepository를 요청하면, LanguageRepositoryImpl을 줘라"
+     * 왜 필요?: ViewModel은 인터페이스(LanguageRepository)만 알고, 구현체는 모름
      * */
-    @Binds
-    abstract fun bindThemeRepository(
-        themeRepositoryImpl: ThemeRepositoryImpl
-    ): ThemeRepository
-    
     @Binds
     abstract fun bindLanguageRepository(
         languageRepositoryImpl: LanguageRepositoryImpl

@@ -48,16 +48,6 @@ fun AnamNavHost(
             
             MainScreen(
                 viewModel = mainViewModel,  // 공유 ViewModel 전달
-                onNavigateToHub = { 
-                    navController.navigate(AnamNavRoute.Hub.route) {
-                        // Use the same navigation options as bottom navigation
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
                 onNavigateToMiniApp = { appId ->
                     // MiniApp Activity 실행 (메인 프로세스)
                     val intent = WebAppActivity.createIntent(context, appId)

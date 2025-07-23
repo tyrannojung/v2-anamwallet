@@ -32,15 +32,9 @@ data class Strings(
     val navSettings: String = "설정",
     
     // Settings Screen
-    val settingsThemeSection: String = "테마",
     val settingsLanguageSection: String = "언어",
     val settingsSupportSection: String = "지원",
     val settingsAboutSection: String = "정보",
-    
-    val settingsDarkMode: String = "다크 모드",
-    val settingsLightMode: String = "라이트 모드",
-    val settingsDarkModeDescription: String = "어두운 테마 사용 중",
-    val settingsLightModeDescription: String = "밝은 테마 사용 중",
     
     val settingsHelp: String = "도움말",
     val settingsHelpDescription: String = "앱 사용 가이드",
@@ -126,15 +120,9 @@ val EnglishStrings = Strings(
     navSettings = "Settings",
     
     // Settings Screen
-    settingsThemeSection = "Theme",
     settingsLanguageSection = "Language",
     settingsSupportSection = "Support",
     settingsAboutSection = "About",
-    
-    settingsDarkMode = "Dark Mode",
-    settingsLightMode = "Light Mode",
-    settingsDarkModeDescription = "Using dark theme",
-    settingsLightModeDescription = "Using light theme",
     
     settingsHelp = "Help",
     settingsHelpDescription = "App usage guide",

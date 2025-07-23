@@ -55,19 +55,8 @@ fun SettingsScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
     ) {
-        // 테마 섹션
-        Spacer(modifier = Modifier.height(20.dp))
-        
-        ThemeSection(
-            currentTheme = uiState.themeMode,
-            onThemeChange = { theme ->
-                viewModel.handleIntent(SettingsContract.SettingsIntent.ChangeTheme(theme))
-            }
-        )
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
         // 언어 섹션
+        Spacer(modifier = Modifier.height(20.dp))
         LanguageSection(
             currentLanguage = uiState.language,
             onLanguageChange = { language ->

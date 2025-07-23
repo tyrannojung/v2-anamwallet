@@ -95,7 +95,6 @@ class MainViewModel @Inject constructor(
         when (intent) {
             is MainContract.MainIntent.ClickBlockchainApp -> handleBlockchainClick(intent.miniApp)
             is MainContract.MainIntent.ClickRegularApp -> handleAppClick(intent.miniApp)
-            is MainContract.MainIntent.ClickAddMore -> handleAddMoreClick()
         }
     }
     
@@ -313,12 +312,6 @@ class MainViewModel @Inject constructor(
     private fun handleAppClick(miniApp: MiniApp) {
         viewModelScope.launch {
             _effect.emit(MainContract.MainEffect.LaunchWebAppActivity(miniApp.appId))
-        }
-    }
-
-    private fun handleAddMoreClick() {
-        viewModelScope.launch {
-            _effect.emit(MainContract.MainEffect.NavigateToHub)
         }
     }
 }

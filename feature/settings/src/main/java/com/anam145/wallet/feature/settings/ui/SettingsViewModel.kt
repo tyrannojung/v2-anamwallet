@@ -3,9 +3,6 @@ package com.anam145.wallet.feature.settings.ui
 import androidx.lifecycle.ViewModel
 import com.anam145.wallet.core.common.model.Language
 import androidx.lifecycle.viewModelScope
-import com.anam145.wallet.core.common.model.ThemeMode
-import com.anam145.wallet.feature.settings.domain.usecase.GetThemeModeUseCase
-import com.anam145.wallet.feature.settings.domain.usecase.SetThemeModeUseCase
 import com.anam145.wallet.feature.settings.domain.usecase.GetLanguageUseCase
 import com.anam145.wallet.feature.settings.domain.usecase.SetLanguageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,15 +17,11 @@ import javax.inject.Inject
  * MVI 패턴을 사용하여 설정 화면의 상태를 관리합니다.
  * 
  * UseCase 설명:
- * - GetThemeModeUseCase: 현재 설정된 테마 모드(라이트/다크/시스템)를 가져옴
- * - SetThemeModeUseCase: 테마 모드를 변경하고 저장
  * - GetLanguageUseCase: 현재 설정된 언어를 가져옴
  * - SetLanguageUseCase: 언어를 변경하고 저장
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val getThemeModeUseCase: GetThemeModeUseCase,
-    private val setThemeModeUseCase: SetThemeModeUseCase,
     private val getLanguageUseCase: GetLanguageUseCase,
     private val setLanguageUseCase: SetLanguageUseCase
 ) : ViewModel() {
@@ -78,10 +71,6 @@ class SettingsViewModel @Inject constructor(
              * data object = 단 하나의 싱글톤
              * 즉 여러 개의 인스턴스가 가능하기 때문에 타입 체크가 필요함
              * */
-            // "이게 ChangeTheme 타입인가?"
-            is SettingsContract.SettingsIntent.ChangeTheme ->
-                // 맞다! 그럼 themeMode에 접근 가능
-                changeTheme(intent.themeMode)
             is SettingsContract.SettingsIntent.ChangeLanguage -> changeLanguage(intent.language)
             SettingsContract.SettingsIntent.ClickHelp -> navigateToHelp()
             SettingsContract.SettingsIntent.ClickFAQ -> navigateToFAQ()
@@ -108,28 +97,13 @@ class SettingsViewModel @Inject constructor(
     private fun loadSettings() {
         // 1. 코루틴 스코프
         viewModelScope.launch {
-            // 2. 두 개의 Flow 합치기
-            combine(
-                getThemeModeUseCase(), // Flow<ThemeMode>
-                getLanguageUseCase()   // Flow<Language>
-            ) { theme, language ->
-                // 3. 두 값이 모두 도착하면 실행
+            getLanguageUseCase().collect { language ->
                 _uiState.update { currentState ->
                     currentState.copy(
-                        themeMode = theme,
                         language = language
                     )
                 }
-            }.collect() // 4. Flow 구독 시작 , collect는 suspend 함수 코루틴 필요.
-        }
-    }
-    
-    /**
-     * 테마 변경
-     */
-    private fun changeTheme(themeMode: ThemeMode) {
-        viewModelScope.launch {
-            setThemeModeUseCase(themeMode)
+            }
         }
     }
     
