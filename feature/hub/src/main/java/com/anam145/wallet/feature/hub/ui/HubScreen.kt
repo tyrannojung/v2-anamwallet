@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,6 +38,23 @@ fun HubScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
     Scaffold(
+        floatingActionButton = {
+            // 로딩 중이 아닐 때만 FAB 표시
+            if (!uiState.isLoading) {
+                FloatingActionButton(
+                    onClick = {
+                        viewModel.handleIntent(HubContract.HubIntent.RefreshMiniApps)
+                    },
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Refresh"
+                    )
+                }
+            }
+        }
     ) { paddingValues ->
         Box(
             modifier = modifier
@@ -53,10 +71,8 @@ fun HubScreen(
                         onRetry = { viewModel.handleIntent(HubContract.HubIntent.RefreshMiniApps) }
                     )
                 }
-                uiState.hubApps.isEmpty() -> {
-                    EmptyContent()
-                }
                 else -> {
+                    // 항상 HubAppsList를 표시 (비어있어도 탭은 보이도록)
                     HubAppsList(
                         apps = uiState.hubApps,
                         loadingAppIds = uiState.loadingAppIds,
@@ -65,9 +81,6 @@ fun HubScreen(
                         },
                         onUninstallClick = { appId ->
                             viewModel.handleIntent(HubContract.HubIntent.UninstallMiniApp(appId))
-                        },
-                        onRefresh = {
-                            viewModel.handleIntent(HubContract.HubIntent.RefreshMiniApps)
                         }
                     )
                 }
@@ -81,76 +94,110 @@ private fun HubAppsList(
     apps: List<HubMiniApp>,
     loadingAppIds: Set<String>,
     onInstallClick: (String) -> Unit,
-    onUninstallClick: (String) -> Unit,
-    onRefresh: () -> Unit
+    onUninstallClick: (String) -> Unit
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    var selectedTab by remember { mutableStateOf(0) }
+    val blockchainApps = apps.filter { it.type == "BLOCKCHAIN" }
+    val regularApps = apps.filter { it.type == "APP" }
+    
+    Column(
+        modifier = Modifier.fillMaxSize()
     ) {
-        // Blockchain 섹션
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Blockchain Modules",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-                IconButton(
-                    onClick = { onRefresh() }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "Refresh",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+        // Tab Row
+        TabRow(
+            selectedTabIndex = selectedTab,
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            Tab(
+                selected = selectedTab == 0,
+                onClick = { selectedTab = 0 },
+                text = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccountBalanceWallet,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "Blockchain",
+                            fontWeight = if (selectedTab == 0) FontWeight.SemiBold else FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
-            }
-        }
-        
-        items(
-            items = apps.filter { it.type == "BLOCKCHAIN" },
-            key = { it.appId }
-        ) { app ->
-            HubAppCard(
-                app = app,
-                isLoading = app.appId in loadingAppIds,
-                onInstallClick = { onInstallClick(app.appId) },
-                onUninstallClick = { onUninstallClick(app.appId) }
+            )
+            Tab(
+                selected = selectedTab == 1,
+                onClick = { selectedTab = 1 },
+                text = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Apps,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "Apps",
+                            fontWeight = if (selectedTab == 1) FontWeight.SemiBold else FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
             )
         }
         
-        // Apps 섹션 (있을 경우)
-        val regularApps = apps.filter { it.type == "APP" }
-        if (regularApps.isNotEmpty()) {
-            item {
-                Text(
-                    text = "Apps",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-                )
+        // Content
+        val currentApps = if (selectedTab == 0) blockchainApps else regularApps
+        
+        if (currentApps.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = if (selectedTab == 0) Icons.Default.AccountBalanceWallet else Icons.Default.Apps,
+                        contentDescription = null,
+                        modifier = Modifier.size(64.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = if (selectedTab == 0) "No blockchain modules available" else "No apps available",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    )
+                }
             }
-            
-            items(
-                items = regularApps,
-                key = { it.appId }
-            ) { app ->
-                HubAppCard(
-                    app = app,
-                    isLoading = app.appId in loadingAppIds,
-                    onInstallClick = { onInstallClick(app.appId) },
-                    onUninstallClick = { onUninstallClick(app.appId) }
-                )
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(
+                    items = currentApps,
+                    key = { it.appId }
+                ) { app ->
+                    HubAppCard(
+                        app = app,
+                        isLoading = app.appId in loadingAppIds,
+                        onInstallClick = { onInstallClick(app.appId) },
+                        onUninstallClick = { onUninstallClick(app.appId) }
+                    )
+                }
             }
         }
     }
@@ -197,7 +244,7 @@ private fun HubAppCard(
             ) {
                 if (app.icon.isNotEmpty()) {
                     val fullIconUrl = if (app.icon.startsWith("/")) {
-                        "https://anamhub.xyz${app.icon}"
+                        "http://10.0.2.2:9090${app.icon}"
                     } else {
                         app.icon
                     }

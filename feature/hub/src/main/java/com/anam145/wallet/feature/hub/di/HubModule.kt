@@ -13,7 +13,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object HubModule {
 
-    private const val HUB_BASE_URL = "https://anamhub.xyz/"
+    private const val HUB_BASE_URL = "http://10.0.2.2:9090/"
 
     @Provides
     @Singleton
