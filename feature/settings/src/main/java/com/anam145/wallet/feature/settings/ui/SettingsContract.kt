@@ -1,6 +1,7 @@
 package com.anam145.wallet.feature.settings.ui
 
 import com.anam145.wallet.core.common.model.Language
+import com.anam145.wallet.feature.settings.ui.components.Skin
 
 /**
  * Settings 화면의 MVI Contract
@@ -32,9 +33,11 @@ interface SettingsContract {
      * - 사용자가 현재 보고 있는 설정값들
      * 
      * @property language 현재 선택된 언어 설정
+     * @property skin 현재 선택된 스킨 테마
      */
     data class SettingsState(
-        val language: Language = Language.KOREAN
+        val language: Language = Language.KOREAN,
+        val skin: Skin = Skin.ANAM
     )
     
     /**
@@ -51,6 +54,7 @@ interface SettingsContract {
      */
     sealed interface SettingsIntent {
         data class ChangeLanguage(val language: Language) : SettingsIntent
+        data class ChangeSkin(val skin: Skin) : SettingsIntent
         data object ClickHelp : SettingsIntent
         data object ClickFAQ : SettingsIntent
         data object ClickAppInfo : SettingsIntent

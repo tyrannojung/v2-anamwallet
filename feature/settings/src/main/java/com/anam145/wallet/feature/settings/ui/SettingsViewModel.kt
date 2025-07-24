@@ -5,6 +5,7 @@ import com.anam145.wallet.core.common.model.Language
 import androidx.lifecycle.viewModelScope
 import com.anam145.wallet.feature.settings.domain.usecase.GetLanguageUseCase
 import com.anam145.wallet.feature.settings.domain.usecase.SetLanguageUseCase
+import com.anam145.wallet.feature.settings.ui.components.Skin
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -72,6 +73,7 @@ class SettingsViewModel @Inject constructor(
              * 즉 여러 개의 인스턴스가 가능하기 때문에 타입 체크가 필요함
              * */
             is SettingsContract.SettingsIntent.ChangeLanguage -> changeLanguage(intent.language)
+            is SettingsContract.SettingsIntent.ChangeSkin -> changeSkin(intent.skin)
             SettingsContract.SettingsIntent.ClickHelp -> navigateToHelp()
             SettingsContract.SettingsIntent.ClickFAQ -> navigateToFAQ()
             SettingsContract.SettingsIntent.ClickAppInfo -> navigateToAppInfo()
@@ -113,6 +115,18 @@ class SettingsViewModel @Inject constructor(
     private fun changeLanguage(language: Language) {
         viewModelScope.launch {
             setLanguageUseCase(language)
+        }
+    }
+    
+    /**
+     * 스킨 변경
+     * TODO: 실제 스킨 저장 UseCase 구현 필요
+     */
+    private fun changeSkin(skin: Skin) {
+        viewModelScope.launch {
+            // 일단 UI 상태만 업데이트
+            _uiState.update { it.copy(skin = skin) }
+            // TODO: setSkinUseCase(skin) 구현 필요
         }
     }
     

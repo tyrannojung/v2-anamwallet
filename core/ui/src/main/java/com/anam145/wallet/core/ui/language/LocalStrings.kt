@@ -97,7 +97,14 @@ data class Strings(
     val authErrorPasswordTooShort: String = "비밀번호는 최소 8자 이상이어야 합니다",
     val authErrorPasswordMismatch: String = "비밀번호가 일치하지 않습니다",
     val authErrorLoginFailed: String = "로그인 중 오류가 발생했습니다",
-    val authErrorPasswordSetupFailed: String = "비밀번호 설정 중 오류가 발생했습니다"
+    val authErrorPasswordSetupFailed: String = "비밀번호 설정 중 오류가 발생했습니다",
+    
+    // Skin
+    val settingsSkinSection: String = "스킨",
+    val skinAnam: String = "ANAM",
+    val skinSeoul: String = "서울",
+    val skinBusan: String = "부산",
+    val skinLA: String = "LA"
 )
 
 /**
@@ -185,7 +192,14 @@ val EnglishStrings = Strings(
     authErrorPasswordTooShort = "Password must be at least 8 characters",
     authErrorPasswordMismatch = "Passwords do not match",
     authErrorLoginFailed = "An error occurred during login",
-    authErrorPasswordSetupFailed = "An error occurred while setting password"
+    authErrorPasswordSetupFailed = "An error occurred while setting password",
+    
+    // Skin
+    settingsSkinSection = "Skin",
+    skinAnam = "ANAM",
+    skinSeoul = "Seoul",
+    skinBusan = "Busan",
+    skinLA = "LA"
 )
 
 /**

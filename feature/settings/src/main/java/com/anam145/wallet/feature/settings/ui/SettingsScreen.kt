@@ -66,6 +66,16 @@ fun SettingsScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
         
+        // 스킨 섹션
+        SkinSection(
+            currentSkin = uiState.skin, // TODO: uiState에 skin 추가 필요
+            onSkinChange = { skin ->
+                viewModel.handleIntent(SettingsContract.SettingsIntent.ChangeSkin(skin))
+            }
+        )
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
         // 지원 섹션
         SettingsSection(title = strings.settingsSupportSection) {
             SettingsListItem(
