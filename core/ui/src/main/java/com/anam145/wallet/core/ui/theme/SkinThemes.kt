@@ -35,65 +35,65 @@ private val AnamColorScheme = lightColorScheme(
 // ========== BUSAN (해양 도시) ==========
 // 바다와 하늘을 연상시키는 블루 계열
 private val BusanColorScheme = lightColorScheme(
-    primary = Color(0xFF00A6FB),           // 바다 블루
-    secondary = Color(0xFFB4E4FF),         // 연한 바다색
-    tertiary = Color(0xFF0077CC),          // 진한 바다색
-    background = Color(0xFFF0F9FF),        // 밝은 하늘색
-    surface = Color(0xFFFFFFFF),           // 깨끗한 흰색
-    surfaceVariant = Color(0xFFE6F4FF),    // 매우 연한 하늘색
-    primaryContainer = Color(0xFFCCE9FF),   // 연한 Primary
-    onPrimaryContainer = Color(0xFF001A33), // 진한 파랑 텍스트
-    onPrimary = Color(0xFFFFFFFF),         // 흰색 텍스트
-    onSecondary = Color(0xFF003D66),       // 진한 파란 텍스트
-    onTertiary = Color(0xFFFFFFFF),        // 흰색 텍스트
-    onBackground = Color(0xFF001A33),      // 거의 검은 파랑
-    onSurface = Color(0xFF001A33),         // 거의 검은 파랑
-    onSurfaceVariant = Color(0xFF4D6B80),  // 중간 톤 파랑
-    outline = Color(0xFFB3D9FF),           // 연한 파란 테두리
-    error = Color(0xFFEF4444),             // 공통 에러 색상
-    onError = Color(0xFFFFFFFF)            // 흰색 텍스트
+    primary = Color(0xFF1565C0),           // 부산 오리지널 블루 (깊은 바다)
+    secondary = Color(0xFF4FC3F7),         // 부산 글로벌 라이트 블루 (얕은 바다)
+    tertiary = Color(0xFF00ACC1),          // 청록색 (항구의 물빛)
+    background = Color(0xFFF5FAFE),        // 매우 연한 하늘색
+    surface = Color(0xFFFFFFFF),           
+    surfaceVariant = Color(0xFFE3F2FD),    // 연한 푸른 회색
+    primaryContainer = Color(0xFFBBDEFB),   // 밝은 하늘색
+    onPrimaryContainer = Color(0xFF0D47A1), // 진한 남색
+    onPrimary = Color(0xFFFFFFFF),         
+    onSecondary = Color(0xFF01579B),       // 진한 청색
+    onTertiary = Color(0xFFFFFFFF),        
+    onBackground = Color(0xFF0D47A1),      
+    onSurface = Color(0xFF0D47A1),         
+    onSurfaceVariant = Color(0xFF546E7A),  // 청회색
+    outline = Color(0xFF90CAF9),           // 연한 청색 테두리
+    error = Color(0xFFEF4444),             
+    onError = Color(0xFFFFFFFF)            
 )
 
 // ========== SEOUL (수도) ==========
-// 경복궁 단청의 전통색을 현대적으로 재해석
+// 서울의 현대적이고 역동적인 이미지를 표현
 private val SeoulColorScheme = lightColorScheme(
-    primary = Color(0xFFE84545),           // 경복궁 단청 빨강
-    secondary = Color(0xFFFFB84D),         // 전통 노랑
-    tertiary = Color(0xFF2E7D32),          // 전통 녹색
-    background = Color(0xFFFFF8F0),        // 따뜻한 배경
-    surface = Color(0xFFFFFFFF),           // 깨끗한 흰색
-    surfaceVariant = Color(0xFFFFF0E6),    // 매우 연한 주황
-    primaryContainer = Color(0xFFFFCCCC),   // 연한 빨강
-    onPrimaryContainer = Color(0xFF330000), // 진한 빨강 텍스트
-    onPrimary = Color(0xFFFFFFFF),         // 흰색 텍스트
-    onSecondary = Color(0xFF663300),       // 진한 갈색 텍스트
-    onTertiary = Color(0xFFFFFFFF),        // 흰색 텍스트
-    onBackground = Color(0xFF330000),      // 거의 검은 빨강
-    onSurface = Color(0xFF330000),         // 거의 검은 빨강
-    onSurfaceVariant = Color(0xFF804040),  // 중간 톤 빨강
-    outline = Color(0xFFFFD4A3),           // 연한 주황 테두리
-    error = Color(0xFFEF4444),             // 공통 에러 색상
-    onError = Color(0xFFFFFFFF)            // 흰색 텍스트
+    primary = Color(0xFF00A968),           // 서울 그린 (자연/남산)
+    secondary = Color(0xFFE60012),         // 서울 레드 (열정)
+    tertiary = Color(0xFF0066CC),          // 서울 블루 (한강)
+    background = Color(0xFFFAFAFA),        // 밝고 깨끗한 배경
+    surface = Color(0xFFFFFFFF),           
+    surfaceVariant = Color(0xFFF5F5F5),    // 모던한 회색조
+    primaryContainer = Color(0xFFE8DCC6),   // 웜 베이지
+    onPrimaryContainer = Color(0xFF410002), // 진한 레드
+    onPrimary = Color(0xFFFFFFFF),         
+    onSecondary = Color(0xFFFFFFFF),       
+    onTertiary = Color(0xFFFFFFFF),        
+    onBackground = Color(0xFF1C1B1F),      // 모던한 다크 그레이
+    onSurface = Color(0xFF1C1B1F),         
+    onSurfaceVariant = Color(0xFF605D62),  // 중간 그레이
+    outline = Color(0xFFE0E0E0),           // 깔끔한 회색 테두리
+    error = Color(0xFFBA1A1A),             
+    onError = Color(0xFFFFFFFF)            
 )
 
-// ========== LA (할리우드/서부) ==========
-// 할리우드의 화려함과 캘리포니아 선셋을 연상시키는 퍼플/오렌지 계열
+// ========== LA (할리우드) ==========
+// 할리우드와 캘리포니아의 따뜻한 햇살을 표현
 private val LAColorScheme = lightColorScheme(
-    primary = Color(0xFF9C27B0),           // 할리우드 퍼플
-    secondary = Color(0xFFFF6D00),         // 캘리포니아 선셋 오렌지
-    tertiary = Color(0xFFFFD600),          // 골든 아워 옐로우
-    background = Color(0xFFFFF8F5),        // 따뜻한 크림색 배경
-    surface = Color(0xFFFFFFFF),           // 깨끗한 흰색
-    surfaceVariant = Color(0xFFF8E6FF),    // 매우 연한 라벤더
-    primaryContainer = Color(0xFFE8C4F0),   // 연한 퍼플
-    onPrimaryContainer = Color(0xFF2E0A3C), // 진한 퍼플 텍스트
-    onPrimary = Color(0xFFFFFFFF),         // 흰색 텍스트
-    onSecondary = Color(0xFFFFFFFF),       // 흰색 텍스트
-    onTertiary = Color(0xFF3E2E00),        // 진한 갈색 텍스트
-    onBackground = Color(0xFF2E0A3C),      // 진한 퍼플
-    onSurface = Color(0xFF2E0A3C),         // 진한 퍼플
-    onSurfaceVariant = Color(0xFF664270),  // 중간 톤 퍼플
-    outline = Color(0xFFDCB8E5),           // 연한 퍼플 테두리
+    primary = Color(0xFFD4A574),           // 부드러운 탠 (California Tan)
+    secondary = Color(0xFFF4A460),         // 샌디 브라운 (캘리포니아 모래)
+    tertiary = Color(0xFF87CEEB),          // 스카이 블루 (LA의 맑은 하늘)
+    background = Color(0xFFFFFAF0),        // 플로럴 화이트
+    surface = Color(0xFFFFFFFF),
+    surfaceVariant = Color(0xFFFFF8DC),    // 콘실크 (따뜻한 크림색)
+    primaryContainer = Color(0xFFFFE4B5),   // 모카신
+    onPrimaryContainer = Color(0xFF5C4033), // 다크 브라운
+    onPrimary = Color(0xFF5C4033),         // 다크 브라운
+    onSecondary = Color(0xFF5C4033),       // 다크 브라운
+    onTertiary = Color(0xFFFFFFFF),        // 흰색
+    onBackground = Color(0xFF3E2723),      // 진한 브라운
+    onSurface = Color(0xFF3E2723),         // 진한 브라운
+    onSurfaceVariant = Color(0xFF795548),  // 중간 브라운
+    outline = Color(0xFFDEB887),           // 버리우드 (연한 브라운)
     error = Color(0xFFEF4444),             // 공통 에러 색상
     onError = Color(0xFFFFFFFF)            // 흰색 텍스트
 )

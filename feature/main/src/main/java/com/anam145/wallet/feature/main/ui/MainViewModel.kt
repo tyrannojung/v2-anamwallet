@@ -96,8 +96,9 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             skinDataStore.selectedSkin
                 .distinctUntilChanged()
-                .collect {
-                    // 스킨이 변경되면 앱 목록 다시 로드
+                .collect { skin ->
+                    // 스킨이 변경되면 UI 상태 업데이트 및 앱 목록 다시 로드
+                    _uiState.update { it.copy(currentSkin = skin) }
                     loadMiniApps()
                 }
         }
@@ -177,7 +178,8 @@ class MainViewModel @Inject constructor(
                             blockchainApps = blockchainApps,
                             regularApps = regularApps,
                             activeBlockchainId = activeId,
-                            error = null
+                            error = null,
+                            currentSkin = currentSkin
                         )
                     }
                     

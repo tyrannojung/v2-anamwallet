@@ -38,7 +38,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.core.common.model.MiniAppType
+import com.anam145.wallet.core.common.model.Skin
 import com.anam145.wallet.core.ui.language.LocalStrings
+import com.anam145.wallet.feature.main.ui.components.ThemeIllustration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
@@ -107,13 +109,21 @@ fun MainScreen(
                 )
             }
             else -> {
-                MiniAppList(
-                    blockchainApps = uiState.blockchainApps,
-                    regularApps = uiState.regularApps,
-                    activeBlockchainId = uiState.activeBlockchainId,
-                    onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
-                    onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) }
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    MiniAppList(
+                        blockchainApps = uiState.blockchainApps,
+                        regularApps = uiState.regularApps,
+                        activeBlockchainId = uiState.activeBlockchainId,
+                        onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
+                        onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) }
+                    )
+                    
+                    // 테마별 일러스트레이션 표시
+                    ThemeIllustration(
+                        skin = uiState.currentSkin,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     }

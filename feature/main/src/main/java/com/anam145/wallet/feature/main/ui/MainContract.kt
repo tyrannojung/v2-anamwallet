@@ -1,6 +1,7 @@
 package com.anam145.wallet.feature.main.ui
 
 import com.anam145.wallet.core.common.model.MiniApp
+import com.anam145.wallet.core.common.model.Skin
 
 /**
  * Main 화면의 Contract 정의
@@ -18,7 +19,8 @@ interface MainContract {
         val blockchainApps: List<MiniApp> = emptyList(),     // 블록체인 타입 앱 목록
         val regularApps: List<MiniApp> = emptyList(),        // 일반 앱 목록
         val activeBlockchainId: String? = null,              // 현재 활성화된 블록체인 앱 ID
-        val error: String? = null                            // 에러 메시지 (null이면 에러 없음)
+        val error: String? = null,                           // 에러 메시지 (null이면 에러 없음)
+        val currentSkin: Skin = Skin.ANAM                    // 현재 선택된 스킨 (테마)
     )
     
     /**
