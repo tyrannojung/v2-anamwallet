@@ -17,6 +17,11 @@ import com.anam145.wallet.feature.miniapp.webapp.WebAppActivity
 import com.anam145.wallet.feature.miniapp.blockchain.BlockchainActivity
 import com.anam145.wallet.feature.auth.ui.login.LoginScreen
 import com.anam145.wallet.feature.auth.ui.setup.SetupPasswordScreen
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.anam145.wallet.ui.language.LanguageViewModel
 
 /**
  * ANAM Wallet의 메인 Navigation Host
@@ -45,17 +50,23 @@ fun AnamNavHost(
         // 메인 화면
         composable(route = AnamNavRoute.Main.route) {
             val context = LocalContext.current
+            val uiState by mainViewModel.uiState.collectAsState()
+            val currentSkin = uiState.currentSkin
+            
+            // 언어 정보도 함께 가져오기
+            val languageViewModel: LanguageViewModel = hiltViewModel()
+            val currentLanguage by languageViewModel.language.collectAsStateWithLifecycle()
             
             MainScreen(
                 viewModel = mainViewModel,  // 공유 ViewModel 전달
                 onNavigateToMiniApp = { appId ->
                     // MiniApp Activity 실행 (메인 프로세스)
-                    val intent = WebAppActivity.createIntent(context, appId)
+                    val intent = WebAppActivity.createIntent(context, appId, currentSkin, currentLanguage)
                     context.startActivity(intent)
                 },
                 onLaunchBlockchain = { blockchainId ->
                     // 블록체인 Activity 실행 (블록체인 프로세스)
-                    val intent = BlockchainActivity.createIntent(context, blockchainId)
+                    val intent = BlockchainActivity.createIntent(context, blockchainId, currentSkin, currentLanguage)
                     context.startActivity(intent)
                 }
             )

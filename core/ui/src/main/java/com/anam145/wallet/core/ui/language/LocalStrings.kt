@@ -2,6 +2,7 @@ package com.anam145.wallet.core.ui.language
 
 import androidx.compose.runtime.compositionLocalOf
 import com.anam145.wallet.core.common.model.Language
+import com.anam145.wallet.core.common.model.Skin
 
 /**
  * 언어에 따른 문자열 리소스를 제공하는 Provider
@@ -17,8 +18,8 @@ val LocalStrings = compositionLocalOf { Strings() }
  */
 data class Strings(
     // Header
-    val headerTitle: String = "AnamWallet",
-    val headerTitleMain: String = "AnamWallet",
+    val headerTitle: String = "Anam Wallet",
+    val headerTitleMain: String = "Anam Wallet",
     val headerTitleHub: String = "허브",
     val headerTitleBrowser: String = "웹뷰",
     val headerTitleIdentity: String = "디지털 신분증",
@@ -42,7 +43,7 @@ data class Strings(
     val settingsFaqDescription: String = "FAQ 확인하기",
     
     val settingsAppInfo: String = "앱 소개",
-    val settingsAppInfoDescription: String = "AnamWallet에 대해 알아보기",
+    val settingsAppInfoDescription: String = "Anam Wallet에 대해 알아보기",
     val settingsLicense: String = "라이선스",
     val settingsLicenseDescription: String = "오픈소스 라이선스 정보",
     
@@ -112,8 +113,8 @@ data class Strings(
  */
 val EnglishStrings = Strings(
     // Header
-    headerTitle = "AnamWallet",
-    headerTitleMain = "AnamWallet",
+    headerTitle = "Anam Wallet",
+    headerTitleMain = "Anam Wallet",
     headerTitleHub = "Hub",
     headerTitleBrowser = "WebView",
     headerTitleIdentity = "Digital ID",
@@ -137,7 +138,7 @@ val EnglishStrings = Strings(
     settingsFaqDescription = "Check frequently asked questions",
     
     settingsAppInfo = "App Info",
-    settingsAppInfoDescription = "Learn about AnamWallet",
+    settingsAppInfoDescription = "Learn about Anam Wallet",
     settingsLicense = "License",
     settingsLicenseDescription = "Open source license information",
     
@@ -209,5 +210,81 @@ fun getStringsForLanguage(language: Language): Strings {
     return when (language) {
         Language.KOREAN -> Strings()
         Language.ENGLISH -> EnglishStrings
+    }
+}
+
+/**
+ * 스킨과 언어에 따른 Strings 객체 반환
+ */
+fun getStringsForSkinAndLanguage(skin: Skin, language: Language): Strings {
+    return when (language) {
+        Language.KOREAN -> getKoreanStringsForSkin(skin)
+        Language.ENGLISH -> getEnglishStringsForSkin(skin)
+    }
+}
+
+/**
+ * 스킨별 한국어 문자열
+ */
+private fun getKoreanStringsForSkin(skin: Skin): Strings {
+    val baseStrings = Strings()
+    return when (skin) {
+        Skin.ANAM -> baseStrings.copy(
+            headerTitle = "Anam Wallet",
+            headerTitleMain = "Anam Wallet",
+            settingsAppInfoDescription = "Anam Wallet에 대해 알아보기",
+            loginTitle = "비밀번호를 입력하여 Anam Wallet에 접근하세요"
+        )
+        Skin.BUSAN -> baseStrings.copy(
+            headerTitle = "Busan Wallet",
+            headerTitleMain = "Busan Wallet",
+            settingsAppInfoDescription = "Busan Wallet에 대해 알아보기",
+            loginTitle = "비밀번호를 입력하여 Busan Wallet에 접근하세요"
+        )
+        Skin.SEOUL -> baseStrings.copy(
+            headerTitle = "Seoul Wallet",
+            headerTitleMain = "Seoul Wallet",
+            settingsAppInfoDescription = "Seoul Wallet에 대해 알아보기",
+            loginTitle = "비밀번호를 입력하여 Seoul Wallet에 접근하세요"
+        )
+        Skin.LA -> baseStrings.copy(
+            headerTitle = "LA Wallet",
+            headerTitleMain = "LA Wallet",
+            settingsAppInfoDescription = "LA Wallet에 대해 알아보기",
+            loginTitle = "비밀번호를 입력하여 LA Wallet에 접근하세요"
+        )
+    }
+}
+
+/**
+ * 스킨별 영어 문자열
+ */
+private fun getEnglishStringsForSkin(skin: Skin): Strings {
+    val baseStrings = EnglishStrings
+    return when (skin) {
+        Skin.ANAM -> baseStrings.copy(
+            headerTitle = "Anam Wallet",
+            headerTitleMain = "Anam Wallet",
+            settingsAppInfoDescription = "Learn about Anam Wallet",
+            loginTitle = "Enter password to access your Anam Wallet"
+        )
+        Skin.BUSAN -> baseStrings.copy(
+            headerTitle = "Busan Wallet",
+            headerTitleMain = "Busan Wallet",
+            settingsAppInfoDescription = "Learn about Busan Wallet",
+            loginTitle = "Enter password to access your Busan Wallet"
+        )
+        Skin.SEOUL -> baseStrings.copy(
+            headerTitle = "Seoul Wallet",
+            headerTitleMain = "Seoul Wallet",
+            settingsAppInfoDescription = "Learn about Seoul Wallet",
+            loginTitle = "Enter password to access your Seoul Wallet"
+        )
+        Skin.LA -> baseStrings.copy(
+            headerTitle = "LA Wallet",
+            headerTitleMain = "LA Wallet",
+            settingsAppInfoDescription = "Learn about LA Wallet",
+            loginTitle = "Enter password to access your LA Wallet"
+        )
     }
 }

@@ -24,7 +24,7 @@ import com.anam145.wallet.navigation.AnamNavHost
 import com.anam145.wallet.navigation.AnamNavRoute
 import com.anam145.wallet.ui.language.LanguageViewModel
 import com.anam145.wallet.core.ui.language.LocalStrings
-import com.anam145.wallet.core.ui.language.getStringsForLanguage
+import com.anam145.wallet.core.ui.language.getStringsForSkinAndLanguage
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.anam145.wallet.feature.main.ui.MainViewModel
@@ -153,7 +153,7 @@ fun AnamWalletApp(
     // 언어 ViewModel
     val languageViewModel: LanguageViewModel = hiltViewModel()
     val language by languageViewModel.language.collectAsStateWithLifecycle()
-    val strings = getStringsForLanguage(language)
+    val strings = getStringsForSkinAndLanguage(skin, language)
 
     /**
      * CompositionLocal로 언어와 문자열 제공

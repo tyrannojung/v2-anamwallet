@@ -117,7 +117,7 @@ private fun LoginContent(
             
             // 타이틀
             Text(
-                text = "ANAM Wallet",
+                text = strings.headerTitleMain,
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )
