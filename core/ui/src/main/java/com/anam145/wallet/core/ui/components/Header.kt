@@ -73,7 +73,7 @@ fun Header(
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "뒤로가기"
+                            contentDescription = "Back"
                         )
                     }
                 }
@@ -145,9 +145,8 @@ private fun BlockchainStatusChip(
                 .padding(horizontal = 12.dp),
             contentAlignment = Alignment.Center
         ) {
-            val strings = LocalStrings.current
             Text(
-                text = "🔗 $blockchainName ${strings.activated}",
+                text = "🔗 $blockchainName Activated",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )

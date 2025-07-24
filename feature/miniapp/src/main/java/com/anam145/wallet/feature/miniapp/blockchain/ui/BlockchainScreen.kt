@@ -45,7 +45,7 @@ fun BlockchainScreen(
                 },
                 showBlockchainStatus = uiState.isActivated,
                 activeBlockchainName = if (uiState.isActivated) {
-                    uiState.manifest?.name ?: "활성화됨"
+                    uiState.manifest?.name ?: "Activated"
                 } else null
             )
         }
