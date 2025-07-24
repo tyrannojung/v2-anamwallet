@@ -19,7 +19,7 @@ object SkinConstants {
         Skin.ANAM to listOf(
             "com.anam.bitcoin",
             "com.anam.ethereum",
-            "kr.go.government24",
+            "com.anam.government24",
         ),
         Skin.BUSAN to listOf(
             "com.anam.bitcoin",
@@ -30,7 +30,11 @@ object SkinConstants {
         ),
         Skin.SEOUL to listOf(
             "com.anam.ethereum",
-            "kr.go.government24"
+            "com.seoul.bike",
+            "com.seoul.culture",
+            "com.seoul.news",
+            "com.seoul.sto",
+            "com.seoul.visitseoul"
         ),
         Skin.LA to listOf(
             "com.anam.bitcoin",
