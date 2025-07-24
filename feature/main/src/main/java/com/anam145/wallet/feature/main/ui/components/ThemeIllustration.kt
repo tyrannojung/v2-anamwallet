@@ -41,7 +41,7 @@ fun ThemeIllustration(
                         .fillMaxWidth(0.5f)
                         .aspectRatio(1f)
                         .padding(16.dp)
-                        .alpha(0.7f),
+                        .alpha(0.3f),
                     contentScale = ContentScale.Fit
                 )
             }
@@ -58,7 +58,7 @@ fun ThemeIllustration(
                         .fillMaxWidth(0.5f)
                         .aspectRatio(1f)
                         .padding(16.dp)
-                        .alpha(0.7f),
+                        .alpha(0.3f),
                     contentScale = ContentScale.Fit
                 )
             }
@@ -75,7 +75,7 @@ fun ThemeIllustration(
                         .fillMaxWidth(0.5f)
                         .aspectRatio(1f)
                         .padding(16.dp)
-                        .alpha(0.7f),
+                        .alpha(0.3f),
                     contentScale = ContentScale.Fit
                 )
             }

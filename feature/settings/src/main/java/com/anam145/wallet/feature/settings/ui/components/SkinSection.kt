@@ -3,12 +3,12 @@ package com.anam145.wallet.feature.settings.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.anam145.wallet.core.common.model.Skin
 import com.anam145.wallet.core.ui.language.LocalStrings
 import androidx.compose.ui.unit.dp
@@ -48,22 +48,13 @@ fun SkinSection(
         }
         
         // 칩 그룹
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Skin.entries.forEach { skin ->
-                    FilterChip(
+            Skin.entries.forEach { skin ->
+                FilterChip(
                         selected = currentSkin == skin,
                         onClick = { onSkinChange(skin) },
                         enabled = true,
@@ -77,37 +68,18 @@ fun SkinSection(
                                 }
                             )
                         },
-                        leadingIcon = if (currentSkin == skin) {
-                            {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(FilterChipDefaults.IconSize)
-                                )
-                            }
-                        } else null,
+                        leadingIcon = null,
                         shape = RoundedCornerShape(8.dp),
-                        border = FilterChipDefaults.filterChipBorder(
-                            enabled = true,
-                            selected = currentSkin == skin,
-                            borderColor = if (currentSkin == skin) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-                            },
-                            selectedBorderColor = MaterialTheme.colorScheme.primary,
-                            borderWidth = if (currentSkin == skin) 2.dp else 1.dp,
-                            selectedBorderWidth = 2.dp
-                        ),
+                        border = null,
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            labelColor = MaterialTheme.colorScheme.onSurface,
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = Color.White,  // 항상 흰색
                             disabledContainerColor = MaterialTheme.colorScheme.surface,
                             disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                         )
-                    )
-                }
+                )
             }
         }
     }

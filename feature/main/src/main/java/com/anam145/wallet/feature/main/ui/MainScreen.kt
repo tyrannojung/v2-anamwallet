@@ -11,6 +11,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -234,20 +235,35 @@ private fun BlockchainCard(
         targetValue = if (isPressed) 0.95f else 1f,
         animationSpec = spring()
     )
-    val borderColor by animateColorAsState(
-        targetValue = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-        animationSpec = tween(300)
-    )
+    
+    // 그라데이션 브러시 (대각선)
+    val gradientBrush = if (isActive) {
+        Brush.linearGradient(
+            colors = listOf(
+                MaterialTheme.colorScheme.primary,
+                MaterialTheme.colorScheme.secondary,
+                MaterialTheme.colorScheme.tertiary
+            ),
+            start = androidx.compose.ui.geometry.Offset(0f, 0f),
+            end = androidx.compose.ui.geometry.Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+        )
+    } else null
     
     Card(
         modifier = Modifier
             .width(160.dp)
             .height(140.dp)
             .scale(scale)
-            .border(
-                width = if (isActive) 2.dp else 0.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(20.dp)
+            .then(
+                if (isActive && gradientBrush != null) {
+                    Modifier.border(
+                        width = 2.dp,
+                        brush = gradientBrush,
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                } else {
+                    Modifier
+                }
             )
             .clickable(
                 interactionSource = interactionSource,
