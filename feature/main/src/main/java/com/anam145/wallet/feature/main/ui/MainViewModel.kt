@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.core.common.model.MiniAppType
 import com.anam145.wallet.core.common.result.MiniAppResult
+import com.anam145.wallet.core.data.datastore.SkinDataStore
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.GetInstalledMiniAppsUseCase
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.InitializeMiniAppsUseCase
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.CheckInitializationStateUseCase
@@ -53,7 +54,8 @@ class MainViewModel @Inject constructor(
     private val switchBlockchainUseCase: SwitchBlockchainUseCase,
     private val getActiveBlockchainUseCase: GetActiveBlockchainUseCase,
     private val setActiveBlockchainUseCase: SetActiveBlockchainUseCase,
-    private val observeAppChangesUseCase: ObserveAppChangesUseCase
+    private val observeAppChangesUseCase: ObserveAppChangesUseCase,
+    private val skinDataStore: SkinDataStore
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(MainContract.MainState())
@@ -89,6 +91,16 @@ class MainViewModel @Inject constructor(
         
         // 앱 변경 이벤트 구독 (설치/삭제 시 자동 새로고침)
         observeAppChanges()
+        
+        // 스킨 변경 감지하여 앱 목록 새로고침
+        viewModelScope.launch {
+            skinDataStore.selectedSkin
+                .distinctUntilChanged()
+                .collect {
+                    // 스킨이 변경되면 앱 목록 다시 로드
+                    loadMiniApps()
+                }
+        }
     }
 
     fun handleIntent(intent: MainContract.MainIntent) {
@@ -143,9 +155,31 @@ class MainViewModel @Inject constructor(
             when (val result = getInstalledMiniAppsUseCase()) {
                 is MiniAppResult.Success -> {
                     val miniAppsMap = result.data
-                    val miniAppsList = miniAppsMap.values.toList()
-                    val blockchainApps = miniAppsList.filter { it.type == MiniAppType.BLOCKCHAIN }
-                    val regularApps = miniAppsList.filter { it.type == MiniAppType.APP }
+                    Log.d("MainViewModel", "loadMiniApps - Total installed apps: ${miniAppsMap.size}")
+                    Log.d("MainViewModel", "loadMiniApps - Installed app IDs: ${miniAppsMap.keys}")
+                    
+                    // 현재 스킨에 따라 앱 필터링
+                    val currentSkin = skinDataStore.selectedSkin.first()
+                    Log.d("MainViewModel", "loadMiniApps - Current skin: $currentSkin")
+                    
+                    val allowedAppIds = skinDataStore.getAppsForSkin(currentSkin)
+                    Log.d("MainViewModel", "loadMiniApps - Allowed app IDs for $currentSkin: $allowedAppIds")
+                    
+                    // 스킨별로 허용된 앱만 필터링
+                    val filteredApps = miniAppsMap.values.filter { app ->
+                        val isAllowed = allowedAppIds.contains(app.appId)
+                        Log.d("MainViewModel", "loadMiniApps - App ${app.appId} allowed in $currentSkin: $isAllowed")
+                        isAllowed
+                    }
+                    
+                    Log.d("MainViewModel", "loadMiniApps - Filtered apps count: ${filteredApps.size}")
+                    Log.d("MainViewModel", "loadMiniApps - Filtered app IDs: ${filteredApps.map { it.appId }}")
+                    
+                    val blockchainApps = filteredApps.filter { it.type == MiniAppType.BLOCKCHAIN }
+                    val regularApps = filteredApps.filter { it.type == MiniAppType.APP }
+                    
+                    Log.d("MainViewModel", "loadMiniApps - Blockchain apps: ${blockchainApps.map { it.appId }}")
+                    Log.d("MainViewModel", "loadMiniApps - Regular apps: ${regularApps.map { it.appId }}")
                     
                     // 저장된 활성 블록체인 ID 복원 또는 첫 번째 블록체인 선택
                     // 이 시점에서는 UI 상태만 설정하고, 실제 블록체인 활성화는

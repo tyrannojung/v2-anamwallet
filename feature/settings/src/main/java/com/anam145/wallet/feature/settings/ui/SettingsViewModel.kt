@@ -2,10 +2,11 @@ package com.anam145.wallet.feature.settings.ui
 
 import androidx.lifecycle.ViewModel
 import com.anam145.wallet.core.common.model.Language
+import com.anam145.wallet.core.common.model.Skin
 import androidx.lifecycle.viewModelScope
+import com.anam145.wallet.core.data.datastore.SkinDataStore
 import com.anam145.wallet.feature.settings.domain.usecase.GetLanguageUseCase
 import com.anam145.wallet.feature.settings.domain.usecase.SetLanguageUseCase
-import com.anam145.wallet.feature.settings.ui.components.Skin
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -24,7 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val getLanguageUseCase: GetLanguageUseCase,
-    private val setLanguageUseCase: SetLanguageUseCase
+    private val setLanguageUseCase: SetLanguageUseCase,
+    private val skinDataStore: SkinDataStore
 ) : ViewModel() {
 
     /**
@@ -99,13 +101,18 @@ class SettingsViewModel @Inject constructor(
     private fun loadSettings() {
         // 1. 코루틴 스코프
         viewModelScope.launch {
-            getLanguageUseCase().collect { language ->
+            // 언어와 스킨을 동시에 관찰
+            combine(
+                getLanguageUseCase(),
+                skinDataStore.selectedSkin
+            ) { language, skin ->
                 _uiState.update { currentState ->
                     currentState.copy(
-                        language = language
+                        language = language,
+                        skin = skin
                     )
                 }
-            }
+            }.collect()
         }
     }
     
@@ -120,13 +127,11 @@ class SettingsViewModel @Inject constructor(
     
     /**
      * 스킨 변경
-     * TODO: 실제 스킨 저장 UseCase 구현 필요
      */
     private fun changeSkin(skin: Skin) {
         viewModelScope.launch {
-            // 일단 UI 상태만 업데이트
-            _uiState.update { it.copy(skin = skin) }
-            // TODO: setSkinUseCase(skin) 구현 필요
+            // SkinDataStore에 저장하면 Flow를 통해 자동으로 UI 업데이트됨
+            skinDataStore.setSelectedSkin(skin)
         }
     }
     

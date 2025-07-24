@@ -25,9 +25,9 @@ object SkinConstants {
             "com.anam.bitcoin",
             "com.anam.ethereum",
             "com.busan.bonmedia",
-            "com.busan.busancard",
-            "com.busan.busanholdom",
-            "com.busan.busanIlbo"
+            "com.busan.card",
+            "com.busan.holdem",
+            "com.busan.ilbo"
         ),
         Skin.SEOUL to listOf(
             "com.anam.bitcoin",

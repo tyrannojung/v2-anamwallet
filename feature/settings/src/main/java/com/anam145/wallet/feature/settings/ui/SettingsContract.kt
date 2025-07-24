@@ -1,7 +1,7 @@
 package com.anam145.wallet.feature.settings.ui
 
 import com.anam145.wallet.core.common.model.Language
-import com.anam145.wallet.feature.settings.ui.components.Skin
+import com.anam145.wallet.core.common.model.Skin
 
 /**
  * Settings 화면의 MVI Contract

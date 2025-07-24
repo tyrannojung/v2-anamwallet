@@ -9,17 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.anam145.wallet.core.common.model.Skin
+import com.anam145.wallet.core.common.constants.SkinConstants
 import com.anam145.wallet.core.ui.language.LocalStrings
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-// 임시 Skin enum (나중에 core.common.model로 이동)
-enum class Skin {
-    ANAM,
-    BUSAN,
-    SEOUL,
-    LA
-}
 
 /**
  * 스킨 설정 섹션 - 칩 스타일
@@ -70,7 +64,7 @@ fun SkinSection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Skin.entries.forEach { skin ->
-                    val isEnabled = skin == Skin.ANAM || skin == Skin.BUSAN
+                    val isEnabled = SkinConstants.isSkinEnabled(skin)
                     FilterChip(
                         selected = currentSkin == skin,
                         onClick = { if (isEnabled) onSkinChange(skin) },
