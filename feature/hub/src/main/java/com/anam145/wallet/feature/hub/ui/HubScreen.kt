@@ -38,6 +38,23 @@ fun HubScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
     Scaffold(
+        floatingActionButton = {
+            // 로딩 중이 아닐 때만 FAB 표시
+            if (!uiState.isLoading) {
+                FloatingActionButton(
+                    onClick = {
+                        viewModel.handleIntent(HubContract.HubIntent.RefreshMiniApps)
+                    },
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Refresh"
+                    )
+                }
+            }
+        }
     ) { paddingValues ->
         Box(
             modifier = modifier
@@ -64,9 +81,6 @@ fun HubScreen(
                         },
                         onUninstallClick = { appId ->
                             viewModel.handleIntent(HubContract.HubIntent.UninstallMiniApp(appId))
-                        },
-                        onRefresh = {
-                            viewModel.handleIntent(HubContract.HubIntent.RefreshMiniApps)
                         }
                     )
                 }
@@ -80,8 +94,7 @@ private fun HubAppsList(
     apps: List<HubMiniApp>,
     loadingAppIds: Set<String>,
     onInstallClick: (String) -> Unit,
-    onUninstallClick: (String) -> Unit,
-    onRefresh: () -> Unit
+    onUninstallClick: (String) -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
     val blockchainApps = apps.filter { it.type == "BLOCKCHAIN" }
@@ -106,11 +119,13 @@ private fun HubAppsList(
                         Icon(
                             imageVector = Icons.Default.AccountBalanceWallet,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = "Blockchain",
-                            fontWeight = if (selectedTab == 0) FontWeight.SemiBold else FontWeight.Normal
+                            fontWeight = if (selectedTab == 0) FontWeight.SemiBold else FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -126,33 +141,17 @@ private fun HubAppsList(
                         Icon(
                             imageVector = Icons.Default.Apps,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = "Apps",
-                            fontWeight = if (selectedTab == 1) FontWeight.SemiBold else FontWeight.Normal
+                            fontWeight = if (selectedTab == 1) FontWeight.SemiBold else FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
             )
-        }
-        
-        // Refresh button
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            IconButton(
-                onClick = { onRefresh() },
-                modifier = Modifier.align(Alignment.CenterEnd)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "Refresh",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
         }
         
         // Content
