@@ -41,6 +41,8 @@ import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.core.common.model.MiniAppType
 import com.anam145.wallet.core.common.model.Skin
 import com.anam145.wallet.core.ui.language.LocalStrings
+import com.anam145.wallet.core.ui.language.Strings
+import com.anam145.wallet.core.common.constants.SectionOrder
 import com.anam145.wallet.feature.main.ui.components.ThemeIllustration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -115,6 +117,7 @@ fun MainScreen(
                         blockchainApps = uiState.blockchainApps,
                         regularApps = uiState.regularApps,
                         activeBlockchainId = uiState.activeBlockchainId,
+                        sectionOrder = uiState.sectionOrder,
                         onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
                         onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) }
                     )
@@ -135,6 +138,7 @@ private fun MiniAppList(
     blockchainApps: List<MiniApp>,
     regularApps: List<MiniApp>,
     activeBlockchainId: String?,
+    sectionOrder: SectionOrder,
     onBlockchainClick: (MiniApp) -> Unit,
     onAppClick: (MiniApp) -> Unit
 ) {
@@ -146,76 +150,126 @@ private fun MiniAppList(
             .verticalScroll(rememberScrollState())
             .padding(bottom = 80.dp) // Space for bottom navigation
     ) {
-        // Blockchain Section
-        if (blockchainApps.isNotEmpty()) {
-            Text(
-                text = strings.mainSectionBlockchain,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.SemiBold
-                ),
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
-            )
-            
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(blockchainApps) { app ->
-                    BlockchainCard(
-                        miniApp = app,
-                        isActive = app.appId == activeBlockchainId,
-                        onClick = { onBlockchainClick(app) }
-                    )
+        when (sectionOrder) {
+            SectionOrder.BLOCKCHAIN_FIRST -> {
+                // 블록체인이 먼저 (기본)
+                BlockchainSection(
+                    blockchainApps = blockchainApps,
+                    activeBlockchainId = activeBlockchainId,
+                    onBlockchainClick = onBlockchainClick,
+                    strings = strings
+                )
+                
+                if (blockchainApps.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
+                
+                AppsSection(
+                    regularApps = regularApps,
+                    onAppClick = onAppClick,
+                    strings = strings
+                )
             }
-            
-            Spacer(modifier = Modifier.height(24.dp))
+            SectionOrder.APPS_FIRST -> {
+                // 앱이 먼저 (부산)
+                AppsSection(
+                    regularApps = regularApps,
+                    onAppClick = onAppClick,
+                    strings = strings
+                )
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                BlockchainSection(
+                    blockchainApps = blockchainApps,
+                    activeBlockchainId = activeBlockchainId,
+                    onBlockchainClick = onBlockchainClick,
+                    strings = strings
+                )
+            }
         }
-        
-        // Apps Section
+    }
+}
+
+@Composable
+private fun BlockchainSection(
+    blockchainApps: List<MiniApp>,
+    activeBlockchainId: String?,
+    onBlockchainClick: (MiniApp) -> Unit,
+    strings: Strings
+) {
+    if (blockchainApps.isNotEmpty()) {
         Text(
-            text = strings.mainSectionApps,
+            text = strings.mainSectionBlockchain,
             style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.SemiBold
             ),
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
         )
         
-        if (regularApps.isEmpty()) {
-            // 앱이 없을 때 메시지 표시
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = strings.mainNoAppsInstalled,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(blockchainApps) { app ->
+                BlockchainCard(
+                    miniApp = app,
+                    isActive = app.appId == activeBlockchainId,
+                    onClick = { onBlockchainClick(app) }
                 )
             }
-        } else {
-            Column(
-                modifier = Modifier.padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                regularApps.chunked(3).forEach { rowApps ->
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        rowApps.forEach { app ->
-                            AppCard(
-                                miniApp = app,
-                                onClick = { onAppClick(app) },
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                        
-                        // Fill empty spaces in the row
-                        repeat(3 - rowApps.size) {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
+        }
+    }
+}
+
+@Composable
+private fun AppsSection(
+    regularApps: List<MiniApp>,
+    onAppClick: (MiniApp) -> Unit,
+    strings: Strings
+) {
+    Text(
+        text = strings.mainSectionApps,
+        style = MaterialTheme.typography.titleMedium.copy(
+            fontWeight = FontWeight.SemiBold
+        ),
+        modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+    )
+    
+    if (regularApps.isEmpty()) {
+        // 앱이 없을 때 메시지 표시 - 이미지 위치를 고려한 높이
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp),  // 이미지가 표시되는 영역의 중간 높이
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = strings.mainNoAppsInstalled,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    } else {
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            regularApps.chunked(3).forEach { rowApps ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    rowApps.forEach { app ->
+                        AppCard(
+                            miniApp = app,
+                            onClick = { onAppClick(app) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    
+                    // Fill empty spaces in the row
+                    repeat(3 - rowApps.size) {
+                        Spacer(modifier = Modifier.weight(1f))
                     }
                 }
             }

@@ -7,6 +7,7 @@ import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.core.common.model.MiniAppType
 import com.anam145.wallet.core.common.result.MiniAppResult
 import com.anam145.wallet.core.data.datastore.SkinDataStore
+import com.anam145.wallet.core.common.constants.SkinConstants
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.GetInstalledMiniAppsUseCase
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.InitializeMiniAppsUseCase
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.CheckInitializationStateUseCase
@@ -98,7 +99,15 @@ class MainViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .collect { skin ->
                     // 스킨이 변경되면 UI 상태 업데이트 및 앱 목록 다시 로드
-                    _uiState.update { it.copy(currentSkin = skin) }
+                    val sectionOrder = SkinConstants.DEFAULT_SECTION_ORDERS[skin] 
+                        ?: SkinConstants.DEFAULT_SECTION_ORDERS[SkinConstants.DEFAULT_SKIN]!!
+                    
+                    _uiState.update { 
+                        it.copy(
+                            currentSkin = skin,
+                            sectionOrder = sectionOrder
+                        ) 
+                    }
                     loadMiniApps()
                 }
         }

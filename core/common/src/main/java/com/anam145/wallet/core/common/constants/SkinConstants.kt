@@ -3,6 +3,14 @@ package com.anam145.wallet.core.common.constants
 import com.anam145.wallet.core.common.model.Skin
 
 /**
+ * 메인 화면 섹션 순서
+ */
+enum class SectionOrder {
+    BLOCKCHAIN_FIRST,  // 블록체인이 위, 앱이 아래 (기본)
+    APPS_FIRST        // 앱이 위, 블록체인이 아래
+}
+
+/**
  * 스킨별 기본 미니앱 설정
  * 
  * 최초 실행 시 이 값들이 DataStore로 복사되며,
@@ -46,4 +54,16 @@ object SkinConstants {
      * 기본 스킨
      */
     val DEFAULT_SKIN = Skin.ANAM
+    
+    /**
+     * 스킨별 섹션 순서 설정
+     * 
+     * 부산만 앱이 먼저, 나머지는 블록체인이 먼저
+     */
+    val DEFAULT_SECTION_ORDERS = mapOf(
+        Skin.ANAM to SectionOrder.BLOCKCHAIN_FIRST,
+        Skin.BUSAN to SectionOrder.APPS_FIRST,
+        Skin.SEOUL to SectionOrder.BLOCKCHAIN_FIRST,
+        Skin.LA to SectionOrder.BLOCKCHAIN_FIRST
+    )
 }
