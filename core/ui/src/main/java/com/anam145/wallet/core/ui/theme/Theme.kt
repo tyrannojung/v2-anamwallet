@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.anam145.wallet.core.common.model.Skin
+import android.util.Log
 
 /**
  * ANAM Wallet 테마 정의
@@ -65,6 +66,11 @@ fun AnamWalletTheme(
 ) {
     // 스킨에 따른 색상 스킴 선택
     val colorScheme = getColorSchemeForSkin(skin)
+    
+    // 디버깅: 테마 적용 정보 로깅
+    Log.d("AnamWalletTheme", "Applying theme for skin: $skin")
+    Log.d("AnamWalletTheme", "Background color: ${colorScheme.background}")
+    Log.d("AnamWalletTheme", "Primary color: ${colorScheme.primary}")
     
     // 상태바 색상 설정 (프리뷰 모드가 아닐 때만)
     val view = LocalView.current

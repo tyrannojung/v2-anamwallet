@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.anam145.wallet.core.ui.language.LocalStrings
+import android.util.Log
 
 /**
  * ANAM Wallet 공통 헤더 컴포넌트
@@ -49,9 +50,13 @@ fun Header(
     activeBlockchainName: String? = null,
     onBlockchainClick: (() -> Unit)? = null
 ) {
+    // 디버깅: 헤더 배경색 확인
+    val backgroundColor = MaterialTheme.colorScheme.background
+    Log.d("Header", "Header background color: $backgroundColor")
+    
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.background
+        color = backgroundColor
     ) {
         Column(
             modifier = Modifier
@@ -135,7 +140,7 @@ private fun BlockchainStatusChip(
             ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
@@ -148,7 +153,7 @@ private fun BlockchainStatusChip(
             Text(
                 text = "🔗 $blockchainName Activated",
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

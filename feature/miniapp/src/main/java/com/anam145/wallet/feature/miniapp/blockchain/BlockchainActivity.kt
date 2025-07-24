@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.Lifecycle
+import com.anam145.wallet.core.common.model.Skin
 import com.anam145.wallet.core.ui.theme.AnamWalletTheme
 import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
 import com.anam145.wallet.feature.miniapp.blockchain.ui.BlockchainContract
@@ -41,8 +43,10 @@ import javax.inject.Inject
 class BlockchainActivity : ComponentActivity() {
     
     companion object {
+        private const val TAG = "BlockchainActivity"
         // Intent에 블록체인 ID를 전달하기 위한 키
         const val EXTRA_BLOCKCHAIN_ID = "blockchain_id"
+        const val EXTRA_SKIN = "skin"
         
         /**
          * BlockchainActivity를 시작하기 위한 Intent 생성
@@ -51,9 +55,10 @@ class BlockchainActivity : ComponentActivity() {
          * @param blockchainId 표시할 블록체인의 ID (예: "com.anam.ethereum")
          * @return 설정된 Intent
          */
-        fun createIntent(context: Context, blockchainId: String): Intent {
+        fun createIntent(context: Context, blockchainId: String, skin: Skin = Skin.ANAM): Intent {
             return Intent(context, BlockchainActivity::class.java).apply {
                 putExtra(EXTRA_BLOCKCHAIN_ID, blockchainId)
+                putExtra(EXTRA_SKIN, skin.name)
                 // FLAG_ACTIVITY_NEW_TASK: 새로운 태스크에서 실행 (다른 프로세스이므로 필수)
                 // FLAG_ACTIVITY_CLEAR_TOP: 이미 실행 중이면 기존 것을 재사용
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -72,8 +77,15 @@ class BlockchainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Intent에서 블록체인 ID 추출
+        // Intent에서 블록체인 ID와 스킨 추출
         val blockchainId = intent.getStringExtra(EXTRA_BLOCKCHAIN_ID) ?: ""
+        val skinName = intent.getStringExtra(EXTRA_SKIN) ?: Skin.ANAM.name
+        val intentSkin = try {
+            Skin.valueOf(skinName)
+        } catch (e: IllegalArgumentException) {
+            Log.e(TAG, "Invalid skin name from intent: $skinName, using default")
+            Skin.ANAM
+        }
 
         /**
          * lifecycleScope는 Activity나 Fragment의 생명주기와 연동된 코루틴 스코프
@@ -106,8 +118,16 @@ class BlockchainActivity : ComponentActivity() {
         
         // Compose UI 설정
         setContent {
-            // 앱 전체 테마 적용
-            AnamWalletTheme {
+            // Intent로 전달받은 스킨 사용 (프로세스 간 동기화)
+            // DataStore는 프로세스별로 독립적으로 동작하므로 Intent로 전달
+            val currentSkin = intentSkin
+            
+            // 디버깅: 프로세스 이름과 스킨 정보 로깅
+            Log.d(TAG, "BlockchainActivity - Process: ${android.os.Process.myPid()}, Skin from Intent: $currentSkin")
+            
+            // 스킨이 적용된 테마
+            AnamWalletTheme(skin = currentSkin) {
+                Log.d(TAG, "BlockchainActivity - Theme applied with skin: $currentSkin")
                 // 블록체인 화면 컴포저블
                 BlockchainScreen(
                     blockchainId = blockchainId,

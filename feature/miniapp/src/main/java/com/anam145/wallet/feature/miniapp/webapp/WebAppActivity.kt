@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.Lifecycle
+import com.anam145.wallet.core.common.model.Skin
 import com.anam145.wallet.core.ui.theme.AnamWalletTheme
 import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
 import com.anam145.wallet.feature.miniapp.webapp.ui.WebAppContract
@@ -34,10 +35,12 @@ class WebAppActivity : ComponentActivity() {
     companion object {
         private const val TAG = "WebAppActivity"
         const val EXTRA_APP_ID = "app_id"
+        const val EXTRA_SKIN = "skin"
         
-        fun createIntent(context: Context, appId: String): Intent {
+        fun createIntent(context: Context, appId: String, skin: Skin = Skin.ANAM): Intent {
             return Intent(context, WebAppActivity::class.java).apply {
                 putExtra(EXTRA_APP_ID, appId)
+                putExtra(EXTRA_SKIN, skin.name)
             }
         }
     }
@@ -51,6 +54,15 @@ class WebAppActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         val appId = intent.getStringExtra(EXTRA_APP_ID) ?: ""
+        
+        // Intent에서 스킨 정보 추출
+        val skinName = intent.getStringExtra(EXTRA_SKIN) ?: Skin.ANAM.name
+        val intentSkin = try {
+            Skin.valueOf(skinName)
+        } catch (e: IllegalArgumentException) {
+            Log.e(TAG, "Invalid skin name from intent: $skinName, using default")
+            Skin.ANAM
+        }
         
         // Effect 처리
         lifecycleScope.launch {
@@ -77,7 +89,16 @@ class WebAppActivity : ComponentActivity() {
         }
         
         setContent {
-            AnamWalletTheme {
+            // Intent로 전달받은 스킨 사용 (프로세스 간 동기화)
+            // DataStore는 프로세스별로 독립적으로 동작하므로 Intent로 전달
+            val currentSkin = intentSkin
+            
+            // 디버깅: 프로세스 이름과 스킨 정보 로깅
+            Log.d(TAG, "WebAppActivity - Process: ${android.os.Process.myPid()}, Skin from Intent: $currentSkin")
+            
+            // 스킨이 적용된 테마
+            AnamWalletTheme(skin = currentSkin) {
+                Log.d(TAG, "WebAppActivity - Theme applied with skin: $currentSkin")
                 WebAppScreen(
                     appId = appId,
                     viewModel = viewModel,
