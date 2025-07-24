@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.anam145.wallet.core.ui.language.LocalStrings
-import android.util.Log
+import androidx.compose.ui.graphics.Color
 
 /**
  * ANAM Wallet 공통 헤더 컴포넌트
@@ -50,13 +50,12 @@ fun Header(
     activeBlockchainName: String? = null,
     onBlockchainClick: (() -> Unit)? = null
 ) {
-    // 디버깅: 헤더 배경색 확인
-    val backgroundColor = MaterialTheme.colorScheme.background
-    Log.d("Header", "Header background color: $backgroundColor")
+    // 헤더 배경색 고정 (테마와 무관)
+    val fixedBackgroundColor = Color(0xFFFCFCFC)
     
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = backgroundColor
+        color = fixedBackgroundColor
     ) {
         Column(
             modifier = Modifier
@@ -83,12 +82,12 @@ fun Header(
                     }
                 }
                 
-                // 타이틀
+                // 타이틀 (고정 색상)
                 Text(
                     text = title,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = Color(0xFF1C1B1F),  // 고정된 텍스트 색상
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = if (showBackButton) 48.dp else 0.dp)
@@ -140,7 +139,11 @@ private fun BlockchainStatusChip(
             ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = Color.White  // 흰색 배경
+        ),
+        border = androidx.compose.foundation.BorderStroke(
+            width = 1.dp,
+            color = Color(0xFFE4E4E7)  // 연한 회색 보더
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
@@ -153,7 +156,7 @@ private fun BlockchainStatusChip(
             Text(
                 text = "🔗 $blockchainName Activated",
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = Color(0xFF3F3F46)  // 고정된 다크 그레이 텍스트
             )
         }
     }
