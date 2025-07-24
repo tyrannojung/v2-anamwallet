@@ -36,6 +36,9 @@ import kotlinx.coroutines.flow.StateFlow
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.anam145.wallet.core.data.datastore.SkinDataStore
+import com.anam145.wallet.core.common.model.Skin
+import com.anam145.wallet.core.common.constants.SkinConstants
 
 // Hilt가 의존성을 주입하는 시작점
 @AndroidEntryPoint
@@ -49,6 +52,9 @@ class MainActivity : ComponentActivity() {
     
     @Inject
     lateinit var passwordManager: PasswordManager
+    
+    @Inject
+    lateinit var skinDataStore: SkinDataStore
     
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState
@@ -115,7 +121,13 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             val authStateValue by authState.collectAsStateWithLifecycle()
-            AnamWalletApp(authState = authStateValue)
+            val currentSkin by skinDataStore.selectedSkin.collectAsStateWithLifecycle(
+                initialValue = SkinConstants.DEFAULT_SKIN
+            )
+            AnamWalletApp(
+                authState = authStateValue,
+                skin = currentSkin
+            )
         }
     }
     
@@ -134,7 +146,8 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 fun AnamWalletApp(
-    authState: MainActivity.AuthState = MainActivity.AuthState.Loading
+    authState: MainActivity.AuthState = MainActivity.AuthState.Loading,
+    skin: Skin = Skin.ANAM
 ) {
     
     // 언어 ViewModel
@@ -150,7 +163,7 @@ fun AnamWalletApp(
     CompositionLocalProvider(
         LocalStrings provides strings
     ) {
-        AnamWalletTheme {
+        AnamWalletTheme(skin = skin) {
             // Navigation Controller 생성
             val navController = rememberNavController()
             

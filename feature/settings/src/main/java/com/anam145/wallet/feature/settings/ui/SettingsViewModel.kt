@@ -5,6 +5,7 @@ import com.anam145.wallet.core.common.model.Language
 import com.anam145.wallet.core.common.model.Skin
 import androidx.lifecycle.viewModelScope
 import com.anam145.wallet.core.data.datastore.SkinDataStore
+import com.anam145.wallet.core.data.datastore.BlockchainDataStore
 import com.anam145.wallet.feature.settings.domain.usecase.GetLanguageUseCase
 import com.anam145.wallet.feature.settings.domain.usecase.SetLanguageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +27,8 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val getLanguageUseCase: GetLanguageUseCase,
     private val setLanguageUseCase: SetLanguageUseCase,
-    private val skinDataStore: SkinDataStore
+    private val skinDataStore: SkinDataStore,
+    private val blockchainDataStore: BlockchainDataStore
 ) : ViewModel() {
 
     /**
@@ -127,10 +129,27 @@ class SettingsViewModel @Inject constructor(
     
     /**
      * 스킨 변경
+     * 
+     * 스킨 변경 시 현재 활성 블록체인이 새 스킨에 없으면
+     * 블록체인 ID를 null로 설정합니다.
+     * MainViewModel이 이를 감지하고 적절한 블록체인으로 자동 전환합니다.
      */
     private fun changeSkin(skin: Skin) {
         viewModelScope.launch {
-            // SkinDataStore에 저장하면 Flow를 통해 자동으로 UI 업데이트됨
+            // 1. 새 스킨의 허용된 앱 목록 가져오기
+            val newSkinApps = skinDataStore.getAppsForSkin(skin)
+            
+            // 2. 현재 활성 블록체인 확인
+            val currentActiveId = blockchainDataStore.activeBlockchainId.first()
+            
+            // 3. 현재 블록체인이 새 스킨에 없으면 null로 설정
+            // MainViewModel의 observeBlockchainService()가 이를 감지하고
+            // 새 스킨에 맞는 적절한 블록체인으로 자동 전환할 것임
+            if (currentActiveId != null && !newSkinApps.contains(currentActiveId)) {
+                blockchainDataStore.clearActiveBlockchainId()
+            }
+            
+            // 4. 스킨 변경
             skinDataStore.setSelectedSkin(skin)
         }
     }

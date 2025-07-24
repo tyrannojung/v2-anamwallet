@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.anam145.wallet.core.common.model.Skin
-import com.anam145.wallet.core.common.constants.SkinConstants
 import com.anam145.wallet.core.ui.language.LocalStrings
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,11 +63,10 @@ fun SkinSection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Skin.entries.forEach { skin ->
-                    val isEnabled = SkinConstants.isSkinEnabled(skin)
                     FilterChip(
                         selected = currentSkin == skin,
-                        onClick = { if (isEnabled) onSkinChange(skin) },
-                        enabled = isEnabled,
+                        onClick = { onSkinChange(skin) },
+                        enabled = true,
                         label = {
                             Text(
                                 text = when (skin) {
@@ -90,12 +88,12 @@ fun SkinSection(
                         } else null,
                         shape = RoundedCornerShape(8.dp),
                         border = FilterChipDefaults.filterChipBorder(
-                            enabled = isEnabled,
+                            enabled = true,
                             selected = currentSkin == skin,
-                            borderColor = when {
-                                currentSkin == skin -> MaterialTheme.colorScheme.primary
-                                !isEnabled -> MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                                else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                            borderColor = if (currentSkin == skin) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
                             },
                             selectedBorderColor = MaterialTheme.colorScheme.primary,
                             borderWidth = if (currentSkin == skin) 2.dp else 1.dp,

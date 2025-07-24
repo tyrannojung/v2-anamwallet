@@ -23,21 +23,18 @@ object SkinConstants {
         ),
         Skin.BUSAN to listOf(
             "com.anam.bitcoin",
-            "com.anam.ethereum",
             "com.busan.bonmedia",
             "com.busan.card",
             "com.busan.holdem",
             "com.busan.ilbo"
         ),
         Skin.SEOUL to listOf(
-            "com.anam.bitcoin",
             "com.anam.ethereum",
             "kr.go.government24"
         ),
         Skin.LA to listOf(
             "com.anam.bitcoin",
             "com.anam.ethereum",
-            "kr.go.government24"
         )
     )
     
@@ -45,19 +42,4 @@ object SkinConstants {
      * 기본 스킨
      */
     val DEFAULT_SKIN = Skin.ANAM
-    
-    /**
-     * 현재 활성화된 스킨 목록
-     */
-    val ENABLED_SKINS = listOf(
-        Skin.ANAM,
-        Skin.BUSAN
-    )
-    
-    /**
-     * 스킨이 활성화되어 있는지 확인
-     */
-    fun isSkinEnabled(skin: Skin): Boolean {
-        return ENABLED_SKINS.contains(skin)
-    }
 }

@@ -252,8 +252,13 @@ class BlockchainService : Service() {
     private fun createBlockchainWebView(blockchainId: String) {
         handler.post {
             try {
-                // 기존 WebView 정리
-                activeBlockchainWebView?.destroy()
+                // 기존 WebView 정리 - 로딩 중단 후 destroy
+                activeBlockchainWebView?.let { webView ->
+                    webView.stopLoading()
+                    webView.loadUrl("about:blank")
+                    webView.destroy()
+                }
+                activeBlockchainWebView = null
                 
                 // JavaScript Bridge 생성
                 val bridge = BlockchainJavaScriptBridge { requestId, responseJson ->

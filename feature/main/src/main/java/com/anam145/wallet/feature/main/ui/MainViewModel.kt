@@ -155,41 +155,21 @@ class MainViewModel @Inject constructor(
             when (val result = getInstalledMiniAppsUseCase()) {
                 is MiniAppResult.Success -> {
                     val miniAppsMap = result.data
-                    Log.d("MainViewModel", "loadMiniApps - Total installed apps: ${miniAppsMap.size}")
-                    Log.d("MainViewModel", "loadMiniApps - Installed app IDs: ${miniAppsMap.keys}")
-                    
                     // 현재 스킨에 따라 앱 필터링
                     val currentSkin = skinDataStore.selectedSkin.first()
-                    Log.d("MainViewModel", "loadMiniApps - Current skin: $currentSkin")
-                    
                     val allowedAppIds = skinDataStore.getAppsForSkin(currentSkin)
-                    Log.d("MainViewModel", "loadMiniApps - Allowed app IDs for $currentSkin: $allowedAppIds")
                     
                     // 스킨별로 허용된 앱만 필터링
                     val filteredApps = miniAppsMap.values.filter { app ->
-                        val isAllowed = allowedAppIds.contains(app.appId)
-                        Log.d("MainViewModel", "loadMiniApps - App ${app.appId} allowed in $currentSkin: $isAllowed")
-                        isAllowed
+                        allowedAppIds.contains(app.appId)
                     }
-                    
-                    Log.d("MainViewModel", "loadMiniApps - Filtered apps count: ${filteredApps.size}")
-                    Log.d("MainViewModel", "loadMiniApps - Filtered app IDs: ${filteredApps.map { it.appId }}")
                     
                     val blockchainApps = filteredApps.filter { it.type == MiniAppType.BLOCKCHAIN }
                     val regularApps = filteredApps.filter { it.type == MiniAppType.APP }
                     
-                    Log.d("MainViewModel", "loadMiniApps - Blockchain apps: ${blockchainApps.map { it.appId }}")
-                    Log.d("MainViewModel", "loadMiniApps - Regular apps: ${regularApps.map { it.appId }}")
-                    
                     // 저장된 활성 블록체인 ID 복원 또는 첫 번째 블록체인 선택
-                    // 이 시점에서는 UI 상태만 설정하고, 실제 블록체인 활성화는
-                    // observeBlockchainService()에서 서비스 연결 후 자동으로 처리됨
                     val savedActiveId = getActiveBlockchainUseCase().first()
-                    val activeId = when {
-                        savedActiveId != null && miniAppsMap.containsKey(savedActiveId) && miniAppsMap[savedActiveId]?.type == MiniAppType.BLOCKCHAIN -> savedActiveId
-                        blockchainApps.isNotEmpty() -> blockchainApps.first().appId
-                        else -> null
-                    }
+                    val activeId = selectBlockchainForCurrentSkin(savedActiveId, blockchainApps)
                     
                     _uiState.update {
                         it.copy(
@@ -201,10 +181,13 @@ class MainViewModel @Inject constructor(
                         )
                     }
                     
-                    // 블록체인 활성화는 observeBlockchainService()에서 처리
-                    // activeBlockchainId가 설정되고 서비스가 연결되면 자동으로 활성화됨
+                    // 새로운 블록체인이 선택되었으면 DataStore에 저장
                     activeId?.let { id ->
-                        Log.d("MainViewModel", "Active blockchain ID set to: $id (will be activated when service connects)")
+                        if (savedActiveId != id) {
+                            viewModelScope.launch {
+                                setActiveBlockchainUseCase(id)
+                            }
+                        }
                     }
                 }
                 is MiniAppResult.Error -> {
@@ -289,10 +272,9 @@ class MainViewModel @Inject constructor(
                 // 첫 번째 Flow: 블록체인 서비스 연결 상태를 관찰
                 observeBlockchainServiceUseCase(), // → Flow<ServiceState>
                 
-                // 두 번째 Flow: UI 상태에서 activeBlockchainId만 추출
-                // map: Flow의 각 값을 변환 (State 전체 → activeBlockchainId만)
-                // distinctUntilChanged: 같은 값이 연속으로 오면 무시 (중복 제거)
-                _uiState.map { it.activeBlockchainId }.distinctUntilChanged()
+                // 두 번째 Flow: DataStore에서 activeBlockchainId를 직접 관찰
+                // Settings에서 변경해도 자동으로 감지됨
+                getActiveBlockchainUseCase() // → Flow<String?>
             ) { serviceState, activeId ->
                 // combine의 transform 람다: 두 Flow의 최신 값을 받아 결합
                 // Pair로 묶어서 반환 (to는 infix 함수로 Pair 생성)
@@ -301,25 +283,38 @@ class MainViewModel @Inject constructor(
                 // collect: Flow를 구독하고 각 값에 대해 처리
                 // 구조 분해 선언으로 Pair를 풀어서 받음
                 
+                // DataStore 변경이 감지되면 UI State도 동기화
+                val currentBlockchainApps = _uiState.value.blockchainApps
+                val finalActiveId = selectBlockchainForCurrentSkin(activeId, currentBlockchainApps)
+                
+                // 새로운 블록체인이 선택되었으면 DataStore에 저장
+                if (activeId != finalActiveId && finalActiveId != null) {
+                    viewModelScope.launch {
+                        setActiveBlockchainUseCase(finalActiveId)
+                    }
+                }
+                
+                _uiState.update { currentState ->
+                    currentState.copy(activeBlockchainId = finalActiveId)
+                }
+                
                 // 서비스가 연결되고 activeBlockchainId가 있으면 자동 활성화
                 // nullable 타입 체크를 위해 로컬 변수로 추출 (스마트 캐스트)
                 val service = serviceState.service
                 
                 // 3가지 조건 모두 만족해야 블록체인 활성화:
                 // 1. 서비스 연결됨 2. service 객체 존재 3. 활성화할 ID 존재
-                if (serviceState.isConnected && service != null && activeId != null) {
+                if (serviceState.isConnected && service != null && finalActiveId != null) {
                     // 블록체인 전환 시도 (결과값이 Unit이므로 성공/실패만 체크)
-                    when (val result = switchBlockchainUseCase(activeId, service)) {
+                    when (val result = switchBlockchainUseCase(finalActiveId, service)) {
                         is MiniAppResult.Success -> {
-                            Log.d("MainViewModel", "Auto-activated blockchain: $activeId")
+                            // 블록체인 활성화 성공
                         }
                         is MiniAppResult.Error.Unknown -> {
-                            // 이제 result.cause를 사용해서 구체적인 에러 정보 로깅
-                            Log.e("MainViewModel", "Failed to auto-activate blockchain: $activeId - ${result.cause.message}")
+                            Log.e("MainViewModel", "Failed to auto-activate blockchain: $finalActiveId - ${result.cause.message}")
                         }
                         is MiniAppResult.Error -> {
-                            // 다른 에러 타입들 (현재는 Unknown만 사용중)
-                            Log.e("MainViewModel", "Error auto-activating blockchain: $activeId - $result")
+                            Log.e("MainViewModel", "Error auto-activating blockchain: $finalActiveId - $result")
                         }
                     }
                 }
@@ -346,6 +341,27 @@ class MainViewModel @Inject constructor(
     private fun handleAppClick(miniApp: MiniApp) {
         viewModelScope.launch {
             _effect.emit(MainContract.MainEffect.LaunchWebAppActivity(miniApp.appId))
+        }
+    }
+    
+    /**
+     * 현재 스킨에 맞는 블록체인을 선택하는 공통 로직
+     * 
+     * @param savedActiveId 저장된 활성 블록체인 ID
+     * @param blockchainApps 현재 스킨에서 사용 가능한 블록체인 앱 목록
+     * @return 선택된 블록체인 ID (없으면 null)
+     */
+    private fun selectBlockchainForCurrentSkin(
+        savedActiveId: String?,
+        blockchainApps: List<MiniApp>
+    ): String? {
+        return when {
+            // 저장된 ID가 현재 스킨의 블록체인 앱에 있으면 유지
+            savedActiveId != null && blockchainApps.any { it.appId == savedActiveId } -> savedActiveId
+            // 없으면 첫 번째 블록체인 선택
+            blockchainApps.isNotEmpty() -> blockchainApps.first().appId
+            // 블록체인 앱이 없으면 null
+            else -> null
         }
     }
 }

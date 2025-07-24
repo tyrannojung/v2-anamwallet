@@ -8,6 +8,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.anam145.wallet.core.common.model.Skin
 
 /**
  * ANAM Wallet 테마 정의
@@ -54,24 +55,30 @@ private val AnamLightColorScheme = lightColorScheme(
 /**
  * ANAM Wallet의 메인 테마 컴포저블
  * 
+ * @param skin 적용할 스킨 (기본값: ANAM)
  * @param content 테마가 적용될 컨텐츠
  */
 @Composable
 fun AnamWalletTheme(
+    skin: Skin = Skin.ANAM,
     content: @Composable () -> Unit
 ) {
-    // 항상 라이트 모드 사용
-    val colorScheme = AnamLightColorScheme
+    // 스킨에 따른 색상 스킴 선택
+    val colorScheme = getColorSchemeForSkin(skin)
     
     // 상태바 색상 설정 (프리뷰 모드가 아닐 때만)
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            val window = (view.context as Activity).window
-            // 상태바 색상을 배경색과 동일하게 설정
-            window.statusBarColor = colorScheme.background.toArgb()
-            // 상태바 아이콘 색상 설정 (라이트 모드이므로 어두운 아이콘)
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+            val context = view.context
+            // Activity 컨텍스트인 경우에만 상태바 설정
+            if (context is Activity) {
+                val window = context.window
+                // 상태바 색상을 배경색과 동일하게 설정
+                window.statusBarColor = colorScheme.background.toArgb()
+                // 상태바 아이콘 색상 설정 (라이트 모드이므로 어두운 아이콘)
+                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+            }
         }
     }
 

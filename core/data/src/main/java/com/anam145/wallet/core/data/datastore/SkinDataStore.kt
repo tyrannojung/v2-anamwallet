@@ -43,7 +43,13 @@ class SkinDataStore @Inject constructor(
     val selectedSkin: Flow<Skin> = context.skinDataStore.data
         .map { preferences ->
             val skinName = preferences[SELECTED_SKIN_KEY] ?: SkinConstants.DEFAULT_SKIN.name
-            Skin.valueOf(skinName)
+            try {
+                Skin.valueOf(skinName)
+            } catch (e: IllegalArgumentException) {
+                // 잘못된 스킨 이름이 저장된 경우 기본값 반환
+                Log.e("SkinDataStore", "Invalid skin name: $skinName, using default", e)
+                SkinConstants.DEFAULT_SKIN
+            }
         }
     
     /**
@@ -184,4 +190,43 @@ class SkinDataStore @Inject constructor(
      */
     val currentSkinApps: Flow<Set<String>> = selectedSkin
         .map { skin -> getAppsForSkin(skin) }
+    
+    /**
+     * 스킨 데이터 유효성 검증 및 복구
+     * 
+     * 앱 업데이트 후 enum 값이 변경되었거나 데이터가 손상된 경우를 처리
+     */
+    suspend fun validateAndRepairSkinData() {
+        context.skinDataStore.edit { preferences ->
+            val skinName = preferences[SELECTED_SKIN_KEY]
+            
+            // 스킨 이름이 유효한지 확인
+            if (skinName != null) {
+                val isValidSkin = try {
+                    Skin.valueOf(skinName)
+                    true
+                } catch (e: IllegalArgumentException) {
+                    false
+                }
+                
+                // 유효하지 않은 스킨이면 기본값으로 복구
+                if (!isValidSkin) {
+                    Log.w("SkinDataStore", "Invalid skin found: $skinName, resetting to default")
+                    preferences[SELECTED_SKIN_KEY] = SkinConstants.DEFAULT_SKIN.name
+                }
+            }
+            
+            // 스킨별 앱 목록 키 검증
+            Skin.values().forEach { skin ->
+                val key = skinAppsKey(skin)
+                val apps = preferences[key]
+                
+                // null이 아니고 빈 Set인 경우만 유지, null이면 초기화하지 않음
+                // (초기화는 getAppsForSkin에서 처리)
+                if (apps != null) {
+                    Log.d("SkinDataStore", "Validated apps for $skin: ${apps.size} apps")
+                }
+            }
+        }
+    }
 }
