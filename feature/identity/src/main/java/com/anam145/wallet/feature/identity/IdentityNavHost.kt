@@ -6,8 +6,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.anam145.wallet.feature.identity.ui.IdentityScreen
 import com.anam145.wallet.feature.identity.ui.StudentCardDetailScreen
 import com.anam145.wallet.feature.identity.ui.DriverLicenseDetailScreen
+import com.anam145.wallet.feature.identity.ui.IssueSelectScreen
 
 /**
  * Identity 기능의 Nested Navigation Host
@@ -30,10 +32,36 @@ fun IdentityNavHost(
         composable(route = IdentityRoute.Main.route) {
             IdentityScreen(
                 onNavigateToStudentCard = {
-                    navController.navigate(IdentityRoute.StudentCard.route)
+                    navController.navigate(IdentityRoute.StudentCard.route) {
+                        launchSingleTop = true
+                    }
                 },
                 onNavigateToDriverLicense = {
-                    navController.navigate(IdentityRoute.DriverLicense.route)
+                    navController.navigate(IdentityRoute.DriverLicense.route) {
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToIssue = {
+                    navController.navigate(IdentityRoute.IssueSelect.route) {
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+        
+        // 발급 선택 화면
+        composable(route = IdentityRoute.IssueSelect.route) {
+            IssueSelectScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onSelectStudentCard = {
+                    // TODO: 학생증 발급 프로세스 시작
+                    navController.popBackStack()
+                },
+                onSelectDriverLicense = {
+                    // TODO: 운전면허증 발급 프로세스 시작
+                    navController.popBackStack()
                 }
             )
         }
@@ -63,6 +91,7 @@ fun IdentityNavHost(
  */
 sealed class IdentityRoute(val route: String) {
     data object Main : IdentityRoute("identity_main")
+    data object IssueSelect : IdentityRoute("identity_issue_select")
     data object StudentCard : IdentityRoute("identity_student_card")
     data object DriverLicense : IdentityRoute("identity_driver_license")
 }

@@ -132,7 +132,18 @@ data class Strings(
     val identityClass1Regular: String = "제1종 보통",
     val identityIssueDate: String = "발급일",
     val identityAptitudeTest: String = "적성검사",
-    val identityRenewal: String = "갱신기간"
+    val identityRenewal: String = "갱신기간",
+    val identityMyIds: String = "내 신분증",
+    val identityAddId: String = "신분증 추가",
+    val identityIssueNewId: String = "발급하기",
+    val identityIssueId: String = "신분증 발급",
+    val identityValid: String = "유효",
+    val identityStudentIdCard: String = "학생증",
+    val identityDriverLicenseCard: String = "운전면허증",
+    val identityIssueStudentId: String = "홍길동\n고려대 학생증\n발급하기",
+    val identityIssueDriverLicense: String = "홍길동\n운전면허증\n발급하기",
+    val identityViewDetail: String = "상세보기",
+    val identitySampleName: String = "홍길동"
 )
 
 /**
@@ -254,7 +265,18 @@ val EnglishStrings = Strings(
     identityClass1Regular = "Class 1 Regular",
     identityIssueDate = "Issue Date",
     identityAptitudeTest = "Aptitude Test",
-    identityRenewal = "Renewal"
+    identityRenewal = "Renewal",
+    identityMyIds = "My IDs",
+    identityAddId = "Add ID",
+    identityIssueNewId = "Issue New ID",
+    identityIssueId = "Issue New ID",
+    identityValid = "Valid",
+    identityStudentIdCard = "Student ID",
+    identityDriverLicenseCard = "Driver's License",
+    identityIssueStudentId = "Issue\nHong Gildong\nKorea Univ. ID",
+    identityIssueDriverLicense = "Issue\nHong Gildong\nDriver's License",
+    identityViewDetail = "Detail",
+    identitySampleName = "Hong Gildong"
 )
 
 /**

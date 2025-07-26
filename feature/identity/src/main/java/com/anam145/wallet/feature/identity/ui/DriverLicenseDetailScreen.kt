@@ -198,7 +198,7 @@ private fun DriverCardDetailBody() {
         
         // 운전자 이름
         Text(
-            text = if (strings == LocalStrings.current) "홍길동" else "Hong Gildong",
+            text = strings.identitySampleName,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
