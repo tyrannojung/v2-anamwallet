@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.identity.ui
+package com.anam145.wallet.feature.identity.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,7 +30,7 @@ import com.anam145.wallet.feature.identity.ui.util.debouncedClickable
  * 발급할 신분증 종류를 선택하는 화면
  */
 @Composable
-fun IssueSelectScreen(
+fun IssueSelect(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit = {},
     onSelectStudentCard: () -> Unit = {},
