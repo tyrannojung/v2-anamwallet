@@ -29,7 +29,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -422,32 +421,3 @@ private fun PasswordStrengthIndicator(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun SetupPasswordScreenPreview() {
-    AnamWalletTheme {
-        SetupPasswordContent(
-            uiState = SetupPasswordContract.State(
-                password = "password123",
-                confirmPassword = "password123",
-                passwordStrength = SetupPasswordContract.PasswordStrength.MEDIUM
-            ),
-            onIntent = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun SetupPasswordScreenDarkPreview() {
-    AnamWalletTheme {
-        SetupPasswordContent(
-            uiState = SetupPasswordContract.State(
-                password = "pass",
-                passwordStrength = SetupPasswordContract.PasswordStrength.WEAK,
-                passwordError = AuthError.PasswordTooShort
-            ),
-            onIntent = {}
-        )
-    }
-}

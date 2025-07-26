@@ -22,7 +22,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -235,30 +234,3 @@ private fun LoginContent(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun LoginScreenPreview() {
-    AnamWalletTheme {
-        LoginContent(
-            uiState = LoginContract.State(
-                password = "password123",
-                isPasswordVisible = false
-            ),
-            onIntent = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun LoginScreenDarkPreview() {
-    AnamWalletTheme {
-        LoginContent(
-            uiState = LoginContract.State(
-                password = "",
-                error = AuthError.PasswordMismatch
-            ),
-            onIntent = {}
-        )
-    }
-}
