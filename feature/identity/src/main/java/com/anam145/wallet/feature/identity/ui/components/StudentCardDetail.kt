@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.identity.ui
+package com.anam145.wallet.feature.identity.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,7 +29,7 @@ import com.anam145.wallet.core.ui.theme.*
  * 학생증 정보를 자세히 표시하는 화면
  */
 @Composable
-fun StudentCardDetailScreen(
+fun StudentCardDetail(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit = {}
 ) {

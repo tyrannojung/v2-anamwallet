@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.identity
+package com.anam145.wallet.feature.identity.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -7,9 +7,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.anam145.wallet.feature.identity.ui.IdentityScreen
-import com.anam145.wallet.feature.identity.ui.StudentCardDetailScreen
-import com.anam145.wallet.feature.identity.ui.DriverLicenseDetailScreen
-import com.anam145.wallet.feature.identity.ui.IssueSelectScreen
+import com.anam145.wallet.feature.identity.ui.components.StudentCardDetail
+import com.anam145.wallet.feature.identity.ui.components.DriverLicenseDetail
+import com.anam145.wallet.feature.identity.ui.components.IssueSelect
 
 /**
  * Identity 기능의 Nested Navigation Host
@@ -51,7 +51,7 @@ fun IdentityNavHost(
         
         // 발급 선택 화면
         composable(route = IdentityRoute.IssueSelect.route) {
-            IssueSelectScreen(
+            IssueSelect(
                 onBackClick = {
                     navController.popBackStack()
                 },
@@ -68,7 +68,7 @@ fun IdentityNavHost(
         
         // 학생증 상세 화면
         composable(route = IdentityRoute.StudentCard.route) {
-            StudentCardDetailScreen(
+            StudentCardDetail(
                 onBackClick = {
                     navController.popBackStack()
                 }
@@ -77,7 +77,7 @@ fun IdentityNavHost(
         
         // 운전면허증 상세 화면
         composable(route = IdentityRoute.DriverLicense.route) {
-            DriverLicenseDetailScreen(
+            DriverLicenseDetail(
                 onBackClick = {
                     navController.popBackStack()
                 }
