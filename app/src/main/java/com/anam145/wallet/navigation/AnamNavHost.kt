@@ -11,7 +11,7 @@ import com.anam145.wallet.feature.main.ui.MainScreen
 import com.anam145.wallet.feature.main.ui.MainViewModel
 import com.anam145.wallet.feature.hub.ui.HubScreen
 import com.anam145.wallet.feature.browser.BrowserScreen
-import com.anam145.wallet.feature.identity.IdentityScreen
+import com.anam145.wallet.feature.identity.IdentityNavHost
 import com.anam145.wallet.feature.settings.ui.SettingsScreen
 import com.anam145.wallet.feature.miniapp.webapp.WebAppActivity
 import com.anam145.wallet.feature.miniapp.blockchain.BlockchainActivity
@@ -82,9 +82,9 @@ fun AnamNavHost(
             BrowserScreen()
         }
         
-        // 신원 화면
+        // 신원 화면 (Nested Navigation)
         composable(route = AnamNavRoute.Identity.route) {
-            IdentityScreen()
+            IdentityNavHost()
         }
         
         // 설정 화면
@@ -120,10 +120,8 @@ fun AnamNavHost(
             // TODO: ModuleDetailScreen(moduleId)
         }
         
-        // 학생증 상세 화면
-        composable(route = AnamNavRoute.StudentCardDetail.route) {
-            // TODO: StudentCardDetailScreen()
-        }
+        // Identity 상세 화면들은 IdentityNavHost에서 처리
+        // 기존 route들은 호환성을 위해 남겨둠 수 있음
         
         // ========== 인증 화면들 ==========
         

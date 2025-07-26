@@ -105,7 +105,34 @@ data class Strings(
     val skinAnam: String = "ANAM",
     val skinSeoul: String = "서울",
     val skinBusan: String = "부산",
-    val skinLA: String = "LA"
+    val skinLA: String = "LA",
+    
+    // Identity (DID) Screen
+    val identityMobileDriverLicense: String = "모바일 운전면허증",
+    val identityMobileStudentId: String = "모바일 학생증",
+    val identityEligibility: String = "발급대상",
+    val identityRequirements: String = "준 비 물",
+    val identityDriverEligibility: String = "1종, 2종 자동차운전면허 소지자",
+    val identityStudentEligibility: String = "고려대학교 재학생",
+    val identityNoRequirements: String = "없음(홍길동으로 발급)",
+    val identityInquire: String = "조회하기",
+    
+    // Identity Detail Screens
+    val identityRefresh: String = "새로고침",
+    val identityPhoto: String = "사진",
+    val identityEnlarge: String = "크게보기",
+    val identityQRScan: String = "QR을 태하여\n카메라에 스캔하세요.",
+    val identityKoreaUniversity: String = "고려대학교",
+    val identityGraduateSchool: String = "정보보호대학원 학생증",
+    val identityFinancialSecurity: String = "금융보안학과",
+    val identityBlockchainMajor: String = "블록체인전공",
+    val identityRepublicOfKorea: String = "대한민국",
+    val identityDriversLicense: String = "자동차운전면허증",
+    val identityLicenseType: String = "종류",
+    val identityClass1Regular: String = "제1종 보통",
+    val identityIssueDate: String = "발급일",
+    val identityAptitudeTest: String = "적성검사",
+    val identityRenewal: String = "갱신기간"
 )
 
 /**
@@ -200,7 +227,34 @@ val EnglishStrings = Strings(
     skinAnam = "ANAM",
     skinSeoul = "Seoul",
     skinBusan = "Busan",
-    skinLA = "LA"
+    skinLA = "LA",
+    
+    // Identity (DID) Screen
+    identityMobileDriverLicense = "Mobile Driver's License",
+    identityMobileStudentId = "Mobile Student ID",
+    identityEligibility = "Eligibility",
+    identityRequirements = "Requirements",
+    identityDriverEligibility = "Class 1 or 2 driver's license holder",
+    identityStudentEligibility = "Korea University student",
+    identityNoRequirements = "None (Issued to Hong Gildong)",
+    identityInquire = "Inquire",
+    
+    // Identity Detail Screens
+    identityRefresh = "Refresh",
+    identityPhoto = "Photo",
+    identityEnlarge = "Enlarge",
+    identityQRScan = "Scan QR code\nwith camera.",
+    identityKoreaUniversity = "Korea University",
+    identityGraduateSchool = "Graduate School of Information Security ID",
+    identityFinancialSecurity = "Financial Security",
+    identityBlockchainMajor = "Blockchain Major",
+    identityRepublicOfKorea = "Republic of Korea",
+    identityDriversLicense = "Driver's License",
+    identityLicenseType = "Type",
+    identityClass1Regular = "Class 1 Regular",
+    identityIssueDate = "Issue Date",
+    identityAptitudeTest = "Aptitude Test",
+    identityRenewal = "Renewal"
 )
 
 /**
