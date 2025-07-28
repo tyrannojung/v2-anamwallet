@@ -6,10 +6,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.anam145.wallet.feature.identity.ui.IdentityScreen
-import com.anam145.wallet.feature.identity.ui.components.StudentCardDetail
-import com.anam145.wallet.feature.identity.ui.components.DriverLicenseDetail
-import com.anam145.wallet.feature.identity.ui.components.IssueSelect
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.anam145.wallet.feature.identity.ui.main.IdentityScreen
+import com.anam145.wallet.feature.identity.ui.issue.IssueSelectScreen
+import com.anam145.wallet.feature.identity.ui.detail.StudentCardDetailScreen
+import com.anam145.wallet.feature.identity.ui.detail.DriverLicenseDetailScreen
 
 /**
  * Identity 기능의 Nested Navigation Host
@@ -31,13 +33,13 @@ fun IdentityNavHost(
         // 메인 Identity 화면
         composable(route = IdentityRoute.Main.route) {
             IdentityScreen(
-                onNavigateToStudentCard = {
-                    navController.navigate(IdentityRoute.StudentCard.route) {
+                onNavigateToStudentCard = { vcId ->
+                    navController.navigate(IdentityRoute.StudentCard.createRoute(vcId)) {
                         launchSingleTop = true
                     }
                 },
-                onNavigateToDriverLicense = {
-                    navController.navigate(IdentityRoute.DriverLicense.route) {
+                onNavigateToDriverLicense = { vcId ->
+                    navController.navigate(IdentityRoute.DriverLicense.createRoute(vcId)) {
                         launchSingleTop = true
                     }
                 },
@@ -51,24 +53,23 @@ fun IdentityNavHost(
         
         // 발급 선택 화면
         composable(route = IdentityRoute.IssueSelect.route) {
-            IssueSelect(
+            IssueSelectScreen(
                 onBackClick = {
-                    navController.popBackStack()
-                },
-                onSelectStudentCard = {
-                    // TODO: 학생증 발급 프로세스 시작
-                    navController.popBackStack()
-                },
-                onSelectDriverLicense = {
-                    // TODO: 운전면허증 발급 프로세스 시작
                     navController.popBackStack()
                 }
             )
         }
         
         // 학생증 상세 화면
-        composable(route = IdentityRoute.StudentCard.route) {
-            StudentCardDetail(
+        composable(
+            route = IdentityRoute.StudentCard.route,
+            arguments = listOf(
+                navArgument("vcId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val vcId = backStackEntry.arguments?.getString("vcId") ?: ""
+            StudentCardDetailScreen(
+                vcId = vcId,
                 onBackClick = {
                     navController.popBackStack()
                 }
@@ -76,8 +77,15 @@ fun IdentityNavHost(
         }
         
         // 운전면허증 상세 화면
-        composable(route = IdentityRoute.DriverLicense.route) {
-            DriverLicenseDetail(
+        composable(
+            route = IdentityRoute.DriverLicense.route,
+            arguments = listOf(
+                navArgument("vcId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val vcId = backStackEntry.arguments?.getString("vcId") ?: ""
+            DriverLicenseDetailScreen(
+                vcId = vcId,
                 onBackClick = {
                     navController.popBackStack()
                 }
@@ -92,6 +100,10 @@ fun IdentityNavHost(
 sealed class IdentityRoute(val route: String) {
     data object Main : IdentityRoute("identity_main")
     data object IssueSelect : IdentityRoute("identity_issue_select")
-    data object StudentCard : IdentityRoute("identity_student_card")
-    data object DriverLicense : IdentityRoute("identity_driver_license")
+    data object StudentCard : IdentityRoute("identity_student_card/{vcId}") {
+        fun createRoute(vcId: String) = "identity_student_card/$vcId"
+    }
+    data object DriverLicense : IdentityRoute("identity_driver_license/{vcId}") {
+        fun createRoute(vcId: String) = "identity_driver_license/$vcId"
+    }
 }

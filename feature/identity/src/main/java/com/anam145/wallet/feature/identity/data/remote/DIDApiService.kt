@@ -1,8 +1,6 @@
 package com.anam145.wallet.feature.identity.data.remote
 
-import com.anam145.wallet.feature.identity.domain.model.DIDDocument
-import com.anam145.wallet.feature.identity.domain.model.RegisterDIDRequest
-import com.anam145.wallet.feature.identity.domain.model.RegisterDIDResponse
+import com.anam145.wallet.feature.identity.domain.model.*
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -29,4 +27,28 @@ interface DIDApiService {
     suspend fun getDIDDocument(
         @Path("did") did: String
     ): Response<DIDDocument>
+    
+    /**
+     * 학생증 발급
+     */
+    @POST("students")
+    suspend fun issueStudentCard(
+        @Body request: IssueStudentCardRequest
+    ): Response<StudentCardResponse>
+    
+    /**
+     * 운전면허증 발급
+     */
+    @POST("licenses")
+    suspend fun issueDriverLicense(
+        @Body request: IssueDriverLicenseRequest
+    ): Response<DriverLicenseResponse>
+    
+    /**
+     * VC 조회
+     */
+    @GET("vcs/{vcId}")
+    suspend fun getVerifiableCredential(
+        @Path("vcId") vcId: String
+    ): Response<VerifiableCredential>
 }

@@ -114,11 +114,18 @@ git clone https://github.com/anam145/v2-anamwallet.git
 - Dark mode
 - Multilingual (Korean/English)
 
+### Recently Added
+
+- DID (Decentralized Identity) - W3C standard-based identity management
+  - Self-sovereign identity creation
+  - Verifiable Credential issuance (Student ID, Driver's License)
+  - Secure key management with Android Keystore
+
 ### Under Development
 
 - Bitcoin support
 - Solana support
-- DID (Decentralized Identity)
+- Additional DID features (Verifiable Presentation)
 
 ## Contributing
 

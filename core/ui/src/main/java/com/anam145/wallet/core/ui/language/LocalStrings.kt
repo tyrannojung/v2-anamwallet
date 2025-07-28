@@ -144,7 +144,11 @@ data class Strings(
     val identityIssueStudentId: String = "홍길동\n고려대 학생증\n발급하기",
     val identityIssueDriverLicense: String = "홍길동\n운전면허증\n발급하기",
     val identityViewDetail: String = "상세보기",
-    val identitySampleName: String = "홍길동"
+    val identitySampleName: String = "홍길동",
+    val identityIssued: String = "발급완료",
+    val identityAllIssued: String = "모든 신분증이 발급되었습니다.",
+    val identityNoIssuedIds: String = "발급된 모바일 신분증이 없습니다.",
+    val dismiss: String = "닫기"
 )
 
 /**
@@ -278,7 +282,11 @@ val EnglishStrings = Strings(
     identityIssueStudentId = "Issue\nHong Gildong\nKorea Univ. ID",
     identityIssueDriverLicense = "Issue\nHong Gildong\nDriver's License",
     identityViewDetail = "Detail",
-    identitySampleName = "Hong Gildong"
+    identitySampleName = "Hong Gildong",
+    identityIssued = "Issued",
+    identityAllIssued = "All IDs have been issued.",
+    identityNoIssuedIds = "No digital IDs have been issued yet.",
+    dismiss = "Dismiss"
 )
 
 /**

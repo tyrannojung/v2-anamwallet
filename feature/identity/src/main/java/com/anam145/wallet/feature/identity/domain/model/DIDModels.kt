@@ -44,3 +44,82 @@ data class DIDCredentials(
     val userDid: String,     // DID (did:anam145:user:xxx)
     val publicKey: String    // 공개키 (PEM 형식)
 )
+
+// VC Request Models
+data class IssueStudentCardRequest(
+    @SerializedName("userDid") val userDid: String
+)
+
+data class IssueDriverLicenseRequest(
+    @SerializedName("userDid") val userDid: String
+)
+
+// VC Response Models
+data class StudentCardResponse(
+    @SerializedName("studentDid") val studentDid: String,
+    @SerializedName("userDid") val userDid: String,
+    @SerializedName("vc") val vc: VerifiableCredential
+)
+
+data class DriverLicenseResponse(
+    @SerializedName("licenseDid") val licenseDid: String,
+    @SerializedName("userDid") val userDid: String,
+    @SerializedName("licenseNumber") val licenseNumber: String,
+    @SerializedName("vc") val vc: VerifiableCredential
+)
+
+// VC Models
+data class VerifiableCredential(
+    @SerializedName("@context") val context: List<String>,
+    @SerializedName("id") val id: String,
+    @SerializedName("type") val type: List<String>,
+    @SerializedName("issuer") val issuer: Issuer,
+    @SerializedName("issuanceDate") val issuanceDate: String,
+    @SerializedName("credentialSubject") val credentialSubject: CredentialSubject,
+    @SerializedName("proof") val proof: Proof
+)
+
+data class Issuer(
+    @SerializedName("id") val id: String,
+    @SerializedName("name") val name: String
+)
+
+// CredentialSubject를 sealed class로 변경하여 다양한 타입 지원
+sealed class CredentialSubject {
+    data class StudentCard(
+        @SerializedName("studentId") val studentId: String,
+        @SerializedName("studentNumber") val studentNumber: String,
+        @SerializedName("university") val university: String,
+        @SerializedName("department") val department: String
+    ) : CredentialSubject()
+    
+    data class DriverLicense(
+        @SerializedName("licenseId") val licenseId: String
+    ) : CredentialSubject()
+}
+
+data class Proof(
+    @SerializedName("type") val type: String,
+    @SerializedName("created") val created: String,
+    @SerializedName("proofPurpose") val proofPurpose: String,
+    @SerializedName("verificationMethod") val verificationMethod: String,
+    @SerializedName("proofValue") val proofValue: String,
+    @SerializedName("challenge") val challenge: String? = null
+)
+
+// Credential Type
+enum class CredentialType {
+    STUDENT_CARD,
+    DRIVER_LICENSE
+}
+
+// Local Credential Info
+data class IssuedCredential(
+    val type: CredentialType,
+    val vcId: String,
+    val issuanceDate: String,
+    val studentNumber: String? = null,
+    val licenseNumber: String? = null,
+    val university: String? = null,
+    val department: String? = null
+)

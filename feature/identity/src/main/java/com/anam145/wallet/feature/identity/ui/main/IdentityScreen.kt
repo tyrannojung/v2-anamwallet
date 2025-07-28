@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.identity.ui
+package com.anam145.wallet.feature.identity.ui.main
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,10 +20,17 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.theme.*
+import com.anam145.wallet.feature.identity.domain.model.CredentialType
+import com.anam145.wallet.feature.identity.domain.model.IssuedCredential
+import com.anam145.wallet.feature.identity.ui.main.IdentityContract
+import com.anam145.wallet.feature.identity.ui.main.IdentityViewModel
 import com.anam145.wallet.feature.identity.ui.util.debouncedClickable
 
 /**
@@ -34,11 +41,26 @@ import com.anam145.wallet.feature.identity.ui.util.debouncedClickable
 @Composable
 fun IdentityScreen(
     modifier: Modifier = Modifier,
-    onNavigateToStudentCard: () -> Unit = {},
-    onNavigateToDriverLicense: () -> Unit = {},
-    onNavigateToIssue: () -> Unit = {}
+    onNavigateToStudentCard: (String) -> Unit = {},
+    onNavigateToDriverLicense: (String) -> Unit = {},
+    onNavigateToIssue: () -> Unit = {},
+    viewModel: IdentityViewModel = hiltViewModel()
 ) {
     val strings = LocalStrings.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    
+    LaunchedEffect(viewModel) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is IdentityContract.Effect.NavigateToStudentCardDetail -> 
+                    onNavigateToStudentCard(effect.vcId)
+                is IdentityContract.Effect.NavigateToDriverLicenseDetail -> 
+                    onNavigateToDriverLicense(effect.vcId)
+                IdentityContract.Effect.NavigateToIssue -> 
+                    onNavigateToIssue()
+            }
+        }
+    }
     
     Column(
         modifier = modifier
@@ -58,23 +80,74 @@ fun IdentityScreen(
             )
         }
         
-        // 카드 리스트
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // 고려대학교 학생증 카드
-            StudentCard(
-                onClick = onNavigateToStudentCard
-            )
-            
-            // 운전면허증 카드
-            DriverLicenseCard(
-                onClick = onNavigateToDriverLicense
-            )
+        // 카드 리스트 또는 빈 상태
+        when {
+            uiState.isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            uiState.issuedCredentials.isEmpty() -> {
+                // 발급된 신분증이 없는 경우
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = strings.identityNoIssuedIds,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+            else -> {
+                // 발급된 신분증 표시
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    uiState.issuedCredentials.forEach { credential ->
+                        when (credential.type) {
+                            CredentialType.STUDENT_CARD -> {
+                                StudentCard(
+                                    credential = credential,
+                                    onClick = { 
+                                        viewModel.handleIntent(
+                                            IdentityContract.Intent.NavigateToDetail(credential)
+                                        )
+                                    }
+                                )
+                            }
+                            CredentialType.DRIVER_LICENSE -> {
+                                DriverLicenseCard(
+                                    credential = credential,
+                                    onClick = { 
+                                        viewModel.handleIntent(
+                                            IdentityContract.Intent.NavigateToDetail(credential)
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
         
         // 발급하기 버튼
@@ -85,7 +158,7 @@ fun IdentityScreen(
             contentAlignment = Alignment.Center
         ) {
             OutlinedButton(
-                onClick = onNavigateToIssue,
+                onClick = { viewModel.handleIntent(IdentityContract.Intent.NavigateToIssue) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -114,6 +187,7 @@ fun IdentityScreen(
 
 @Composable
 private fun StudentCard(
+    credential: IssuedCredential,
     onClick: () -> Unit
 ) {
     val strings = LocalStrings.current
@@ -237,7 +311,7 @@ private fun StudentCard(
                     Spacer(modifier = Modifier.height(4.dp))
                     
                     Text(
-                        text = "2023572504",
+                        text = credential.studentNumber ?: "2023572504",
                         fontSize = 14.sp,
                         color = Color(0xFF666666)
                     )
@@ -245,9 +319,7 @@ private fun StudentCard(
                     Spacer(modifier = Modifier.height(2.dp))
                     
                     Text(
-                        text = if (strings == LocalStrings.current) 
-                            "${strings.identityFinancialSecurity} · ${strings.identityBlockchainMajor}"
-                        else "${strings.identityFinancialSecurity} · ${strings.identityBlockchainMajor}",
+                        text = "${credential.department ?: strings.identityFinancialSecurity} · ${strings.identityBlockchainMajor}",
                         fontSize = 13.sp,
                         color = Color(0xFF888888)
                     )
@@ -273,6 +345,7 @@ private fun StudentCard(
 
 @Composable
 private fun DriverLicenseCard(
+    credential: IssuedCredential,
     onClick: () -> Unit
 ) {
     val strings = LocalStrings.current
@@ -413,7 +486,7 @@ private fun DriverLicenseCard(
                     Spacer(modifier = Modifier.height(4.dp))
                     
                     Text(
-                        text = "11-22-333333-44",
+                        text = credential.licenseNumber ?: "11-22-333333-44",
                         fontSize = 14.sp,
                         color = Color(0xFF666666)
                     )

@@ -1,8 +1,11 @@
 package com.anam145.wallet.feature.identity.di
 
+import com.anam145.wallet.feature.identity.data.remote.CredentialSubjectDeserializer
 import com.anam145.wallet.feature.identity.data.remote.DIDApiService
 import com.anam145.wallet.feature.identity.data.repository.DIDRepositoryImpl
+import com.anam145.wallet.feature.identity.domain.model.CredentialSubject
 import com.anam145.wallet.feature.identity.domain.repository.DIDRepository
+import com.google.gson.GsonBuilder
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -28,10 +31,17 @@ abstract class IdentityModule {
         @Provides
         @Singleton
         fun provideDIDRetrofit(): Retrofit {
+            val gson = GsonBuilder()
+                .registerTypeAdapter(
+                    CredentialSubject::class.java,
+                    CredentialSubjectDeserializer()
+                )
+                .create()
+                
             // 에뮬레이터용 DID 서버 주소
             return Retrofit.Builder()
                 .baseUrl("http://10.0.2.2:8081/")
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
         }
         

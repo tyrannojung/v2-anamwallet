@@ -3,10 +3,9 @@ package com.anam145.wallet.feature.identity.data.repository
 import com.anam145.wallet.core.security.keystore.DIDKeyManager
 import com.anam145.wallet.feature.identity.data.local.DIDLocalDataSource
 import com.anam145.wallet.feature.identity.data.remote.DIDApiService
-import com.anam145.wallet.feature.identity.domain.model.DIDDocument
-import com.anam145.wallet.feature.identity.domain.model.RegisterDIDRequest
-import com.anam145.wallet.feature.identity.domain.model.DIDCredentials
+import com.anam145.wallet.feature.identity.domain.model.*
 import com.anam145.wallet.feature.identity.domain.repository.DIDRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -100,5 +99,99 @@ class DIDRepositoryImpl @Inject constructor(
     
     override suspend fun isDIDInitialized(): Boolean {
         return localDataSource.isDIDInitialized.first()
+    }
+    
+    override suspend fun issueStudentCard(): Result<VerifiableCredential> {
+        return try {
+            val credentials = getDIDCredentials()
+                ?: return Result.failure(Exception("DID가 초기화되지 않았습니다"))
+            
+            android.util.Log.d("DIDRepository", "Issuing student card for: ${credentials.userDid}")
+            
+            val request = IssueStudentCardRequest(userDid = credentials.userDid)
+            val response = apiService.issueStudentCard(request)
+            
+            if (!response.isSuccessful) {
+                android.util.Log.e("DIDRepository", "Student card issuance failed: ${response.code()} - ${response.errorBody()?.string()}")
+                return Result.failure(
+                    Exception("학생증 발급 실패: ${response.code()} - ${response.message()}")
+                )
+            }
+            
+            val studentResponse = response.body()
+                ?: return Result.failure(Exception("응답 본문이 비어있습니다"))
+            
+            android.util.Log.d("DIDRepository", "Student card issued successfully!")
+            android.util.Log.d("DIDRepository", "VC ID: ${studentResponse.vc.id}")
+            
+            // VC 정보 로컬 저장
+            val credentialInfo = IssuedCredential(
+                type = CredentialType.STUDENT_CARD,
+                vcId = studentResponse.vc.id,
+                issuanceDate = studentResponse.vc.issuanceDate,
+                studentNumber = (studentResponse.vc.credentialSubject as? CredentialSubject.StudentCard)?.studentNumber,
+                university = (studentResponse.vc.credentialSubject as? CredentialSubject.StudentCard)?.university,
+                department = (studentResponse.vc.credentialSubject as? CredentialSubject.StudentCard)?.department
+            )
+            localDataSource.saveStudentCardVC(studentResponse.vc.id, credentialInfo)
+            
+            Result.success(studentResponse.vc)
+            
+        } catch (e: Exception) {
+            android.util.Log.e("DIDRepository", "Failed to issue student card", e)
+            Result.failure(e)
+        }
+    }
+    
+    override suspend fun issueDriverLicense(): Result<VerifiableCredential> {
+        return try {
+            val credentials = getDIDCredentials()
+                ?: return Result.failure(Exception("DID가 초기화되지 않았습니다"))
+            
+            android.util.Log.d("DIDRepository", "Issuing driver license for: ${credentials.userDid}")
+            
+            val request = IssueDriverLicenseRequest(userDid = credentials.userDid)
+            val response = apiService.issueDriverLicense(request)
+            
+            if (!response.isSuccessful) {
+                android.util.Log.e("DIDRepository", "Driver license issuance failed: ${response.code()} - ${response.errorBody()?.string()}")
+                return Result.failure(
+                    Exception("운전면허증 발급 실패: ${response.code()} - ${response.message()}")
+                )
+            }
+            
+            val licenseResponse = response.body()
+                ?: return Result.failure(Exception("응답 본문이 비어있습니다"))
+            
+            android.util.Log.d("DIDRepository", "Driver license issued successfully!")
+            android.util.Log.d("DIDRepository", "VC ID: ${licenseResponse.vc.id}")
+            
+            // VC 정보 로컬 저장
+            val credentialInfo = IssuedCredential(
+                type = CredentialType.DRIVER_LICENSE,
+                vcId = licenseResponse.vc.id,
+                issuanceDate = licenseResponse.vc.issuanceDate,
+                licenseNumber = licenseResponse.licenseNumber
+            )
+            localDataSource.saveDriverLicenseVC(licenseResponse.vc.id, credentialInfo)
+            
+            Result.success(licenseResponse.vc)
+            
+        } catch (e: Exception) {
+            android.util.Log.e("DIDRepository", "Failed to issue driver license", e)
+            Result.failure(e)
+        }
+    }
+    
+    override fun getIssuedCredentials(): Flow<List<IssuedCredential>> {
+        return localDataSource.getIssuedCredentials()
+    }
+    
+    override fun isStudentCardIssued(): Flow<Boolean> {
+        return localDataSource.isStudentCardIssued()
+    }
+    
+    override fun isDriverLicenseIssued(): Flow<Boolean> {
+        return localDataSource.isDriverLicenseIssued()
     }
 }

@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.identity.ui.components
+package com.anam145.wallet.feature.identity.ui.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,16 +24,20 @@ import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.theme.*
 
 /**
- * 학생증 상세 화면
+ * 운전면허증 상세 화면
  * 
- * 학생증 정보를 자세히 표시하는 화면
+ * 운전면허증 정보를 자세히 표시하는 화면
  */
 @Composable
-fun StudentCardDetail(
+fun DriverLicenseDetailScreen(
     modifier: Modifier = Modifier,
+    vcId: String,
     onBackClick: () -> Unit = {}
 ) {
     val strings = LocalStrings.current
+    
+    // TODO: vcId를 사용하여 실제 VC 데이터 로드
+    // 현재는 하드코딩된 데이터 사용
     
     Column(
         modifier = modifier
@@ -57,7 +61,7 @@ fun StudentCardDetail(
             }
             
             Text(
-                text = strings.identityMobileStudentId,
+                text = strings.identityMobileDriverLicense,
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
@@ -74,7 +78,7 @@ fun StudentCardDetail(
                 .padding(top = 8.dp),
             contentAlignment = Alignment.Center
         ) {
-            // 학생증 카드
+            // 운전면허증 카드
             Card(
                 modifier = Modifier
                     .width(350.dp)
@@ -89,10 +93,10 @@ fun StudentCardDetail(
             ) {
                 Column {
                     // 카드 헤더
-                    CardDetailHeader()
+                    DriverCardDetailHeader()
                     
                     // 카드 바디
-                    CardDetailBody()
+                    DriverCardDetailBody()
                 }
             }
         }
@@ -100,7 +104,7 @@ fun StudentCardDetail(
 }
 
 @Composable
-private fun CardDetailHeader() {
+private fun DriverCardDetailHeader() {
     val strings = LocalStrings.current
     
     Box(
@@ -110,32 +114,49 @@ private fun CardDetailHeader() {
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(
-                        Color(0xFF8B1538),
-                        Color(0xFFA91E3E)
+                        Color(0xFF0D47A1),  // 진한 파랑
+                        Color(0xFF1976D2)   // 파랑
                     )
                 )
             )
             .padding(25.dp)
     ) {
-        // 배경 로고
+        // 배경 태극기 패턴
         Box(
             modifier = Modifier
                 .size(200.dp)
                 .offset(x = (-50).dp, y = (-30).dp)
                 .rotate(-15f)
                 .alpha(0.1f)
-                .background(
-                    color = Color.White.copy(alpha = 0.3f),
-                    shape = CircleShape
-                )
-        )
+        ) {
+            // 태극기 원 패턴
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.Center)
+                    .background(
+                        color = Color.Red.copy(alpha = 0.3f),
+                        shape = CircleShape
+                    )
+            )
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .align(Alignment.TopStart)
+                    .offset(x = 25.dp, y = 25.dp)
+                    .background(
+                        color = Color.Blue.copy(alpha = 0.3f),
+                        shape = CircleShape
+                    )
+            )
+        }
         
         // 새로고침 버튼 제거
         
-        // 대학 정보
+        // 기관 정보
         Column {
             Text(
-                text = strings.identityGraduateSchool,
+                text = strings.identityDriversLicense,
                 color = Color.White.copy(alpha = 0.9f),
                 fontSize = 12.sp
             )
@@ -143,7 +164,7 @@ private fun CardDetailHeader() {
             Spacer(modifier = Modifier.height(5.dp))
             
             Text(
-                text = strings.identityKoreaUniversity,
+                text = strings.identityRepublicOfKorea,
                 color = Color.White,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -153,7 +174,7 @@ private fun CardDetailHeader() {
 }
 
 @Composable
-private fun CardDetailBody() {
+private fun DriverCardDetailBody() {
     val strings = LocalStrings.current
     
     Column(
@@ -179,7 +200,7 @@ private fun CardDetailBody() {
         
         Spacer(modifier = Modifier.height(20.dp))
         
-        // 학생 이름
+        // 운전자 이름
         Text(
             text = strings.identitySampleName,
             fontSize = 24.sp,
@@ -189,16 +210,16 @@ private fun CardDetailBody() {
         
         Spacer(modifier = Modifier.height(5.dp))
         
-        // 학번
+        // 면허번호
         Text(
-            text = "2023572504",
+            text = "11-22-333333-44",
             fontSize = 16.sp,
             color = Color(0xFF666666)
         )
         
         Spacer(modifier = Modifier.height(20.dp))
         
-        // 학과 정보 섹션
+        // 면허 정보 섹션
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -209,21 +230,75 @@ private fun CardDetailBody() {
             
             Spacer(modifier = Modifier.height(20.dp))
             
-            Text(
-                text = strings.identityFinancialSecurity,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFF888888)
-            )
+            // 면허 종류
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = strings.identityLicenseType,
+                        fontSize = 12.sp,
+                        color = Color(0xFF999999)
+                    )
+                    Text(
+                        text = strings.identityClass1Regular,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF666666)
+                    )
+                }
+                
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = strings.identityIssueDate,
+                        fontSize = 12.sp,
+                        color = Color(0xFF999999)
+                    )
+                    Text(
+                        text = "2020.01.15",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF666666)
+                    )
+                }
+            }
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(15.dp))
             
-            Text(
-                text = strings.identityBlockchainMajor,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFF888888)
-            )
+            // 갱신 정보
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = strings.identityAptitudeTest,
+                        fontSize = 12.sp,
+                        color = Color(0xFF999999)
+                    )
+                    Text(
+                        text = "2028.01.15",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF666666)
+                    )
+                }
+                
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = strings.identityRenewal,
+                        fontSize = 12.sp,
+                        color = Color(0xFF999999)
+                    )
+                    Text(
+                        text = "2030.01.15",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF666666)
+                    )
+                }
+            }
             
             Spacer(modifier = Modifier.height(20.dp))
             
