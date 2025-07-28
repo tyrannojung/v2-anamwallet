@@ -17,6 +17,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import com.anam145.wallet.feature.miniapp.webapp.ui.components.WebAppWebView
 import com.anam145.wallet.feature.miniapp.webapp.ui.components.ErrorContent
 import com.anam145.wallet.feature.miniapp.webapp.ui.components.ServiceConnectionCard
+import com.anam145.wallet.feature.miniapp.webapp.ui.components.VPBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,6 +82,41 @@ private fun WebAppScreenContent(
                     
                     webView?.evaluateJavascript(script, null)
                 }
+                is WebAppContract.Effect.SendVPResponse -> {
+                    // VP 응답을 JavaScript로 전달
+                    // JSON 문자열을 JavaScript에서 파싱할 수 있도록 escape 처리
+                    val escapedJson = effect.vpJson
+                        .replace("\\", "\\\\")
+                        .replace("\"", "\\\"")
+                        .replace("\n", "\\n")
+                        .replace("\r", "\\r")
+                        .replace("\t", "\\t")
+                    
+                    val script = """
+                        (function() {
+                            const vpData = JSON.parse("${escapedJson}");
+                            const event = new CustomEvent('vpResponse', {
+                                detail: vpData
+                            });
+                            window.dispatchEvent(event);
+                        })();
+                    """.trimIndent()
+                    
+                    webView?.evaluateJavascript(script, null)
+                }
+                is WebAppContract.Effect.SendVPError -> {
+                    // VP 에러를 JavaScript로 전달
+                    val script = """
+                        (function() {
+                            const event = new CustomEvent('vpError', {
+                                detail: { error: '${effect.error}' }
+                            });
+                            window.dispatchEvent(event);
+                        })();
+                    """.trimIndent()
+                    
+                    webView?.evaluateJavascript(script, null)
+                }
                 else -> {
                     // Activity에서 처리
                 }
@@ -131,6 +167,11 @@ private fun WebAppScreenContent(
                                     WebAppContract.Intent.RequestTransaction(transactionData)
                                 )
                             },
+                            onVPRequest = { vpRequest ->
+                                viewModel.handleIntent(
+                                    WebAppContract.Intent.RequestVP(vpRequest)
+                                )
+                            },
                             onWebViewCreated = { 
                                 webView = it
                                 viewModel.onWebViewReady()
@@ -148,6 +189,24 @@ private fun WebAppScreenContent(
                     }
                 )
             }
+        }
+    }
+    
+    // VP 바텀시트
+    if (uiState.showVPBottomSheet) {
+        uiState.vpRequestData?.let { vpRequestData ->
+            VPBottomSheet(
+                serviceName = vpRequestData.service,
+                purpose = vpRequestData.purpose,
+                credentialType = vpRequestData.type,
+                credentials = uiState.credentials,
+                onCredentialSelected = { credentialId ->
+                    viewModel.handleIntent(WebAppContract.Intent.SelectCredential(credentialId))
+                },
+                onDismiss = {
+                    viewModel.handleIntent(WebAppContract.Intent.DismissVPBottomSheet)
+                }
+            )
         }
     }
 }

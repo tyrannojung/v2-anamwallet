@@ -27,6 +27,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <!-- VP/Credential Service (Main 프로세스) -->
+        <service
+            android:name="com.anam145.wallet.feature.miniapp.webapp.data.service.CredentialService"
+            android:exported="false" />
             
     </application>
 

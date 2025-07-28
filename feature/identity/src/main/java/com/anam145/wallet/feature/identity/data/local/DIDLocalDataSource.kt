@@ -7,9 +7,10 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.anam145.wallet.feature.identity.domain.model.DIDCredentials
-import com.anam145.wallet.feature.identity.domain.model.IssuedCredential
+import com.anam145.wallet.feature.identity.domain.model.*
+import com.anam145.wallet.feature.identity.data.remote.CredentialSubjectDeserializer
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -34,15 +35,15 @@ class DIDLocalDataSource @Inject constructor(
         private val KEY_USER_DID = stringPreferencesKey("userDid")
         private val KEY_IS_INITIALIZED = booleanPreferencesKey("isInitialized")
         
-        // VC 관련 키
-        private val KEY_STUDENT_VC_ID = stringPreferencesKey("studentVcId")
-        private val KEY_DRIVER_LICENSE_VC_ID = stringPreferencesKey("driverLicenseVcId")
-        private val KEY_STUDENT_CARD_INFO = stringPreferencesKey("studentCardInfo")
-        private val KEY_DRIVER_LICENSE_INFO = stringPreferencesKey("driverLicenseInfo")
+        // 전체 VC 저장용 키
+        private val KEY_STUDENT_VC = stringPreferencesKey("studentVc")
+        private val KEY_DRIVER_LICENSE_VC = stringPreferencesKey("driverLicenseVc")
     }
     
     private val dataStore = context.didDataStore
-    private val gson = Gson()
+    private val gson = GsonBuilder()
+        .registerTypeAdapter(CredentialSubject::class.java, CredentialSubjectDeserializer())
+        .create()
     
     /**
      * DID 자격증명 정보 저장 (공개키는 DIDKeyManager에서 관리)
@@ -85,49 +86,58 @@ class DIDLocalDataSource @Inject constructor(
         preferences[KEY_IS_INITIALIZED] ?: false
     }
     
-    /**
-     * 학생증 VC 정보 저장
-     */
-    suspend fun saveStudentCardVC(vcId: String, info: IssuedCredential) {
-        dataStore.edit { preferences ->
-            preferences[KEY_STUDENT_VC_ID] = vcId
-            preferences[KEY_STUDENT_CARD_INFO] = gson.toJson(info)
-        }
-    }
     
     /**
-     * 운전면허증 VC 정보 저장
-     */
-    suspend fun saveDriverLicenseVC(vcId: String, info: IssuedCredential) {
-        dataStore.edit { preferences ->
-            preferences[KEY_DRIVER_LICENSE_VC_ID] = vcId
-            preferences[KEY_DRIVER_LICENSE_INFO] = gson.toJson(info)
-        }
-    }
-    
-    /**
-     * 발급된 VC 목록 조회
+     * 발급된 VC 목록 조회 (전체 VC에서 추출)
      */
     fun getIssuedCredentials(): Flow<List<IssuedCredential>> = dataStore.data.map { preferences ->
         val credentials = mutableListOf<IssuedCredential>()
         
-        preferences[KEY_STUDENT_CARD_INFO]?.let { infoJson ->
+        // 학생증 VC에서 정보 추출
+        preferences[KEY_STUDENT_VC]?.let { vcJson ->
             try {
-                credentials.add(
-                    gson.fromJson(infoJson, IssuedCredential::class.java)
-                )
+                android.util.Log.d("DIDLocalDataSource", "Student VC JSON: $vcJson")
+                val vc = gson.fromJson(vcJson, VerifiableCredential::class.java)
+                android.util.Log.d("DIDLocalDataSource", "Parsed VC: $vc")
+                val subject = vc.credentialSubject as? CredentialSubject.StudentCard
+                android.util.Log.d("DIDLocalDataSource", "Student subject: $subject")
+                if (subject != null) {
+                    credentials.add(
+                        IssuedCredential(
+                            type = CredentialType.STUDENT_CARD,
+                            vcId = vc.id,
+                            issuanceDate = vc.issuanceDate,
+                            studentNumber = subject.studentNumber,
+                            university = subject.university,
+                            department = subject.department
+                        )
+                    )
+                }
             } catch (e: Exception) {
-                android.util.Log.e("DIDLocalDataSource", "Failed to decode student card info", e)
+                android.util.Log.e("DIDLocalDataSource", "Failed to decode student VC", e)
             }
         }
         
-        preferences[KEY_DRIVER_LICENSE_INFO]?.let { infoJson ->
+        // 운전면허증 VC에서 정보 추출
+        preferences[KEY_DRIVER_LICENSE_VC]?.let { vcJson ->
             try {
-                credentials.add(
-                    gson.fromJson(infoJson, IssuedCredential::class.java)
-                )
+                android.util.Log.d("DIDLocalDataSource", "Driver License VC JSON: $vcJson")
+                val vc = gson.fromJson(vcJson, VerifiableCredential::class.java)
+                android.util.Log.d("DIDLocalDataSource", "Parsed VC: $vc")
+                val subject = vc.credentialSubject as? CredentialSubject.DriverLicense
+                android.util.Log.d("DIDLocalDataSource", "Driver License subject: $subject")
+                if (subject != null) {
+                    credentials.add(
+                        IssuedCredential(
+                            type = CredentialType.DRIVER_LICENSE,
+                            vcId = vc.id,
+                            issuanceDate = vc.issuanceDate,
+                            licenseNumber = subject.licenseNumber
+                        )
+                    )
+                }
             } catch (e: Exception) {
-                android.util.Log.e("DIDLocalDataSource", "Failed to decode driver license info", e)
+                android.util.Log.e("DIDLocalDataSource", "Failed to decode driver license VC", e)
             }
         }
         
@@ -138,14 +148,61 @@ class DIDLocalDataSource @Inject constructor(
      * 학생증 발급 여부
      */
     fun isStudentCardIssued(): Flow<Boolean> = dataStore.data.map { preferences ->
-        preferences[KEY_STUDENT_VC_ID] != null
+        preferences[KEY_STUDENT_VC] != null
     }
     
     /**
      * 운전면허증 발급 여부
      */
     fun isDriverLicenseIssued(): Flow<Boolean> = dataStore.data.map { preferences ->
-        preferences[KEY_DRIVER_LICENSE_VC_ID] != null
+        preferences[KEY_DRIVER_LICENSE_VC] != null
+    }
+    
+    
+    /**
+     * 학생증 전체 VC 저장
+     */
+    suspend fun saveStudentVC(vc: VerifiableCredential) {
+        dataStore.edit { preferences ->
+            preferences[KEY_STUDENT_VC] = gson.toJson(vc)
+        }
+    }
+    
+    /**
+     * 운전면허증 전체 VC 저장
+     */
+    suspend fun saveDriverLicenseVC(vc: VerifiableCredential) {
+        dataStore.edit { preferences ->
+            preferences[KEY_DRIVER_LICENSE_VC] = gson.toJson(vc)
+        }
+    }
+    
+    /**
+     * 학생증 전체 VC 조회
+     */
+    fun getStudentVC(): Flow<VerifiableCredential?> = dataStore.data.map { preferences ->
+        preferences[KEY_STUDENT_VC]?.let { vcJson ->
+            try {
+                gson.fromJson(vcJson, VerifiableCredential::class.java)
+            } catch (e: Exception) {
+                android.util.Log.e("DIDLocalDataSource", "Failed to decode student VC", e)
+                null
+            }
+        }
+    }
+    
+    /**
+     * 운전면허증 전체 VC 조회
+     */
+    fun getDriverLicenseVC(): Flow<VerifiableCredential?> = dataStore.data.map { preferences ->
+        preferences[KEY_DRIVER_LICENSE_VC]?.let { vcJson ->
+            try {
+                gson.fromJson(vcJson, VerifiableCredential::class.java)
+            } catch (e: Exception) {
+                android.util.Log.e("DIDLocalDataSource", "Failed to decode driver license VC", e)
+                null
+            }
+        }
     }
     
     /**

@@ -51,4 +51,12 @@ interface DIDApiService {
     suspend fun getVerifiableCredential(
         @Path("vcId") vcId: String
     ): Response<VerifiableCredential>
+    
+    /**
+     * VC 조회 (간략한 메서드명)
+     */
+    @GET("vcs/{vcId}")
+    suspend fun getVC(
+        @Path("vcId") vcId: String
+    ): Response<VerifiableCredential>
 }

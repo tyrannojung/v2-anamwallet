@@ -95,6 +95,12 @@ class WebAppActivity : ComponentActivity() {
                             is WebAppContract.Effect.SendTransactionResponse -> {
                                 // WebAppScreen의 WebView에서 처리됨
                             }
+                            is WebAppContract.Effect.SendVPResponse -> {
+                                // WebAppScreen의 WebView에서 처리됨
+                            }
+                            is WebAppContract.Effect.SendVPError -> {
+                                // WebAppScreen의 WebView에서 처리됨
+                            }
                         }
                     }
                     .launchIn(this)

@@ -1,6 +1,7 @@
 package com.anam145.wallet.feature.miniapp.webapp.ui
 
 import com.anam145.wallet.core.common.model.MiniAppManifest
+import com.anam145.wallet.feature.miniapp.webapp.domain.model.CredentialInfo
 import org.json.JSONObject
 
 /**
@@ -21,6 +22,9 @@ interface WebAppContract {
      * @property webViewReady WebView 준비 상태
      * @property activeBlockchainId 활성화된 블록체인 ID
      * @property activeBlockchainName 활성화된 블록체인 이름
+     * @property showVPBottomSheet VP 바텀시트 표시 여부
+     * @property vpRequestData VP 요청 데이터
+     * @property credentials 신분증 목록
      */
     data class State(
         val appId: String = "",
@@ -31,7 +35,20 @@ interface WebAppContract {
         val webViewReady: Boolean = false,
         val activeBlockchainId: String? = null,
         val activeBlockchainName: String? = null,
-        val webUrl: String? = null
+        val webUrl: String? = null,
+        val showVPBottomSheet: Boolean = false,
+        val vpRequestData: VPRequestData? = null,
+        val credentials: List<CredentialInfo> = emptyList()
+    )
+    
+    /**
+     * VP 요청 데이터
+     */
+    data class VPRequestData(
+        val service: String,
+        val purpose: String,
+        val challenge: String,
+        val type: String = "both" // "both", "driver", "student"
     )
     
     /**
@@ -40,6 +57,15 @@ interface WebAppContract {
     sealed interface Intent {
         /** 결제 요청 */
         data class RequestTransaction(val transactionData: JSONObject) : Intent
+        
+        /** VP 요청 */
+        data class RequestVP(val vpRequest: JSONObject) : Intent
+        
+        /** VP 바텀시트 닫기 */
+        object DismissVPBottomSheet : Intent
+        
+        /** 신분증 선택 */
+        data class SelectCredential(val credentialId: String) : Intent
         
         /** 서비스 재연결 시도 */
         object RetryServiceConnection : Intent
@@ -57,6 +83,12 @@ interface WebAppContract {
     sealed interface Effect {
         /** JavaScript 실행하여 결제 응답 전달 */
         data class SendTransactionResponse(val responseJson: String) : Effect
+        
+        /** JavaScript 실행하여 VP 응답 전달 */
+        data class SendVPResponse(val vpJson: String) : Effect
+        
+        /** JavaScript 실행하여 VP 에러 전달 */
+        data class SendVPError(val error: String) : Effect
         
         /** 에러 토스트 표시 */
         data class ShowError(val message: String) : Effect

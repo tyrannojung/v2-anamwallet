@@ -9,6 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -20,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.theme.*
 
@@ -32,12 +35,11 @@ import com.anam145.wallet.core.ui.theme.*
 fun StudentCardDetailScreen(
     modifier: Modifier = Modifier,
     vcId: String,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    viewModel: StudentCardDetailViewModel = hiltViewModel()
 ) {
     val strings = LocalStrings.current
-    
-    // TODO: vcId를 사용하여 실제 VC 데이터 로드
-    // 현재는 하드코딩된 데이터 사용
+    val studentCard by viewModel.studentCard.collectAsState()
     
     Column(
         modifier = modifier
@@ -96,7 +98,9 @@ fun StudentCardDetailScreen(
                     CardDetailHeader()
                     
                     // 카드 바디
-                    CardDetailBody()
+                    studentCard?.let {
+                        CardDetailBody(studentCard = it)
+                    } ?: CardDetailBodyLoading()
                 }
             }
         }
@@ -157,7 +161,9 @@ private fun CardDetailHeader() {
 }
 
 @Composable
-private fun CardDetailBody() {
+private fun CardDetailBody(
+    studentCard: StudentCardDetailViewModel.StudentCardInfo
+) {
     val strings = LocalStrings.current
     
     Column(
@@ -185,7 +191,7 @@ private fun CardDetailBody() {
         
         // 학생 이름
         Text(
-            text = strings.identitySampleName,
+            text = studentCard.name,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
@@ -195,7 +201,7 @@ private fun CardDetailBody() {
         
         // 학번
         Text(
-            text = "2023572504",
+            text = studentCard.studentNumber,
             fontSize = 16.sp,
             color = Color(0xFF666666)
         )
@@ -214,7 +220,7 @@ private fun CardDetailBody() {
             Spacer(modifier = Modifier.height(20.dp))
             
             Text(
-                text = strings.identityFinancialSecurity,
+                text = studentCard.university,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color(0xFF888888)
@@ -223,7 +229,7 @@ private fun CardDetailBody() {
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = strings.identityBlockchainMajor,
+                text = studentCard.department,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color(0xFF888888)
@@ -282,5 +288,31 @@ private fun CardDetailBody() {
                     .padding(start = 20.dp)
             )
         }
+    }
+}
+
+@Composable
+private fun CardDetailBodyLoading() {
+    val strings = LocalStrings.current
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(30.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // 로딩 표시
+        CircularProgressIndicator(
+            modifier = Modifier.size(50.dp),
+            color = MaterialTheme.colorScheme.primary
+        )
+        
+        Spacer(modifier = Modifier.height(20.dp))
+        
+        Text(
+            text = strings.loading,
+            fontSize = 16.sp,
+            color = Color.Gray
+        )
     }
 }

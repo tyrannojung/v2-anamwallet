@@ -9,6 +9,8 @@ import com.anam145.wallet.feature.miniapp.common.domain.usecase.ConnectToService
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.LoadMiniAppManifestUseCase
 import com.anam145.wallet.feature.miniapp.common.domain.usecase.RequestTransactionUseCase
 import com.anam145.wallet.feature.miniapp.webapp.domain.usecase.GetActiveBlockchainIdFromWebAppServiceUseCase
+import com.anam145.wallet.feature.miniapp.webapp.domain.usecase.GetCredentialsUseCase
+import com.anam145.wallet.feature.miniapp.webapp.domain.usecase.CreateVPFromServiceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -16,6 +18,9 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import javax.inject.Inject
 import com.anam145.wallet.core.common.extension.resolveEntryPoint
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.anam145.wallet.feature.miniapp.webapp.domain.model.CredentialInfo
 
 /**
  * WebApp 화면의 ViewModel
@@ -27,7 +32,9 @@ class WebAppViewModel @Inject constructor(
     private val loadMiniAppManifestUseCase: LoadMiniAppManifestUseCase,
     private val connectToServiceUseCase: ConnectToServiceUseCase,
     private val requestTransactionUseCase: RequestTransactionUseCase,
-    private val getActiveBlockchainIdUseCase: GetActiveBlockchainIdFromWebAppServiceUseCase
+    private val getActiveBlockchainIdUseCase: GetActiveBlockchainIdFromWebAppServiceUseCase,
+    private val getCredentialsUseCase: GetCredentialsUseCase,
+    private val createVPUseCase: CreateVPFromServiceUseCase
 ) : ViewModel() {
     
     companion object {
@@ -91,6 +98,9 @@ class WebAppViewModel @Inject constructor(
     fun handleIntent(intent: WebAppContract.Intent) {
         when (intent) {
             is WebAppContract.Intent.RequestTransaction -> requestTransaction(intent.transactionData)
+            is WebAppContract.Intent.RequestVP -> requestVP(intent.vpRequest)
+            is WebAppContract.Intent.DismissVPBottomSheet -> dismissVPBottomSheet()
+            is WebAppContract.Intent.SelectCredential -> selectCredential(intent.credentialId)
             is WebAppContract.Intent.RetryServiceConnection -> retryServiceConnection()
             is WebAppContract.Intent.DismissError -> dismissError()
             is WebAppContract.Intent.NavigateBack -> navigateBack()
@@ -315,6 +325,129 @@ class WebAppViewModel @Inject constructor(
     private fun checkAndLoadUrl() {
         if (_uiState.value.manifest != null && _uiState.value.webViewReady) {
             loadUrlInWebView()
+        }
+    }
+    
+    /**
+     * VP 요청을 처리합니다.
+     * 
+     * @param vpRequest VP 요청 JSON 객체
+     */
+    private fun requestVP(vpRequest: JSONObject) {
+        viewModelScope.launch {
+            try {
+                val service = vpRequest.optString("service", "Unknown Service")
+                val purpose = vpRequest.optString("purpose", "본인인증")
+                val challenge = vpRequest.optString("challenge", "")
+                val type = vpRequest.optString("type", "both")
+                
+                // 신분증 목록 조회
+                when (val result = getCredentialsUseCase()) {
+                    is Result<List<CredentialInfo>> -> {
+                        if (result.isSuccess) {
+                            val credentials = result.getOrNull() ?: emptyList()
+                            
+                            _uiState.update { 
+                                it.copy(
+                                    showVPBottomSheet = true,
+                                    vpRequestData = WebAppContract.VPRequestData(
+                                        service = service,
+                                        purpose = purpose,
+                                        challenge = challenge,
+                                        type = type
+                                    ),
+                                    credentials = credentials
+                                )
+                            }
+                        } else {
+                            Log.e(TAG, "Failed to get credentials", result.exceptionOrNull())
+                            _effect.emit(WebAppContract.Effect.ShowError("신분증 목록 조회 실패"))
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error parsing VP request", e)
+                _effect.emit(WebAppContract.Effect.ShowError("VP 요청 처리 실패"))
+            }
+        }
+    }
+    
+    /**
+     * VP 바텀시트를 닫습니다.
+     */
+    private fun dismissVPBottomSheet() {
+        _uiState.update { 
+            it.copy(
+                showVPBottomSheet = false,
+                vpRequestData = null
+            )
+        }
+        
+        // 사용자가 취소한 경우 에러 이벤트 전송
+        viewModelScope.launch {
+            _effect.emit(WebAppContract.Effect.SendVPError("User cancelled"))
+        }
+    }
+    
+    /**
+     * 신분증을 선택하고 VP를 생성합니다.
+     * 
+     * @param credentialId 선택된 신분증 ID
+     */
+    private fun selectCredential(credentialId: String) {
+        viewModelScope.launch {
+            val vpRequestData = _uiState.value.vpRequestData ?: return@launch
+            
+            try {
+                // AIDL을 통해 Main 프로세스에서 VP 생성 요청
+                when (val result = createVPUseCase(credentialId, vpRequestData.challenge)) {
+                    is Result<String> -> {
+                        if (result.isSuccess) {
+                            val vpJson = result.getOrNull() ?: ""
+                            
+                            // 바텀시트 닫기
+                            _uiState.update { 
+                                it.copy(
+                                    showVPBottomSheet = false,
+                                    vpRequestData = null,
+                                    credentials = emptyList()
+                                )
+                            }
+                            
+                            // VP 응답 전송
+                            _effect.emit(WebAppContract.Effect.SendVPResponse(vpJson))
+                            
+                        } else {
+                            val error = result.exceptionOrNull()?.message ?: "VP creation failed"
+                            Log.e(TAG, "VP creation failed", result.exceptionOrNull())
+                            
+                            _effect.emit(WebAppContract.Effect.SendVPError(error))
+                            
+                            // 바텀시트 닫기
+                            _uiState.update { 
+                                it.copy(
+                                    showVPBottomSheet = false,
+                                    vpRequestData = null,
+                                    credentials = emptyList()
+                                )
+                            }
+                        }
+                    }
+                }
+                
+            } catch (e: Exception) {
+                Log.e(TAG, "Error creating VP", e)
+                _effect.emit(WebAppContract.Effect.SendVPError("VP creation failed"))
+                
+                // 바텀시트 닫기
+                _uiState.update { 
+                    it.copy(
+                        showVPBottomSheet = false,
+                        vpRequestData = null,
+                        credentials = emptyList()
+                    )
+                }
+            }
         }
     }
     

@@ -63,4 +63,16 @@ interface DIDRepository {
      * @return 운전면허증 발급 여부 Flow
      */
     fun isDriverLicenseIssued(): Flow<Boolean>
+    
+    /**
+     * 학생증 자격증명 조회
+     * @return 학생증 VerifiableCredential
+     */
+    suspend fun getStudentCredential(): VerifiableCredential?
+    
+    /**
+     * 운전면허증 자격증명 조회
+     * @return 운전면허증 VerifiableCredential
+     */
+    suspend fun getDriverLicenseCredential(): VerifiableCredential?
 }

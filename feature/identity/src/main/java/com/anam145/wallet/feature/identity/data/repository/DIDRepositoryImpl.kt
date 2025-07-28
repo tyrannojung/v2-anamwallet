@@ -31,14 +31,13 @@ class DIDRepositoryImpl @Inject constructor(
             
             // 1. EC 키쌍 생성
             val (publicKeyPem, _) = keyManager.generateAndStoreKeyPair(USER_KEY_ALIAS)
-            val publicKeyBase64 = keyManager.pemToBase64(publicKeyPem)
             
             android.util.Log.d("DIDRepository", "Generated public key: ${publicKeyPem.take(50)}...")
             
             // 2. DID 서버 등록
             val request = RegisterDIDRequest(
-                publicKeyPem = publicKeyBase64,
-                meta = mapOf("name" to userName)
+                publicKey = publicKeyPem,  // PEM 형식 그대로
+                additionalInfo = mapOf("name" to userName)
             )
             
             val response = apiService.registerUserDID(request)
@@ -123,17 +122,11 @@ class DIDRepositoryImpl @Inject constructor(
             
             android.util.Log.d("DIDRepository", "Student card issued successfully!")
             android.util.Log.d("DIDRepository", "VC ID: ${studentResponse.vc.id}")
+            android.util.Log.d("DIDRepository", "Full VC: ${studentResponse.vc}")
+            android.util.Log.d("DIDRepository", "CredentialSubject: ${studentResponse.vc.credentialSubject}")
             
-            // VC 정보 로컬 저장
-            val credentialInfo = IssuedCredential(
-                type = CredentialType.STUDENT_CARD,
-                vcId = studentResponse.vc.id,
-                issuanceDate = studentResponse.vc.issuanceDate,
-                studentNumber = (studentResponse.vc.credentialSubject as? CredentialSubject.StudentCard)?.studentNumber,
-                university = (studentResponse.vc.credentialSubject as? CredentialSubject.StudentCard)?.university,
-                department = (studentResponse.vc.credentialSubject as? CredentialSubject.StudentCard)?.department
-            )
-            localDataSource.saveStudentCardVC(studentResponse.vc.id, credentialInfo)
+            // 전체 VC 저장
+            localDataSource.saveStudentVC(studentResponse.vc)
             
             Result.success(studentResponse.vc)
             
@@ -165,15 +158,11 @@ class DIDRepositoryImpl @Inject constructor(
             
             android.util.Log.d("DIDRepository", "Driver license issued successfully!")
             android.util.Log.d("DIDRepository", "VC ID: ${licenseResponse.vc.id}")
+            android.util.Log.d("DIDRepository", "Full VC: ${licenseResponse.vc}")
+            android.util.Log.d("DIDRepository", "CredentialSubject: ${licenseResponse.vc.credentialSubject}")
             
-            // VC 정보 로컬 저장
-            val credentialInfo = IssuedCredential(
-                type = CredentialType.DRIVER_LICENSE,
-                vcId = licenseResponse.vc.id,
-                issuanceDate = licenseResponse.vc.issuanceDate,
-                licenseNumber = licenseResponse.licenseNumber
-            )
-            localDataSource.saveDriverLicenseVC(licenseResponse.vc.id, credentialInfo)
+            // 전체 VC 저장
+            localDataSource.saveDriverLicenseVC(licenseResponse.vc)
             
             Result.success(licenseResponse.vc)
             
@@ -193,5 +182,25 @@ class DIDRepositoryImpl @Inject constructor(
     
     override fun isDriverLicenseIssued(): Flow<Boolean> {
         return localDataSource.isDriverLicenseIssued()
+    }
+    
+    override suspend fun getStudentCredential(): VerifiableCredential? {
+        return try {
+            // 로컬에서 전체 VC 조회
+            localDataSource.getStudentVC().first()
+        } catch (e: Exception) {
+            android.util.Log.e("DIDRepository", "Error getting student credential", e)
+            null
+        }
+    }
+    
+    override suspend fun getDriverLicenseCredential(): VerifiableCredential? {
+        return try {
+            // 로컬에서 전체 VC 조회
+            localDataSource.getDriverLicenseVC().first()
+        } catch (e: Exception) {
+            android.util.Log.e("DIDRepository", "Error getting driver license credential", e)
+            null
+        }
     }
 }

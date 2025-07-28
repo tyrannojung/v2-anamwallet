@@ -8,8 +8,8 @@ import com.google.gson.annotations.SerializedName
 
 // API Request/Response Models
 data class RegisterDIDRequest(
-    @SerializedName("publicKeyPem") val publicKeyPem: String,
-    @SerializedName("meta") val meta: Map<String, String> = emptyMap()
+    @SerializedName("publicKey") val publicKey: String,
+    @SerializedName("additionalInfo") val additionalInfo: Map<String, String> = emptyMap()
 )
 
 data class RegisterDIDResponse(
@@ -89,12 +89,19 @@ sealed class CredentialSubject {
     data class StudentCard(
         @SerializedName("studentId") val studentId: String,
         @SerializedName("studentNumber") val studentNumber: String,
+        @SerializedName("name") val name: String,
         @SerializedName("university") val university: String,
         @SerializedName("department") val department: String
     ) : CredentialSubject()
     
     data class DriverLicense(
-        @SerializedName("licenseId") val licenseId: String
+        @SerializedName("licenseId") val licenseId: String,
+        @SerializedName("licenseNumber") val licenseNumber: String,
+        @SerializedName("name") val name: String,
+        @SerializedName("birthDate") val birthDate: String,
+        @SerializedName("issueDate") val issueDate: String,
+        @SerializedName("expiryDate") val expiryDate: String,
+        @SerializedName("licenseType") val licenseType: String
     ) : CredentialSubject()
 }
 
@@ -112,6 +119,15 @@ enum class CredentialType {
     STUDENT_CARD,
     DRIVER_LICENSE
 }
+
+// VP (Verifiable Presentation) Model
+data class VerifiablePresentation(
+    @SerializedName("@context") val context: List<String>,
+    @SerializedName("type") val type: List<String>,
+    @SerializedName("holder") val holder: String,
+    @SerializedName("verifiableCredential") val verifiableCredential: VerifiableCredential,
+    @SerializedName("proof") val proof: Proof?
+)
 
 // Local Credential Info
 data class IssuedCredential(

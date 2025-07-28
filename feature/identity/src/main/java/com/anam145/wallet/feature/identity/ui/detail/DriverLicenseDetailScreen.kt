@@ -9,6 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -20,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.theme.*
 
@@ -32,12 +35,11 @@ import com.anam145.wallet.core.ui.theme.*
 fun DriverLicenseDetailScreen(
     modifier: Modifier = Modifier,
     vcId: String,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    viewModel: DriverLicenseDetailViewModel = hiltViewModel()
 ) {
     val strings = LocalStrings.current
-    
-    // TODO: vcId를 사용하여 실제 VC 데이터 로드
-    // 현재는 하드코딩된 데이터 사용
+    val driverLicense by viewModel.driverLicense.collectAsState()
     
     Column(
         modifier = modifier
@@ -96,7 +98,9 @@ fun DriverLicenseDetailScreen(
                     DriverCardDetailHeader()
                     
                     // 카드 바디
-                    DriverCardDetailBody()
+                    driverLicense?.let {
+                        DriverCardDetailBody(driverLicense = it)
+                    } ?: DriverCardDetailBodyLoading()
                 }
             }
         }
@@ -174,7 +178,9 @@ private fun DriverCardDetailHeader() {
 }
 
 @Composable
-private fun DriverCardDetailBody() {
+private fun DriverCardDetailBody(
+    driverLicense: DriverLicenseDetailViewModel.DriverLicenseInfo
+) {
     val strings = LocalStrings.current
     
     Column(
@@ -202,7 +208,7 @@ private fun DriverCardDetailBody() {
         
         // 운전자 이름
         Text(
-            text = strings.identitySampleName,
+            text = driverLicense.name,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
@@ -212,7 +218,7 @@ private fun DriverCardDetailBody() {
         
         // 면허번호
         Text(
-            text = "11-22-333333-44",
+            text = driverLicense.licenseNumber,
             fontSize = 16.sp,
             color = Color(0xFF666666)
         )
@@ -242,7 +248,7 @@ private fun DriverCardDetailBody() {
                         color = Color(0xFF999999)
                     )
                     Text(
-                        text = strings.identityClass1Regular,
+                        text = driverLicense.licenseType,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFF666666)
@@ -256,7 +262,7 @@ private fun DriverCardDetailBody() {
                         color = Color(0xFF999999)
                     )
                     Text(
-                        text = "2020.01.15",
+                        text = driverLicense.issueDate,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFF666666)
@@ -278,7 +284,7 @@ private fun DriverCardDetailBody() {
                         color = Color(0xFF999999)
                     )
                     Text(
-                        text = "2028.01.15",
+                        text = driverLicense.expiryDate,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFF666666)
@@ -292,7 +298,7 @@ private fun DriverCardDetailBody() {
                         color = Color(0xFF999999)
                     )
                     Text(
-                        text = "2030.01.15",
+                        text = driverLicense.expiryDate,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFF666666)
@@ -353,5 +359,31 @@ private fun DriverCardDetailBody() {
                     .padding(start = 20.dp)
             )
         }
+    }
+}
+
+@Composable
+private fun DriverCardDetailBodyLoading() {
+    val strings = LocalStrings.current
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(30.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // 로딩 표시
+        CircularProgressIndicator(
+            modifier = Modifier.size(50.dp),
+            color = MaterialTheme.colorScheme.primary
+        )
+        
+        Spacer(modifier = Modifier.height(20.dp))
+        
+        Text(
+            text = strings.loading,
+            fontSize = 16.sp,
+            color = Color.Gray
+        )
     }
 }

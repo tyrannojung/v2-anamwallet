@@ -38,7 +38,7 @@ abstract class IdentityModule {
                 )
                 .create()
                 
-            // 에뮬레이터용 DID 서버 주소
+            // 에뮬레이터용 DID 서버 주소 (HTTPS)
             return Retrofit.Builder()
                 .baseUrl("http://10.0.2.2:8081/")
                 .addConverterFactory(GsonConverterFactory.create(gson))

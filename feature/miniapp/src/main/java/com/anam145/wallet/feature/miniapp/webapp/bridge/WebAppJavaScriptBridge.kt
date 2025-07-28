@@ -16,7 +16,8 @@ import org.json.JSONObject
 class WebAppJavaScriptBridge(
     private val context: Context,
     private val manifest: MiniAppManifest?,
-    private val onTransactionRequest: ((JSONObject) -> Unit)? = null
+    private val onTransactionRequest: ((JSONObject) -> Unit)? = null,
+    private val onVPRequest: ((JSONObject) -> Unit)? = null
 ) {
     
     // WebView 인스턴스 참조
@@ -125,6 +126,26 @@ class WebAppJavaScriptBridge(
                 web.loadUrl(fullUrl)
             } ?: Log.e(TAG, "WebView is null, cannot navigate")
         } ?: Log.e(TAG, "Context is not ComponentActivity")
+    }
+    
+    /**
+     * VP (Verifiable Presentation) 요청
+     * JavaScript: window.anam.requestVP(jsonString)
+     */
+    @JavascriptInterface
+    fun requestVP(vpRequestJson: String) {
+        Log.d(TAG, "VP request received: $vpRequestJson")
+        
+        try {
+            val vpRequest = JSONObject(vpRequestJson)
+            
+            // UI 스레드에서 콜백 실행
+            (context as? ComponentActivity)?.runOnUiThread {
+                onVPRequest?.invoke(vpRequest)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing VP request", e)
+        }
     }
     
     /**
