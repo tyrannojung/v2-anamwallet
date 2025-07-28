@@ -99,6 +99,7 @@ data class Strings(
     val authErrorPasswordMismatch: String = "비밀번호가 일치하지 않습니다",
     val authErrorLoginFailed: String = "로그인 중 오류가 발생했습니다",
     val authErrorPasswordSetupFailed: String = "비밀번호 설정 중 오류가 발생했습니다",
+    val authErrorDIDCreationFailed: String = "디지털 신원 생성에 실패했습니다. 네트워크 연결을 확인해주세요.",
     
     // Skin
     val settingsSkinSection: String = "스킨",
@@ -232,6 +233,7 @@ val EnglishStrings = Strings(
     authErrorPasswordMismatch = "Passwords do not match",
     authErrorLoginFailed = "An error occurred during login",
     authErrorPasswordSetupFailed = "An error occurred while setting password",
+    authErrorDIDCreationFailed = "Failed to create digital identity. Please check your network connection.",
     
     // Skin
     settingsSkinSection = "Skin",

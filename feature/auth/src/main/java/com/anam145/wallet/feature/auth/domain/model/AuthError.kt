@@ -8,4 +8,5 @@ sealed class AuthError : Exception() {
     object PasswordMismatch : AuthError()
     object LoginFailed : AuthError()
     object PasswordSetupFailed : AuthError()
+    object DIDCreationFailed : AuthError()
 }

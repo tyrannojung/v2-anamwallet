@@ -105,7 +105,7 @@ class SetupPasswordViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             
-            // 비밀번호 저장과 DID 생성을 병렬로 실행
+            // 비밀번호 저장과 DID 생성을 병렬로 실행 (둘 다 필수)
             val passwordDeferred = async { saveAppPasswordUseCase(password) }
             val didDeferred = async { initializeUserDIDUseCase() }
             
@@ -120,10 +120,14 @@ class SetupPasswordViewModel @Inject constructor(
                     _effect.emit(SetupPasswordContract.Effect.NavigateToMain)
                 }
                 passwordResult.isSuccess && didResult.isFailure -> {
-                    // 비밀번호는 성공, DID 실패 (메인 화면에서 재시도 가능)
-                    android.util.Log.w("SetupPassword", "Password saved but DID creation failed: ${didResult.exceptionOrNull()}")
-                    passwordManager.setPassword(password)
-                    _effect.emit(SetupPasswordContract.Effect.NavigateToMain)
+                    // 비밀번호는 성공, DID 실패 - 재시도 필요
+                    android.util.Log.e("SetupPassword", "DID creation failed: ${didResult.exceptionOrNull()}")
+                    _uiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            error = AuthError.DIDCreationFailed
+                        )
+                    }
                 }
                 else -> {
                     // 비밀번호 저장 실패

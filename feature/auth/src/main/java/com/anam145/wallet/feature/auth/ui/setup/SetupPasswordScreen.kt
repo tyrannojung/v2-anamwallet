@@ -55,6 +55,7 @@ private fun AuthError.toMessage(): String {
         AuthError.PasswordMismatch -> strings.authErrorPasswordMismatch
         AuthError.LoginFailed -> strings.authErrorLoginFailed
         AuthError.PasswordSetupFailed -> strings.authErrorPasswordSetupFailed
+        AuthError.DIDCreationFailed -> strings.authErrorDIDCreationFailed
     }
 }
 
