@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.anam145.wallet.core.security.domain.usecase.SaveAppPasswordUseCase
 import com.anam145.wallet.feature.auth.domain.PasswordManager
 import com.anam145.wallet.feature.auth.domain.model.AuthError
+import com.anam145.wallet.feature.identity.domain.usecase.InitializeUserDIDUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SetupPasswordViewModel @Inject constructor(
     private val saveAppPasswordUseCase: SaveAppPasswordUseCase,
-    private val passwordManager: PasswordManager
+    private val passwordManager: PasswordManager,
+    private val initializeUserDIDUseCase: InitializeUserDIDUseCase
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(SetupPasswordContract.State())
@@ -102,13 +105,29 @@ class SetupPasswordViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             
-            saveAppPasswordUseCase(password).fold(
-                onSuccess = {
-                    // 비밀번호를 메모리에 캐싱
+            // 비밀번호 저장과 DID 생성을 병렬로 실행
+            val passwordDeferred = async { saveAppPasswordUseCase(password) }
+            val didDeferred = async { initializeUserDIDUseCase() }
+            
+            val passwordResult = passwordDeferred.await()
+            val didResult = didDeferred.await()
+            
+            when {
+                passwordResult.isSuccess && didResult.isSuccess -> {
+                    // 둘 다 성공
+                    android.util.Log.d("SetupPassword", "Password and DID created successfully!")
                     passwordManager.setPassword(password)
                     _effect.emit(SetupPasswordContract.Effect.NavigateToMain)
-                },
-                onFailure = { throwable ->
+                }
+                passwordResult.isSuccess && didResult.isFailure -> {
+                    // 비밀번호는 성공, DID 실패 (메인 화면에서 재시도 가능)
+                    android.util.Log.w("SetupPassword", "Password saved but DID creation failed: ${didResult.exceptionOrNull()}")
+                    passwordManager.setPassword(password)
+                    _effect.emit(SetupPasswordContract.Effect.NavigateToMain)
+                }
+                else -> {
+                    // 비밀번호 저장 실패
+                    android.util.Log.e("SetupPassword", "Password setup failed: ${passwordResult.exceptionOrNull()}")
                     _uiState.update { state ->
                         state.copy(
                             isLoading = false,
@@ -116,7 +135,7 @@ class SetupPasswordViewModel @Inject constructor(
                         )
                     }
                 }
-            )
+            }
         }
     }
     

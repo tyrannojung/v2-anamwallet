@@ -42,6 +42,9 @@ dependencies {
     // DataStore
     implementation(libs.androidx.datastore.preferences)
     
+    // Security
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
@@ -49,6 +52,7 @@ dependencies {
     // Crypto
     implementation("com.lambdaworks:scrypt:1.4.0")
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
+    implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
     
     // JSON
     implementation("com.google.code.gson:gson:2.10.1")

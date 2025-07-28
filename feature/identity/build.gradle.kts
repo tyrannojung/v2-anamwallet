@@ -45,6 +45,9 @@ android {
 
 dependencies {
     implementation(project(":core:ui"))
+    implementation(project(":core:common"))
+    implementation(project(":core:data"))
+    implementation(project(":core:security"))
     
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -63,6 +66,16 @@ dependencies {
     // Lifecycle
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+    
+    // Network
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+    
+    // JSON
+    implementation("com.google.code.gson:gson:2.10.1")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
