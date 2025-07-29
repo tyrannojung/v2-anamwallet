@@ -84,6 +84,9 @@ sealed class AnamNavRoute(
     /** 학생증 상세 화면 */
     data object StudentCardDetail : AnamNavRoute("student_card")
     
+    /** 운전면허증 상세 화면 */
+    data object DriverLicenseDetail : AnamNavRoute("driver_license")
+    
     // ========== 인증 화면들 ==========
     // 로그인 및 비밀번호 설정 화면들
     
@@ -109,6 +112,7 @@ sealed class AnamNavRoute(
                 Identity.route -> Identity
                 Settings.route -> Settings
                 StudentCardDetail.route -> StudentCardDetail
+                DriverLicenseDetail.route -> DriverLicenseDetail
                 Login.route -> Login
                 SetupPassword.route -> SetupPassword
                 else -> {

@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:security"))
     implementation(project(":feature:auth"))
+    implementation(project(":feature:identity"))
     
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -60,6 +61,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     
     // Hilt
     implementation(libs.hilt.android)
@@ -79,6 +81,9 @@ dependencies {
     
     // WebView
     implementation("androidx.webkit:webkit:1.11.0")
+    
+    // OkHttp
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

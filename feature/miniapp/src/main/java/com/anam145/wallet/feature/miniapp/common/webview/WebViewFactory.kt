@@ -82,7 +82,6 @@ object WebViewFactory {
             ): android.webkit.WebResourceResponse? {
                 return assetLoader.shouldInterceptRequest(url.toUri())
             }
-            
         }
     }
 }

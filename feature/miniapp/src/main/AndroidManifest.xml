@@ -20,6 +20,12 @@
             android:name=".common.bridge.service.MainBridgeService"
             android:enabled="true"
             android:exported="false" />
+            
+        <!-- 신분증 Service (메인 프로세스) -->
+        <service
+            android:name=".webapp.data.service.CredentialService"
+            android:enabled="true"
+            android:exported="false" />
         
         <!-- 블록체인 Activity (블록체인 프로세스) -->
         <activity

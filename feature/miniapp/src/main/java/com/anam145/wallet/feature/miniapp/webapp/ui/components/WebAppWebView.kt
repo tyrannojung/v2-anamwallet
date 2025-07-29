@@ -21,6 +21,7 @@ fun WebAppWebView(
     manifest: MiniAppManifest,
     fileManager: MiniAppFileManager,
     onTransactionRequest: (JSONObject) -> Unit,
+    onVPRequest: (JSONObject) -> Unit,
     onWebViewCreated: (WebView) -> Unit
 ) {
     val context = LocalContext.current
@@ -30,7 +31,8 @@ fun WebAppWebView(
         WebAppJavaScriptBridge(
             context = context,
             manifest = manifest,
-            onTransactionRequest = onTransactionRequest
+            onTransactionRequest = onTransactionRequest,
+            onVPRequest = onVPRequest
         )
     }
     

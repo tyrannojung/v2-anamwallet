@@ -99,13 +99,56 @@ data class Strings(
     val authErrorPasswordMismatch: String = "비밀번호가 일치하지 않습니다",
     val authErrorLoginFailed: String = "로그인 중 오류가 발생했습니다",
     val authErrorPasswordSetupFailed: String = "비밀번호 설정 중 오류가 발생했습니다",
+    val authErrorDIDCreationFailed: String = "디지털 신원 생성에 실패했습니다. 네트워크 연결을 확인해주세요.",
     
     // Skin
     val settingsSkinSection: String = "스킨",
     val skinAnam: String = "ANAM",
     val skinSeoul: String = "서울",
     val skinBusan: String = "부산",
-    val skinLA: String = "LA"
+    val skinLA: String = "LA",
+    
+    // Identity (DID) Screen
+    val identityMobileDriverLicense: String = "모바일 운전면허증",
+    val identityMobileStudentId: String = "모바일 학생증",
+    val identityEligibility: String = "발급대상",
+    val identityRequirements: String = "준 비 물",
+    val identityDriverEligibility: String = "1종, 2종 자동차운전면허 소지자",
+    val identityStudentEligibility: String = "고려대학교 재학생",
+    val identityNoRequirements: String = "없음(홍길동으로 발급)",
+    val identityInquire: String = "조회하기",
+    
+    // Identity Detail Screens
+    val identityRefresh: String = "새로고침",
+    val identityPhoto: String = "사진",
+    val identityEnlarge: String = "크게보기",
+    val identityQRScan: String = "QR을 태하여\n카메라에 스캔하세요.",
+    val identityKoreaUniversity: String = "고려대학교",
+    val identityGraduateSchool: String = "정보보호대학원 학생증",
+    val identityFinancialSecurity: String = "금융보안학과",
+    val identityBlockchainMajor: String = "블록체인전공",
+    val identityRepublicOfKorea: String = "대한민국",
+    val identityDriversLicense: String = "자동차운전면허증",
+    val identityLicenseType: String = "종류",
+    val identityClass1Regular: String = "제1종 보통",
+    val identityIssueDate: String = "발급일",
+    val identityAptitudeTest: String = "적성검사",
+    val identityRenewal: String = "갱신기간",
+    val identityMyIds: String = "내 신분증",
+    val identityAddId: String = "신분증 추가",
+    val identityIssueNewId: String = "발급하기",
+    val identityIssueId: String = "신분증 발급",
+    val identityValid: String = "유효",
+    val identityStudentIdCard: String = "학생증",
+    val identityDriverLicenseCard: String = "운전면허증",
+    val identityIssueStudentId: String = "홍길동\n고려대 학생증\n발급하기",
+    val identityIssueDriverLicense: String = "홍길동\n운전면허증\n발급하기",
+    val identityViewDetail: String = "상세보기",
+    val identitySampleName: String = "홍길동",
+    val identityIssued: String = "발급완료",
+    val identityAllIssued: String = "모든 신분증이 발급되었습니다.",
+    val identityNoIssuedIds: String = "발급된 모바일 신분증이 없습니다.",
+    val dismiss: String = "닫기"
 )
 
 /**
@@ -194,13 +237,56 @@ val EnglishStrings = Strings(
     authErrorPasswordMismatch = "Passwords do not match",
     authErrorLoginFailed = "An error occurred during login",
     authErrorPasswordSetupFailed = "An error occurred while setting password",
+    authErrorDIDCreationFailed = "Failed to create digital identity. Please check your network connection.",
     
     // Skin
     settingsSkinSection = "Skin",
     skinAnam = "ANAM",
     skinSeoul = "Seoul",
     skinBusan = "Busan",
-    skinLA = "LA"
+    skinLA = "LA",
+    
+    // Identity (DID) Screen
+    identityMobileDriverLicense = "Mobile Driver's License",
+    identityMobileStudentId = "Mobile Student ID",
+    identityEligibility = "Eligibility",
+    identityRequirements = "Requirements",
+    identityDriverEligibility = "Class 1 or 2 driver's license holder",
+    identityStudentEligibility = "Korea University student",
+    identityNoRequirements = "None (Issued to Hong Gildong)",
+    identityInquire = "Inquire",
+    
+    // Identity Detail Screens
+    identityRefresh = "Refresh",
+    identityPhoto = "Photo",
+    identityEnlarge = "Enlarge",
+    identityQRScan = "Scan QR code\nwith camera.",
+    identityKoreaUniversity = "Korea University",
+    identityGraduateSchool = "Graduate School of Information Security ID",
+    identityFinancialSecurity = "Financial Security",
+    identityBlockchainMajor = "Blockchain Major",
+    identityRepublicOfKorea = "Republic of Korea",
+    identityDriversLicense = "Driver's License",
+    identityLicenseType = "Type",
+    identityClass1Regular = "Class 1 Regular",
+    identityIssueDate = "Issue Date",
+    identityAptitudeTest = "Aptitude Test",
+    identityRenewal = "Renewal",
+    identityMyIds = "My IDs",
+    identityAddId = "Add ID",
+    identityIssueNewId = "Issue New ID",
+    identityIssueId = "Issue New ID",
+    identityValid = "Valid",
+    identityStudentIdCard = "Student ID",
+    identityDriverLicenseCard = "Driver's License",
+    identityIssueStudentId = "Issue\nHong Gildong\nKorea Univ. ID",
+    identityIssueDriverLicense = "Issue\nHong Gildong\nDriver's License",
+    identityViewDetail = "Detail",
+    identitySampleName = "Hong Gildong",
+    identityIssued = "Issued",
+    identityAllIssued = "All IDs have been issued.",
+    identityNoIssuedIds = "No digital IDs have been issued yet.",
+    dismiss = "Dismiss"
 )
 
 /**

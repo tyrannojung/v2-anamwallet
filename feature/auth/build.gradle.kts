@@ -70,6 +70,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
     implementation(project(":core:security"))
+    implementation(project(":feature:identity"))
     
     // Testing
     testImplementation(libs.junit)

@@ -47,8 +47,10 @@ object WebViewConfigurer {
             allowFileAccess = false
             allowContentAccess = false
             
-            // Mixed content 차단 (HTTPS에서 HTTP 리소스 로드 차단)
-            mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
+            // Mixed content 설정
+            // 개발 환경에서는 HTTP 허용, 프로덕션에서는 차단해야 함
+            // TODO: BuildConfig.DEBUG로 분기 처리 필요
+            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             
             // 캐시 설정
             cacheMode = WebSettings.LOAD_NO_CACHE
