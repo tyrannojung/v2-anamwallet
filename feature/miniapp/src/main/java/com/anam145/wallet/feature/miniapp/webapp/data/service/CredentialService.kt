@@ -51,7 +51,7 @@ class CredentialService : Service() {
                 val credentials = runBlocking {
                     val issuedCredentials = didRepository.getIssuedCredentials().first()
                     val didCredentials = didRepository.getDIDCredentials()
-                    val userName = didCredentials?.userDid?.substringAfterLast(":") ?: "사용자"
+                    val userName = didCredentials?.userDid?.substringAfterLast(":") ?: "User"
                     
                     val credentialList = mutableListOf<CredentialInfo>()
                     
@@ -63,7 +63,7 @@ class CredentialService : Service() {
                         CredentialInfo(
                             id = "student_001",
                             type = CredentialType.STUDENT_CARD,
-                            name = "고려대학교 학생증",
+                            name = "Korea University Student ID",
                             holderName = userName,
                             isIssued = studentCardIssued,
                             issuedDate = studentInfo?.issuanceDate
@@ -78,7 +78,7 @@ class CredentialService : Service() {
                         CredentialInfo(
                             id = "driver_001",
                             type = CredentialType.DRIVER_LICENSE,
-                            name = "대한민국 운전면허증",
+                            name = "Korea Driver's License",
                             holderName = userName,
                             isIssued = driverLicenseIssued,
                             issuedDate = driverInfo?.issuanceDate

@@ -84,7 +84,7 @@ fun VPBottomSheet(
             
             // 제목
             Text(
-                text = "${serviceName}에서 신분증을 요청합니다",
+                text = "${serviceName} requests your ID",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -95,7 +95,7 @@ fun VPBottomSheet(
             
             // 목적
             Text(
-                text = "목적: $purpose",
+                text = "Purpose: $purpose",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -107,7 +107,7 @@ fun VPBottomSheet(
             // 신분증 목록
             if (supportedCredentials.isNotEmpty()) {
                 Text(
-                    text = "신분증을 선택하세요",
+                    text = "Select an ID",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth()
@@ -137,7 +137,7 @@ fun VPBottomSheet(
                     )
                 ) {
                     Text(
-                        text = "이용 가능한 신분증이 없습니다",
+                        text = "No available IDs",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onErrorContainer,
                         textAlign = TextAlign.Center,
@@ -155,7 +155,7 @@ fun VPBottomSheet(
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("취소")
+                Text("Cancel")
             }
         }
     }
@@ -216,7 +216,7 @@ private fun CredentialCard(
                 
                 if (!enabled) {
                     Text(
-                        text = "발급이 필요합니다",
+                        text = "Requires issuance",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error
                     )
@@ -237,7 +237,7 @@ private fun CredentialCard(
             if (enabled) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "선택",
+                    contentDescription = "Select",
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
