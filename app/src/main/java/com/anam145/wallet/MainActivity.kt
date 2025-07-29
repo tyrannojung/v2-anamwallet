@@ -22,10 +22,9 @@ import com.anam145.wallet.core.ui.components.Header
 import com.anam145.wallet.navigation.AnamBottomNavigation
 import com.anam145.wallet.navigation.AnamNavHost
 import com.anam145.wallet.navigation.AnamNavRoute
-import com.anam145.wallet.ui.theme.ThemeViewModel
 import com.anam145.wallet.ui.language.LanguageViewModel
 import com.anam145.wallet.core.ui.language.LocalStrings
-import com.anam145.wallet.core.ui.language.getStringsForLanguage
+import com.anam145.wallet.core.ui.language.getStringsForSkinAndLanguage
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.anam145.wallet.feature.main.ui.MainViewModel
@@ -37,6 +36,9 @@ import kotlinx.coroutines.flow.StateFlow
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.anam145.wallet.core.data.datastore.SkinDataStore
+import com.anam145.wallet.core.common.model.Skin
+import com.anam145.wallet.core.common.constants.SkinConstants
 
 // Hilt가 의존성을 주입하는 시작점
 @AndroidEntryPoint
@@ -50,6 +52,9 @@ class MainActivity : ComponentActivity() {
     
     @Inject
     lateinit var passwordManager: PasswordManager
+    
+    @Inject
+    lateinit var skinDataStore: SkinDataStore
     
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState
@@ -116,7 +121,13 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             val authStateValue by authState.collectAsStateWithLifecycle()
-            AnamWalletApp(authState = authStateValue)
+            val currentSkin by skinDataStore.selectedSkin.collectAsStateWithLifecycle(
+                initialValue = SkinConstants.DEFAULT_SKIN
+            )
+            AnamWalletApp(
+                authState = authStateValue,
+                skin = currentSkin
+            )
         }
     }
     
@@ -135,36 +146,14 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 fun AnamWalletApp(
-    authState: MainActivity.AuthState = MainActivity.AuthState.Loading
+    authState: MainActivity.AuthState = MainActivity.AuthState.Loading,
+    skin: Skin = Skin.ANAM
 ) {
-    // 테마 ViewModel
-    // hiltViewModel() → ViewModel 인스턴스 생성
-    val themeViewModel: ThemeViewModel = hiltViewModel()
-    // collectAsStateWithLifecycle : 화면이 보일 때만 수집!
-    /**
-     * 1. 사용자가 앱 사용 중 (수집 중 ✓)
-     * 2. 홈 버튼 → 앱이 백그라운드로
-     * 3. 하지만 여전히 데이터 수집 중...
-     * 4. 배터리 낭비 + 불필요한 연산 -> collectAsStateWithLifecycle 사용한 이유!
-     * by 문법 = "대신해줘!"
-     *
-     * ex)
-     * 이 귀찮은 일을
-     * val box = State(10)
-     * println(box.value)
-     * box.value = 20
-     *
-     * by가 대신해줌
-     * var number by State(10)
-     * println(number)  // 알아서 .value
-     * number = 20      // 알아서 .value =
-     * */
-    val themeMode by themeViewModel.themeMode.collectAsStateWithLifecycle()
     
     // 언어 ViewModel
     val languageViewModel: LanguageViewModel = hiltViewModel()
     val language by languageViewModel.language.collectAsStateWithLifecycle()
-    val strings = getStringsForLanguage(language)
+    val strings = getStringsForSkinAndLanguage(skin, language)
 
     /**
      * CompositionLocal로 언어와 문자열 제공
@@ -174,7 +163,7 @@ fun AnamWalletApp(
     CompositionLocalProvider(
         LocalStrings provides strings
     ) {
-        AnamWalletTheme(themeMode = themeMode) {
+        AnamWalletTheme(skin = skin) {
             // Navigation Controller 생성
             val navController = rememberNavController()
             

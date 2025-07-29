@@ -11,6 +11,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -38,7 +39,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.anam145.wallet.core.common.model.MiniApp
 import com.anam145.wallet.core.common.model.MiniAppType
+import com.anam145.wallet.core.common.model.Skin
 import com.anam145.wallet.core.ui.language.LocalStrings
+import com.anam145.wallet.core.ui.language.Strings
+import com.anam145.wallet.core.common.constants.SectionOrder
+import com.anam145.wallet.feature.main.ui.components.ThemeIllustration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
@@ -54,7 +59,6 @@ import java.io.File
 fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
-    onNavigateToHub: () -> Unit = {},
     onNavigateToMiniApp: (String) -> Unit = {},
     onLaunchBlockchain: (String) -> Unit = {}
 ) {
@@ -68,7 +72,6 @@ fun MainScreen(
     LaunchedEffect(key1 = viewModel) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
-                is MainContract.MainEffect.NavigateToHub -> onNavigateToHub()
                 is MainContract.MainEffect.LaunchWebAppActivity -> onNavigateToMiniApp(effect.appId)
                 is MainContract.MainEffect.LaunchBlockchainActivity -> onLaunchBlockchain(effect.blockchainId)
                 is MainContract.MainEffect.ShowError -> {
@@ -109,14 +112,22 @@ fun MainScreen(
                 )
             }
             else -> {
-                MiniAppList(
-                    blockchainApps = uiState.blockchainApps,
-                    regularApps = uiState.regularApps,
-                    activeBlockchainId = uiState.activeBlockchainId,
-                    onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
-                    onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) },
-                    onAddMoreClick = { viewModel.handleIntent(MainContract.MainIntent.ClickAddMore) }
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    MiniAppList(
+                        blockchainApps = uiState.blockchainApps,
+                        regularApps = uiState.regularApps,
+                        activeBlockchainId = uiState.activeBlockchainId,
+                        sectionOrder = uiState.sectionOrder,
+                        onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
+                        onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) }
+                    )
+                    
+                    // 테마별 일러스트레이션 표시
+                    ThemeIllustration(
+                        skin = uiState.currentSkin,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     }
@@ -127,9 +138,9 @@ private fun MiniAppList(
     blockchainApps: List<MiniApp>,
     regularApps: List<MiniApp>,
     activeBlockchainId: String?,
+    sectionOrder: SectionOrder,
     onBlockchainClick: (MiniApp) -> Unit,
-    onAppClick: (MiniApp) -> Unit,
-    onAddMoreClick: () -> Unit
+    onAppClick: (MiniApp) -> Unit
 ) {
     val strings = LocalStrings.current
     
@@ -139,110 +150,128 @@ private fun MiniAppList(
             .verticalScroll(rememberScrollState())
             .padding(bottom = 80.dp) // Space for bottom navigation
     ) {
-        // Blockchain Section
-        if (blockchainApps.isNotEmpty()) {
-            Text(
-                text = strings.mainSectionBlockchain,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.SemiBold
-                ),
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
-            )
-            
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(blockchainApps) { app ->
-                    BlockchainCard(
-                        miniApp = app,
-                        isActive = app.appId == activeBlockchainId,
-                        onClick = { onBlockchainClick(app) }
-                    )
+        when (sectionOrder) {
+            SectionOrder.BLOCKCHAIN_FIRST -> {
+                // 블록체인이 먼저 (기본)
+                BlockchainSection(
+                    blockchainApps = blockchainApps,
+                    activeBlockchainId = activeBlockchainId,
+                    onBlockchainClick = onBlockchainClick,
+                    strings = strings
+                )
+                
+                if (blockchainApps.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
+                
+                AppsSection(
+                    regularApps = regularApps,
+                    onAppClick = onAppClick,
+                    strings = strings
+                )
             }
-            
-            Spacer(modifier = Modifier.height(24.dp))
+            SectionOrder.APPS_FIRST -> {
+                // 앱이 먼저 (부산)
+                AppsSection(
+                    regularApps = regularApps,
+                    onAppClick = onAppClick,
+                    strings = strings
+                )
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                BlockchainSection(
+                    blockchainApps = blockchainApps,
+                    activeBlockchainId = activeBlockchainId,
+                    onBlockchainClick = onBlockchainClick,
+                    strings = strings
+                )
+            }
         }
-        
-        // Apps Section
+    }
+}
+
+@Composable
+private fun BlockchainSection(
+    blockchainApps: List<MiniApp>,
+    activeBlockchainId: String?,
+    onBlockchainClick: (MiniApp) -> Unit,
+    strings: Strings
+) {
+    if (blockchainApps.isNotEmpty()) {
         Text(
-            text = strings.mainSectionApps,
+            text = strings.mainSectionBlockchain,
             style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.SemiBold
             ),
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
         )
         
-        if (regularApps.isEmpty()) {
-            // 앱이 없을 때 메시지 표시
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = strings.mainNoAppsInstalled,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(blockchainApps) { app ->
+                BlockchainCard(
+                    miniApp = app,
+                    isActive = app.appId == activeBlockchainId,
+                    onClick = { onBlockchainClick(app) }
                 )
-            }
-        } else {
-            Column(
-                modifier = Modifier.padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                regularApps.chunked(3).forEach { rowApps ->
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        rowApps.forEach { app ->
-                            AppCard(
-                                miniApp = app,
-                                onClick = { onAppClick(app) },
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                        
-                        // Fill empty spaces in the row
-                        repeat(3 - rowApps.size) {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
-                    }
-                }
             }
         }
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Add More Card
-        Card(
+    }
+}
+
+@Composable
+private fun AppsSection(
+    regularApps: List<MiniApp>,
+    onAppClick: (MiniApp) -> Unit,
+    strings: Strings
+) {
+    Text(
+        text = strings.mainSectionApps,
+        style = MaterialTheme.typography.titleMedium.copy(
+            fontWeight = FontWeight.SemiBold
+        ),
+        modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+    )
+    
+    if (regularApps.isEmpty()) {
+        // 앱이 없을 때 메시지 표시 - 이미지 위치를 고려한 높이
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .height(80.dp)
-                .clickable { onAddMoreClick() },
-            shape = ShapeCard,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            )
+                .height(300.dp),  // 이미지가 표시되는 영역의 중간 높이
+            contentAlignment = Alignment.Center
         ) {
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add More",
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = strings.mainAddMoreServices,
-                    style = MaterialTheme.typography.bodyLarge
-                )
+            Text(
+                text = strings.mainNoAppsInstalled,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    } else {
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            regularApps.chunked(3).forEach { rowApps ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    rowApps.forEach { app ->
+                        AppCard(
+                            miniApp = app,
+                            onClick = { onAppClick(app) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    
+                    // Fill empty spaces in the row
+                    repeat(3 - rowApps.size) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
             }
         }
     }
@@ -260,20 +289,35 @@ private fun BlockchainCard(
         targetValue = if (isPressed) 0.95f else 1f,
         animationSpec = spring()
     )
-    val borderColor by animateColorAsState(
-        targetValue = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-        animationSpec = tween(300)
-    )
+    
+    // 그라데이션 브러시 (대각선)
+    val gradientBrush = if (isActive) {
+        Brush.linearGradient(
+            colors = listOf(
+                MaterialTheme.colorScheme.primary,
+                MaterialTheme.colorScheme.secondary,
+                MaterialTheme.colorScheme.tertiary
+            ),
+            start = androidx.compose.ui.geometry.Offset(0f, 0f),
+            end = androidx.compose.ui.geometry.Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+        )
+    } else null
     
     Card(
         modifier = Modifier
             .width(160.dp)
             .height(140.dp)
             .scale(scale)
-            .border(
-                width = if (isActive) 2.dp else 0.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(20.dp)
+            .then(
+                if (isActive && gradientBrush != null) {
+                    Modifier.border(
+                        width = 2.dp,
+                        brush = gradientBrush,
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                } else {
+                    Modifier
+                }
             )
             .clickable(
                 interactionSource = interactionSource,

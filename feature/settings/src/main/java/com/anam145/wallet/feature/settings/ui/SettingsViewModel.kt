@@ -2,10 +2,10 @@ package com.anam145.wallet.feature.settings.ui
 
 import androidx.lifecycle.ViewModel
 import com.anam145.wallet.core.common.model.Language
+import com.anam145.wallet.core.common.model.Skin
 import androidx.lifecycle.viewModelScope
-import com.anam145.wallet.core.common.model.ThemeMode
-import com.anam145.wallet.feature.settings.domain.usecase.GetThemeModeUseCase
-import com.anam145.wallet.feature.settings.domain.usecase.SetThemeModeUseCase
+import com.anam145.wallet.core.data.datastore.SkinDataStore
+import com.anam145.wallet.core.data.datastore.BlockchainDataStore
 import com.anam145.wallet.feature.settings.domain.usecase.GetLanguageUseCase
 import com.anam145.wallet.feature.settings.domain.usecase.SetLanguageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,17 +20,15 @@ import javax.inject.Inject
  * MVI 패턴을 사용하여 설정 화면의 상태를 관리합니다.
  * 
  * UseCase 설명:
- * - GetThemeModeUseCase: 현재 설정된 테마 모드(라이트/다크/시스템)를 가져옴
- * - SetThemeModeUseCase: 테마 모드를 변경하고 저장
  * - GetLanguageUseCase: 현재 설정된 언어를 가져옴
  * - SetLanguageUseCase: 언어를 변경하고 저장
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val getThemeModeUseCase: GetThemeModeUseCase,
-    private val setThemeModeUseCase: SetThemeModeUseCase,
     private val getLanguageUseCase: GetLanguageUseCase,
-    private val setLanguageUseCase: SetLanguageUseCase
+    private val setLanguageUseCase: SetLanguageUseCase,
+    private val skinDataStore: SkinDataStore,
+    private val blockchainDataStore: BlockchainDataStore
 ) : ViewModel() {
 
     /**
@@ -78,11 +76,8 @@ class SettingsViewModel @Inject constructor(
              * data object = 단 하나의 싱글톤
              * 즉 여러 개의 인스턴스가 가능하기 때문에 타입 체크가 필요함
              * */
-            // "이게 ChangeTheme 타입인가?"
-            is SettingsContract.SettingsIntent.ChangeTheme ->
-                // 맞다! 그럼 themeMode에 접근 가능
-                changeTheme(intent.themeMode)
             is SettingsContract.SettingsIntent.ChangeLanguage -> changeLanguage(intent.language)
+            is SettingsContract.SettingsIntent.ChangeSkin -> changeSkin(intent.skin)
             SettingsContract.SettingsIntent.ClickHelp -> navigateToHelp()
             SettingsContract.SettingsIntent.ClickFAQ -> navigateToFAQ()
             SettingsContract.SettingsIntent.ClickAppInfo -> navigateToAppInfo()
@@ -108,28 +103,18 @@ class SettingsViewModel @Inject constructor(
     private fun loadSettings() {
         // 1. 코루틴 스코프
         viewModelScope.launch {
-            // 2. 두 개의 Flow 합치기
+            // 언어와 스킨을 동시에 관찰
             combine(
-                getThemeModeUseCase(), // Flow<ThemeMode>
-                getLanguageUseCase()   // Flow<Language>
-            ) { theme, language ->
-                // 3. 두 값이 모두 도착하면 실행
+                getLanguageUseCase(),
+                skinDataStore.selectedSkin
+            ) { language, skin ->
                 _uiState.update { currentState ->
                     currentState.copy(
-                        themeMode = theme,
-                        language = language
+                        language = language,
+                        skin = skin
                     )
                 }
-            }.collect() // 4. Flow 구독 시작 , collect는 suspend 함수 코루틴 필요.
-        }
-    }
-    
-    /**
-     * 테마 변경
-     */
-    private fun changeTheme(themeMode: ThemeMode) {
-        viewModelScope.launch {
-            setThemeModeUseCase(themeMode)
+            }.collect()
         }
     }
     
@@ -139,6 +124,33 @@ class SettingsViewModel @Inject constructor(
     private fun changeLanguage(language: Language) {
         viewModelScope.launch {
             setLanguageUseCase(language)
+        }
+    }
+    
+    /**
+     * 스킨 변경
+     * 
+     * 스킨 변경 시 현재 활성 블록체인이 새 스킨에 없으면
+     * 블록체인 ID를 null로 설정합니다.
+     * MainViewModel이 이를 감지하고 적절한 블록체인으로 자동 전환합니다.
+     */
+    private fun changeSkin(skin: Skin) {
+        viewModelScope.launch {
+            // 1. 새 스킨의 허용된 앱 목록 가져오기
+            val newSkinApps = skinDataStore.getAppsForSkin(skin)
+            
+            // 2. 현재 활성 블록체인 확인
+            val currentActiveId = blockchainDataStore.activeBlockchainId.first()
+            
+            // 3. 현재 블록체인이 새 스킨에 없으면 null로 설정
+            // MainViewModel의 observeBlockchainService()가 이를 감지하고
+            // 새 스킨에 맞는 적절한 블록체인으로 자동 전환할 것임
+            if (currentActiveId != null && !newSkinApps.contains(currentActiveId)) {
+                blockchainDataStore.clearActiveBlockchainId()
+            }
+            
+            // 4. 스킨 변경
+            skinDataStore.setSelectedSkin(skin)
         }
     }
     

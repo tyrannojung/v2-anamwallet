@@ -55,23 +55,22 @@ fun SettingsScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
     ) {
-        // 테마 섹션
+        // 언어 섹션
         Spacer(modifier = Modifier.height(20.dp))
-        
-        ThemeSection(
-            currentTheme = uiState.themeMode,
-            onThemeChange = { theme ->
-                viewModel.handleIntent(SettingsContract.SettingsIntent.ChangeTheme(theme))
+        LanguageSection(
+            currentLanguage = uiState.language,
+            onLanguageChange = { language ->
+                viewModel.handleIntent(SettingsContract.SettingsIntent.ChangeLanguage(language))
             }
         )
         
         Spacer(modifier = Modifier.height(24.dp))
         
-        // 언어 섹션
-        LanguageSection(
-            currentLanguage = uiState.language,
-            onLanguageChange = { language ->
-                viewModel.handleIntent(SettingsContract.SettingsIntent.ChangeLanguage(language))
+        // 스킨 섹션
+        SkinSection(
+            currentSkin = uiState.skin, // TODO: uiState에 skin 추가 필요
+            onSkinChange = { skin ->
+                viewModel.handleIntent(SettingsContract.SettingsIntent.ChangeSkin(skin))
             }
         )
         

@@ -8,7 +8,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anam145.wallet.core.ui.components.Header
+import com.anam145.wallet.core.ui.language.LocalStrings
+import com.anam145.wallet.core.ui.language.getStringsForSkinAndLanguage
+import com.anam145.wallet.core.common.model.Skin
+import com.anam145.wallet.core.common.model.Language
 import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
+import androidx.compose.runtime.CompositionLocalProvider
 import com.anam145.wallet.feature.miniapp.blockchain.ui.components.BlockchainWebView
 import com.anam145.wallet.feature.miniapp.blockchain.ui.components.ErrorContent
 import com.anam145.wallet.feature.miniapp.blockchain.ui.components.ServiceConnectionCard
@@ -18,10 +23,34 @@ import com.anam145.wallet.feature.miniapp.blockchain.ui.components.ServiceConnec
 fun BlockchainScreen(
     blockchainId: String,
     viewModel: BlockchainViewModel,
+    fileManager: MiniAppFileManager,
+    skin: Skin = Skin.ANAM,
+    language: Language = Language.KOREAN
+) {
+    // 스킨과 언어에 맞는 문자열 가져오기
+    val strings = getStringsForSkinAndLanguage(skin, language)
+    
+    // CompositionLocal로 문자열 제공
+    CompositionLocalProvider(
+        LocalStrings provides strings
+    ) {
+        BlockchainScreenContent(
+            blockchainId = blockchainId,
+            viewModel = viewModel,
+            fileManager = fileManager
+        )
+    }
+}
+
+@Composable
+private fun BlockchainScreenContent(
+    blockchainId: String,
+    viewModel: BlockchainViewModel,
     fileManager: MiniAppFileManager
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var webView by remember { mutableStateOf<WebView?>(null) }
+    val strings = LocalStrings.current
     
     // 초기화
     LaunchedEffect(key1 = blockchainId) {
@@ -38,14 +67,14 @@ fun BlockchainScreen(
     Scaffold(
         topBar = {
             Header(
-                title = "AnamWallet",
+                title = strings.headerTitle,
                 showBackButton = true,
                 onBackClick = {
                     viewModel.handleIntent(BlockchainContract.Intent.NavigateBack)
                 },
                 showBlockchainStatus = uiState.isActivated,
                 activeBlockchainName = if (uiState.isActivated) {
-                    uiState.manifest?.name ?: "활성화됨"
+                    uiState.manifest?.name ?: "Activated"
                 } else null
             )
         }

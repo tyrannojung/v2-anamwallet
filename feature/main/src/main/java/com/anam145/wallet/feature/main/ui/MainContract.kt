@@ -1,6 +1,8 @@
 package com.anam145.wallet.feature.main.ui
 
 import com.anam145.wallet.core.common.model.MiniApp
+import com.anam145.wallet.core.common.model.Skin
+import com.anam145.wallet.core.common.constants.SectionOrder
 
 /**
  * Main 화면의 Contract 정의
@@ -18,7 +20,9 @@ interface MainContract {
         val blockchainApps: List<MiniApp> = emptyList(),     // 블록체인 타입 앱 목록
         val regularApps: List<MiniApp> = emptyList(),        // 일반 앱 목록
         val activeBlockchainId: String? = null,              // 현재 활성화된 블록체인 앱 ID
-        val error: String? = null                            // 에러 메시지 (null이면 에러 없음)
+        val error: String? = null,                           // 에러 메시지 (null이면 에러 없음)
+        val currentSkin: Skin = Skin.ANAM,                   // 현재 선택된 스킨 (테마)
+        val sectionOrder: SectionOrder = SectionOrder.BLOCKCHAIN_FIRST  // 섹션 표시 순서
     )
     
     /**
@@ -30,9 +34,6 @@ interface MainContract {
         
         /** 일반 앱 클릭 */
         data class ClickRegularApp(val miniApp: MiniApp) : MainIntent
-        
-        /** 더 많은 서비스 추가 클릭 */
-        data object ClickAddMore : MainIntent
     }
     
     /**
@@ -44,9 +45,6 @@ interface MainContract {
         
         /** 웹앱 액티비티 실행 (app 프로세스) */
         data class LaunchWebAppActivity(val appId: String) : MainEffect
-        
-        /** Hub 화면으로 이동 (Navigation Component) */
-        data object NavigateToHub : MainEffect
         
         /** 에러 메시지 표시 */
         data class ShowError(val message: String) : MainEffect

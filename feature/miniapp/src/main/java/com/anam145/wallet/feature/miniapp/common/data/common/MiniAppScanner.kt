@@ -100,10 +100,12 @@ class MiniAppScanner @Inject constructor(
 
             // === 3. 각 앱의 상세 정보 로드 ===
             appIds.forEach { appId ->
+                Log.d(TAG, "Processing app: $appId")
                 try {
                     // manifest.json 파일 읽기 시도
                     fileManager.loadManifest(appId)
                         .onSuccess { manifest ->
+                            Log.d(TAG, "Loaded manifest for $appId: appId=${manifest.appId}, name=${manifest.name}, type=${manifest.type}")
                             val miniApp = MiniApp(
                                 appId = manifest.appId,
                                 name = manifest.name,
@@ -117,6 +119,7 @@ class MiniAppScanner @Inject constructor(
                                 iconPath = fileManager.getMiniAppBasePath(appId) + MiniAppConstants.ICON_PATH
                             )
                             installedAppsMap[appId] = miniApp
+                            Log.d(TAG, "Added to map: $appId -> ${miniApp.name} (${miniApp.type})")
                         }
                         // manifest 로드 실패 시 로그만 남기고 계속 진행
                         // (하나의 앱이 실패해도 다른 앱들은 처리)

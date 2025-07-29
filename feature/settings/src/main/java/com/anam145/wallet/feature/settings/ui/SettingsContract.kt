@@ -1,7 +1,7 @@
 package com.anam145.wallet.feature.settings.ui
 
 import com.anam145.wallet.core.common.model.Language
-import com.anam145.wallet.core.common.model.ThemeMode
+import com.anam145.wallet.core.common.model.Skin
 
 /**
  * Settings 화면의 MVI Contract
@@ -32,12 +32,12 @@ interface SettingsContract {
      * - 화면 회전 시에도 유지되어야 함
      * - 사용자가 현재 보고 있는 설정값들
      * 
-     * @property themeMode 현재 선택된 테마 모드 (라이트/다크/시스템)
      * @property language 현재 선택된 언어 설정
+     * @property skin 현재 선택된 스킨 테마
      */
     data class SettingsState(
-        val themeMode: ThemeMode = ThemeMode.SYSTEM,
-        val language: Language = Language.KOREAN
+        val language: Language = Language.KOREAN,
+        val skin: Skin = Skin.ANAM
     )
     
     /**
@@ -53,8 +53,8 @@ interface SettingsContract {
      * - when 문에서 else 브랜치 불필요
      */
     sealed interface SettingsIntent {
-        data class ChangeTheme(val themeMode: ThemeMode) : SettingsIntent
         data class ChangeLanguage(val language: Language) : SettingsIntent
+        data class ChangeSkin(val skin: Skin) : SettingsIntent
         data object ClickHelp : SettingsIntent
         data object ClickFAQ : SettingsIntent
         data object ClickAppInfo : SettingsIntent
