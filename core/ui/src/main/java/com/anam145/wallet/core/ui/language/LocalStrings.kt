@@ -53,8 +53,24 @@ data class Strings(
     // Feature Screen Messages
     val mainScreenTitle: String = "홈 대시보드",
     val hubScreenTitle: String = "허브 화면",
-    val browserScreenTitle: String = "브라우저 화면",
+    val browserScreenTitle: String = "브라우저",
     val identityScreenTitle: String = "디지털 신분증 화면",
+    
+    // Browser Screen
+    val browserUrlPlaceholder: String = "URL 입력 또는 검색",
+    val browserNoBookmarks: String = "북마크가 없습니다",
+    val browserNoBookmarksDescription: String = "웹사이트 방문 시 북마크를 추가하세요",
+    val browserBookmarkAdded: String = "북마크가 추가되었습니다",
+    val browserBookmarkRemoved: String = "북마크가 삭제되었습니다",
+    val browserDeleteBookmarkTitle: String = "북마크 삭제",
+    val browserDeleteBookmarkMessage: String = "%s을(를) 북마크에서 삭제하시겠습니까?",
+    val browserPageLoadError: String = "페이지를 불러올 수 없습니다",
+    val browserGoBack: String = "뒤로 가기",
+    val browserGoForward: String = "앞으로 가기",
+    val browserReload: String = "새로고침",
+    val browserHome: String = "홈",
+    val browserCancel: String = "취소",
+    val browserDelete: String = "삭제",
     
     // Main Screen
     val mainSectionBlockchain: String = "블록체인",
@@ -191,8 +207,24 @@ val EnglishStrings = Strings(
     // Feature Screen Messages
     mainScreenTitle = "Home Dashboard",
     hubScreenTitle = "Hub Screen",
-    browserScreenTitle = "Browser Screen",
+    browserScreenTitle = "Browser",
     identityScreenTitle = "Digital ID Screen",
+    
+    // Browser Screen
+    browserUrlPlaceholder = "Enter URL or search",
+    browserNoBookmarks = "No bookmarks",
+    browserNoBookmarksDescription = "Add bookmarks when visiting websites",
+    browserBookmarkAdded = "Bookmark added",
+    browserBookmarkRemoved = "Bookmark removed",
+    browserDeleteBookmarkTitle = "Delete Bookmark",
+    browserDeleteBookmarkMessage = "Delete %s from bookmarks?",
+    browserPageLoadError = "Unable to load page",
+    browserGoBack = "Go back",
+    browserGoForward = "Go forward",
+    browserReload = "Reload",
+    browserHome = "Home",
+    browserCancel = "Cancel",
+    browserDelete = "Delete",
     
     // Main Screen
     mainSectionBlockchain = "Blockchain",

@@ -10,7 +10,7 @@ import androidx.navigation.navArgument
 import com.anam145.wallet.feature.main.ui.MainScreen
 import com.anam145.wallet.feature.main.ui.MainViewModel
 import com.anam145.wallet.feature.hub.ui.HubScreen
-import com.anam145.wallet.feature.browser.BrowserScreen
+import com.anam145.wallet.feature.browser.ui.BrowserScreen
 import com.anam145.wallet.feature.identity.navigation.IdentityNavHost
 import com.anam145.wallet.feature.settings.ui.SettingsScreen
 import com.anam145.wallet.feature.miniapp.webapp.WebAppActivity
