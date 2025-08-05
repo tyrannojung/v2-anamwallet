@@ -8,10 +8,11 @@ package com.anam145.wallet.core.security.data.util
 object ScryptConstants {
     /**
      * SCrypt N 파라미터 (CPU/메모리 비용)
-     * - 모바일 최적화: 16384 (2^14)
+     * - 모바일 최적화: 8192 (2^13) - 대부분 안드로이드 기기에서 0.5초 이내
+     * - 고성능 기기: 16384 (2^14) 사용 가능
      * - 데스크톱: 262144 (2^18) 사용 가능
      */
-    const val N = 16384  // 2^14
+    const val N = 8192  // 2^13
     
     /**
      * SCrypt N 파라미터 (빠른 버전)
