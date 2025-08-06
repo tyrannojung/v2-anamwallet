@@ -1,7 +1,9 @@
 package com.anam145.wallet.feature.browser.di
 
 import com.anam145.wallet.feature.browser.data.repository.BookmarkRepositoryImpl
+import com.anam145.wallet.feature.browser.data.repository.UniversalRepositoryImpl
 import com.anam145.wallet.feature.browser.domain.repository.BookmarkRepository
+import com.anam145.wallet.feature.browser.domain.repository.UniversalRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -20,4 +22,10 @@ abstract class BrowserModule {
     abstract fun bindBookmarkRepository(
         bookmarkRepositoryImpl: BookmarkRepositoryImpl
     ): BookmarkRepository
+    
+    @Binds
+    @Singleton
+    abstract fun bindUniversalRepository(
+        universalRepositoryImpl: UniversalRepositoryImpl
+    ): UniversalRepository
 }

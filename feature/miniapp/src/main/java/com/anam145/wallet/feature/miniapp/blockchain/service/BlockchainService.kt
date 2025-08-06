@@ -113,14 +113,34 @@ class BlockchainService : Service() {
                 
                 // WebView에 이벤트 전달
                 handler.post {
-                    val script = """
+                    // Universal Request 확인
+                    val payload = requestData.optString("payload")
+                    val isUniversalRequest = payload.isNotEmpty()
+                    
+                    val script = if (isUniversalRequest) {
+                        // Universal Bridge 요청
+                        """
+                        (function() {
+                            const event = new CustomEvent('universalRequest', {
+                                detail: {
+                                    requestId: '$requestId',
+                                    payload: '$payload'
+                                }
+                            });
+                            window.dispatchEvent(event);
+                        })();
+                        """.trimIndent()
+                    } else {
+                        // 기존 트랜잭션 요청 (하위 호환성)
+                        """
                         (function() {
                             const event = new CustomEvent('transactionRequest', {
                                 detail: $requestJson
                             });
                             window.dispatchEvent(event);
                         })();
-                    """.trimIndent()
+                        """.trimIndent()
+                    }
                     
                     activeBlockchainWebView?.evaluateJavascript(script) { result ->
                         Log.d(TAG, "Event dispatched to blockchain: $result")

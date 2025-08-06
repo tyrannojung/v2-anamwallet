@@ -1,12 +1,18 @@
 package com.anam145.wallet.feature.browser.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.anam145.wallet.core.data.datastore.BlockchainDataStore
+import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
 import com.anam145.wallet.feature.browser.domain.usecase.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import javax.inject.Inject
 
 /**
@@ -27,11 +33,22 @@ class BrowserViewModel @Inject constructor(
     private val addBookmarkUseCase: AddBookmarkUseCase,
     private val deleteBookmarkUseCase: DeleteBookmarkUseCase,
     private val toggleBookmarkUseCase: ToggleBookmarkUseCase,
-    private val checkBookmarkStatusUseCase: CheckBookmarkStatusUseCase
+    private val checkBookmarkStatusUseCase: CheckBookmarkStatusUseCase,
+    private val blockchainDataStore: BlockchainDataStore,
+    private val fileManager: MiniAppFileManager,
+    private val requestUniversalMethodUseCase: RequestUniversalMethodUseCase,
+    private val getInstalledMiniAppsUseCase: com.anam145.wallet.feature.miniapp.common.domain.usecase.GetInstalledMiniAppsUseCase
 ) : ViewModel() {
+    
+    companion object {
+        private const val TAG = "BrowserViewModel"
+    }
     
     private val _uiState = MutableStateFlow(BrowserContract.State())
     val uiState: StateFlow<BrowserContract.State> = _uiState.asStateFlow()
+    
+    // 브릿지 스크립트 캐시: blockchainId -> script
+    private val bridgeScriptCache = mutableMapOf<String, String>()
     
     private val _effect = MutableSharedFlow<BrowserContract.Effect>(
         replay = 0,
@@ -46,6 +63,16 @@ class BrowserViewModel @Inject constructor(
     init {
         observeBookmarks()
         observeCurrentUrl()
+        observeActiveBlockchain()
+        
+        // 초기 활성 블록체인 확인
+        viewModelScope.launch {
+            val activeBlockchain = blockchainDataStore.activeBlockchainId.first()
+            Log.d(TAG, "Initial active blockchain: $activeBlockchain")
+            activeBlockchain?.let {
+                handleIntent(BrowserContract.Intent.LoadBlockchainBridge(it))
+            }
+        }
     }
     
     fun handleIntent(intent: BrowserContract.Intent) {
@@ -63,6 +90,8 @@ class BrowserViewModel @Inject constructor(
             is BrowserContract.Intent.DeleteBookmark -> deleteBookmark(intent.bookmark)
             is BrowserContract.Intent.ClearError -> clearError()
             BrowserContract.Intent.ShowBookmarks -> showBookmarks()
+            is BrowserContract.Intent.HandleUniversalRequest -> handleUniversalRequest(intent.requestId, intent.payload)
+            is BrowserContract.Intent.LoadBlockchainBridge -> loadBlockchainBridge(intent.blockchainId)
         }
     }
     
@@ -229,6 +258,205 @@ class BrowserViewModel @Inject constructor(
                 isLoading = false,
                 error = BrowserContract.BrowserError.PageLoadError
             )
+        }
+    }
+    
+    /**
+     * 활성 블록체인 변경 감지
+     */
+    private fun observeActiveBlockchain() {
+        viewModelScope.launch {
+            blockchainDataStore.activeBlockchainId.collect { blockchainId ->
+                blockchainId?.let {
+                    handleIntent(BrowserContract.Intent.LoadBlockchainBridge(it))
+                }
+            }
+        }
+    }
+    
+    /**
+     * 블록체인 Bridge 스크립트 로드
+     * 1. 메모리 캐시 확인
+     * 2. MiniAppScanner 캐시에서 bridge 정보 확인
+     * 3. 없으면 파일에서 직접 로드 (fallback)
+     */
+    private fun loadBlockchainBridge(blockchainId: String) {
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(isBridgeLoaded = false) }
+                
+                // 1. 메모리 캐시 확인
+                bridgeScriptCache[blockchainId]?.let { cachedScript ->
+                    Log.d(TAG, "Using cached bridge script for: $blockchainId")
+                    _effect.emit(BrowserContract.Effect.InjectBridgeScript(cachedScript))
+                    _uiState.update { 
+                        it.copy(
+                            activeBlockchainId = blockchainId,
+                            isBridgeLoaded = true
+                        )
+                    }
+                    return@launch
+                }
+                
+                // 2. MiniAppScanner 캐시에서 bridge 정보 확인
+                val miniAppsResult = withContext(Dispatchers.IO) {
+                    getInstalledMiniAppsUseCase()
+                }
+                
+                when (miniAppsResult) {
+                    is com.anam145.wallet.core.common.result.MiniAppResult.Success -> {
+                        val miniApp = miniAppsResult.data[blockchainId]
+                        
+                        miniApp?.bridge?.let { bridgeConfig ->
+                            Log.d(TAG, "Bridge config found in cache for $blockchainId: ${bridgeConfig.script}")
+                            
+                            // Bridge 스크립트 로드
+                            val scriptResult = withContext(Dispatchers.IO) {
+                                fileManager.loadBridgeScript(blockchainId, bridgeConfig.script)
+                            }
+                            
+                            when (scriptResult) {
+                                is com.anam145.wallet.core.common.result.MiniAppResult.Success -> {
+                                    val bridgeScript = scriptResult.data
+                                    
+                                    // 메모리 캐시에 저장
+                                    bridgeScriptCache[blockchainId] = bridgeScript
+                                    
+                                    // Bridge 스크립트 주입
+                                    _effect.emit(
+                                        BrowserContract.Effect.InjectBridgeScript(bridgeScript)
+                                    )
+                                    
+                                    _uiState.update { 
+                                        it.copy(
+                                            activeBlockchainId = blockchainId,
+                                            isBridgeLoaded = true
+                                        )
+                                    }
+                                    
+                                    Log.d(TAG, "Bridge loaded and cached for: $blockchainId")
+                                }
+                                is com.anam145.wallet.core.common.result.MiniAppResult.Error -> {
+                                    Log.e(TAG, "Failed to load bridge script: $scriptResult")
+                                    updateNoBridge(blockchainId)
+                                }
+                            }
+                        } ?: run {
+                            // Bridge 설정이 없는 경우 - 정상적인 상황
+                            Log.d(TAG, "No bridge configuration for: $blockchainId")
+                            updateNoBridge(blockchainId)
+                        }
+                    }
+                    is com.anam145.wallet.core.common.result.MiniAppResult.Error -> {
+                        // 3. Fallback: 캐시가 없으면 직접 manifest 로드
+                        Log.d(TAG, "MiniApp cache miss, loading manifest directly for: $blockchainId")
+                        loadBridgeFromManifest(blockchainId)
+                    }
+                }
+                
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to load bridge", e)
+                updateNoBridge(blockchainId)
+            }
+        }
+    }
+    
+    /**
+     * Fallback: manifest에서 직접 bridge 로드
+     */
+    private suspend fun loadBridgeFromManifest(blockchainId: String) {
+        val manifestResult = withContext(Dispatchers.IO) {
+            fileManager.loadManifest(blockchainId)
+        }
+        
+        when (manifestResult) {
+            is com.anam145.wallet.core.common.result.MiniAppResult.Success -> {
+                val manifest = manifestResult.data
+                
+                manifest.bridge?.let { bridgeConfig ->
+                    Log.d(TAG, "Bridge script found in manifest for $blockchainId: ${bridgeConfig.script}")
+                    
+                    val scriptResult = withContext(Dispatchers.IO) {
+                        fileManager.loadBridgeScript(blockchainId, bridgeConfig.script)
+                    }
+                    
+                    when (scriptResult) {
+                        is com.anam145.wallet.core.common.result.MiniAppResult.Success -> {
+                            val bridgeScript = scriptResult.data
+                            
+                            // 메모리 캐시에 저장
+                            bridgeScriptCache[blockchainId] = bridgeScript
+                            
+                            _effect.emit(
+                                BrowserContract.Effect.InjectBridgeScript(bridgeScript)
+                            )
+                            
+                            _uiState.update { 
+                                it.copy(
+                                    activeBlockchainId = blockchainId,
+                                    isBridgeLoaded = true
+                                )
+                            }
+                            
+                            Log.d(TAG, "Bridge loaded from manifest for: $blockchainId")
+                        }
+                        is com.anam145.wallet.core.common.result.MiniAppResult.Error -> {
+                            Log.e(TAG, "Failed to load bridge script: $scriptResult")
+                            updateNoBridge(blockchainId)
+                        }
+                    }
+                } ?: updateNoBridge(blockchainId)
+            }
+            is com.anam145.wallet.core.common.result.MiniAppResult.Error -> {
+                Log.e(TAG, "Failed to load manifest: $manifestResult")
+                updateNoBridge(blockchainId)
+            }
+        }
+    }
+    
+    private fun updateNoBridge(blockchainId: String) {
+        _uiState.update { 
+            it.copy(
+                activeBlockchainId = blockchainId,
+                isBridgeLoaded = false
+            )
+        }
+    }
+    
+    /**
+     * Universal Bridge 요청 처리
+     */
+    private fun handleUniversalRequest(requestId: String, payload: String) {
+        viewModelScope.launch {
+            try {
+                val activeBlockchain = _uiState.value.activeBlockchainId
+                    ?: throw IllegalStateException("No active blockchain")
+                
+                // UseCase를 통해 요청 전달
+                val response = requestUniversalMethodUseCase(
+                    requestId = requestId,
+                    blockchainId = activeBlockchain,
+                    payload = payload
+                )
+                
+                // 응답 전송
+                _effect.emit(
+                    BrowserContract.Effect.SendUniversalResponse(
+                        requestId = requestId,
+                        response = response
+                    )
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Universal request failed", e)
+                
+                // 에러 응답
+                _effect.emit(
+                    BrowserContract.Effect.SendUniversalResponse(
+                        requestId = requestId,
+                        response = """{"error": "${e.message}"}"""
+                    )
+                )
+            }
         }
     }
 }

@@ -48,10 +48,12 @@ import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.theme.ShapeCard
 import com.anam145.wallet.feature.browser.domain.model.Bookmark
 import com.anam145.wallet.feature.browser.ui.BrowserContract
+import com.anam145.wallet.feature.browser.ui.components.getUniversalBridgeScript
 import com.anam145.wallet.feature.browser.ui.BrowserViewModel
 import com.anam145.wallet.feature.browser.ui.components.*
 import kotlinx.coroutines.launch
 import android.widget.Toast
+import android.util.Log
 
 /**
  * Browser 에러를 문자열로 변환
@@ -86,6 +88,8 @@ fun BrowserScreen(
     
     // WebView 참조
     var webView by remember { mutableStateOf<WebView?>(null) }
+    // Bridge Script 상태
+    var bridgeScript by remember { mutableStateOf<String?>(null) }
     
     // Effects 처리
     LaunchedEffect(viewModel) {
@@ -100,6 +104,40 @@ fun BrowserScreen(
                 is BrowserContract.Effect.HideKeyboard -> {
                     keyboardController?.hide()
                     focusManager.clearFocus()
+                }
+                is BrowserContract.Effect.InjectBridgeScript -> {
+                    val wasNull = bridgeScript == null
+                    bridgeScript = effect.script
+                    
+                    // WebView가 이미 로드되어 있으면
+                    webView?.let { view ->
+                        val currentUrl = view.url
+                        
+                        // 첫 번째 bridge 로드이고 이미 페이지가 로드된 경우 새로고침
+                        if (wasNull && currentUrl != null && currentUrl != "about:blank") {
+                            Log.d("BrowserScreen", "Bridge loaded late, reloading page: $currentUrl")
+                            view.reload()
+                        } else {
+                            // 그렇지 않으면 즉시 주입
+                            // 먼저 Universal Bridge가 있는지 확인하고 없으면 주입
+                            view.evaluateJavascript(
+                                """
+                                (function() {
+                                    if (!window._anamBridge) {
+                                        ${getUniversalBridgeScript()}
+                                    }
+                                })();
+                                """.trimIndent(),
+                                null
+                            )
+                            // 그 다음 blockchain bridge 주입
+                            view.evaluateJavascript(effect.script, null)
+                        }
+                    }
+                }
+                is BrowserContract.Effect.SendUniversalResponse -> {
+                    val bridge = webView?.tag as? com.anam145.wallet.feature.browser.bridge.BrowserJavaScriptBridge
+                    bridge?.sendUniversalResponse(effect.requestId, effect.response)
                 }
             }
         }
@@ -162,7 +200,16 @@ fun BrowserScreen(
                         },
                         onPageError = { error ->
                             viewModel.onPageError(error)
-                        }
+                        },
+                        onUniversalRequest = { requestId, payload ->
+                            viewModel.handleIntent(
+                                BrowserContract.Intent.HandleUniversalRequest(
+                                    requestId = requestId,
+                                    payload = payload
+                                )
+                            )
+                        },
+                        bridgeScript = bridgeScript
                     )
                     
                     // 에러 화면

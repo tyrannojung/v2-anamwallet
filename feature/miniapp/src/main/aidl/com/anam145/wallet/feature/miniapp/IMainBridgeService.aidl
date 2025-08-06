@@ -4,6 +4,7 @@ package com.anam145.wallet.feature.miniapp;
 import com.anam145.wallet.feature.miniapp.IBlockchainCallback;
 import com.anam145.wallet.feature.miniapp.IKeystoreCallback;
 import com.anam145.wallet.feature.miniapp.IKeystoreDecryptCallback;
+import com.anam145.wallet.feature.miniapp.IUniversalCallback;
 
 /**
  * 메인 브릿지 서비스와 통신하기 위한 AIDL 인터페이스
@@ -53,4 +54,16 @@ interface IMainBridgeService {
      * @param callback 결과 콜백
      */
     void decryptKeystore(String keystoreJson, IKeystoreDecryptCallback callback);
+    
+    /**
+     * Universal Bridge 요청 처리
+     * 
+     * 모든 블록체인의 요청을 동적으로 처리합니다.
+     * Native는 payload의 내용을 파싱하지 않고 그대로 전달합니다.
+     * 
+     * @param requestId 요청 고유 ID
+     * @param payload JSON 형태의 요청 데이터 (블록체인이 정의한 형식)
+     * @param callback 결과 콜백
+     */
+    void processUniversalRequest(String requestId, String payload, IUniversalCallback callback);
 }

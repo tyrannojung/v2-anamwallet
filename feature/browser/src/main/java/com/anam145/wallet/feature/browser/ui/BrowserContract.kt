@@ -31,7 +31,9 @@ interface BrowserContract {
         val searchSuggestions: List<String> = emptyList(),
         val showBookmarks: Boolean = true, // 초기 화면에 북마크 표시
         val pageTitle: String = "",
-        val error: BrowserError? = null
+        val error: BrowserError? = null,
+        val activeBlockchainId: String? = null,
+        val isBridgeLoaded: Boolean = false
     )
     
     /**
@@ -51,6 +53,8 @@ interface BrowserContract {
         data class DeleteBookmark(val bookmark: Bookmark) : Intent
         data object ClearError : Intent
         data object ShowBookmarks : Intent
+        data class HandleUniversalRequest(val requestId: String, val payload: String) : Intent
+        data class LoadBlockchainBridge(val blockchainId: String) : Intent
     }
     
     /**
@@ -60,5 +64,7 @@ interface BrowserContract {
         data object BookmarkAdded : Effect
         data object BookmarkRemoved : Effect
         data object HideKeyboard : Effect
+        data class InjectBridgeScript(val script: String) : Effect
+        data class SendUniversalResponse(val requestId: String, val response: String) : Effect
     }
 }

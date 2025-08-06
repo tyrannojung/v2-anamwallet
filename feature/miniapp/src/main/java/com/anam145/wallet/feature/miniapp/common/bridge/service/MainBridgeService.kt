@@ -20,6 +20,7 @@ import com.anam145.wallet.feature.miniapp.IBlockchainService
 import com.anam145.wallet.feature.miniapp.IKeystoreCallback
 import com.anam145.wallet.feature.miniapp.IKeystoreDecryptCallback
 import com.anam145.wallet.feature.miniapp.IMainBridgeService
+import com.anam145.wallet.feature.miniapp.IUniversalCallback
 import com.anam145.wallet.feature.miniapp.blockchain.service.BlockchainService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -249,6 +250,75 @@ class MainBridgeService : Service() {
                     } catch (callbackError: RemoteException) {
                         Log.e(TAG, "Failed to send error callback", callbackError)
                     }
+                }
+            }
+        }
+        
+        override fun processUniversalRequest(
+            requestId: String,
+            payload: String,
+            callback: IUniversalCallback
+        ) {
+            Log.d(TAG, "Universal request received: $requestId")
+            Log.d(TAG, "Payload: $payload")
+            
+            try {
+                // 블록체인 서비스가 연결되어 있지 않으면 에러 반환
+                if (!isBlockchainServiceBound || blockchainService == null) {
+                    callback.onError(requestId, "BlockchainService not connected")
+                    return
+                }
+                
+                // 현재 활성화된 블록체인 확인
+                val activeBlockchainId = blockchainService?.getActiveBlockchainId()
+                if (activeBlockchainId.isNullOrEmpty()) {
+                    callback.onError(requestId, "No active blockchain")
+                    return
+                }
+                
+                // Universal Request를 위한 JSON 준비
+                val universalRequest = JSONObject().apply {
+                    put("requestId", requestId)
+                    put("payload", payload)
+                }
+                
+                // 블록체인 서비스로 전달 (기존 processRequest 사용)
+                blockchainService?.processRequest(
+                    universalRequest.toString(),
+                    object : IBlockchainCallback.Stub() {
+                        override fun onSuccess(responseData: String) {
+                            try {
+                                Log.d(TAG, "Universal request success: $responseData")
+                                callback.onSuccess(requestId, responseData)
+                            } catch (e: RemoteException) {
+                                Log.e(TAG, "Failed to send success callback", e)
+                            }
+                        }
+                        
+                        override fun onError(errorData: String) {
+                            try {
+                                Log.e(TAG, "Universal request error: $errorData")
+                                callback.onError(requestId, errorData)
+                            } catch (e: RemoteException) {
+                                Log.e(TAG, "Failed to send error callback", e)
+                            }
+                        }
+                    }
+                )
+                
+            } catch (e: RemoteException) {
+                Log.e(TAG, "RemoteException in processUniversalRequest", e)
+                try {
+                    callback.onError(requestId, "Remote exception: ${e.message}")
+                } catch (callbackError: RemoteException) {
+                    Log.e(TAG, "Failed to send error callback", callbackError)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error processing universal request", e)
+                try {
+                    callback.onError(requestId, e.message ?: "Unknown error")
+                } catch (callbackError: RemoteException) {
+                    Log.e(TAG, "Failed to send error callback", callbackError)
                 }
             }
         }

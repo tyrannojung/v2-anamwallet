@@ -28,6 +28,19 @@ class BlockchainJavaScriptBridge(
         }
     }
     
+    /**
+     * Universal Bridge 응답 전송
+     * 
+     * 블록체인 미니앱에서 Universal Bridge 요청에 대한 응답을 전송합니다.
+     */
+    @JavascriptInterface
+    fun sendUniversalResponse(requestId: String, responseJson: String) {
+        Log.d(TAG, "sendUniversalResponse from blockchain: $requestId")
+        handler.post {
+            onResponse(requestId, responseJson)
+        }
+    }
+    
     @JavascriptInterface
     fun log(message: String) {
         Log.d(TAG, "Blockchain JS: $message")

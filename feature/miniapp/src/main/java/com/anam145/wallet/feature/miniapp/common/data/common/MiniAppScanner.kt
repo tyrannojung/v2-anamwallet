@@ -116,7 +116,9 @@ class MiniAppScanner @Inject constructor(
                                 },
                                 // 아이콘 파일 경로 생성
                                 // 예: /data/data/.../files/miniapps/bitcoin/assets/icons/app_icon.png
-                                iconPath = fileManager.getMiniAppBasePath(appId) + MiniAppConstants.ICON_PATH
+                                iconPath = fileManager.getMiniAppBasePath(appId) + MiniAppConstants.ICON_PATH,
+                                // Bridge 설정도 함께 캐싱
+                                bridge = manifest.bridge
                             )
                             installedAppsMap[appId] = miniApp
                             Log.d(TAG, "Added to map: $appId -> ${miniApp.name} (${miniApp.type})")
