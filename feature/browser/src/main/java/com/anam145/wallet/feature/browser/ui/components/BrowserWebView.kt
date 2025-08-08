@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.feature.browser.bridge.BrowserJavaScriptBridge
 
 /**
@@ -29,7 +30,7 @@ fun BrowserWebView(
     bridgeScript: String? = null
 ) {
     val context = LocalContext.current
-    val strings = com.anam145.wallet.core.ui.language.LocalStrings.current
+    val strings = LocalStrings.current
     
     // JavaScript Bridge 생성
     val jsBridge = remember {

@@ -48,6 +48,7 @@ interface BrowserContract {
         data object ShowUrlBar : Intent
         data object HideUrlBar : Intent
         data class UpdateUrlInput(val input: String) : Intent
+        data object ClearUrlInput : Intent
         data class SelectSuggestion(val suggestion: String) : Intent
         data class SelectBookmark(val bookmark: Bookmark) : Intent
         data class DeleteBookmark(val bookmark: Bookmark) : Intent

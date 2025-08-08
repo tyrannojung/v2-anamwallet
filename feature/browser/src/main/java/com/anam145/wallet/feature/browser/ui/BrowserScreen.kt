@@ -146,26 +146,38 @@ fun BrowserScreen(
                 showUrlBar = uiState.showUrlBar,
                 urlInput = uiState.urlInput,
                 searchSuggestions = uiState.searchSuggestions,
+                showBookmarks = uiState.showBookmarks,  // 북마크 화면 여부 전달
                 onUrlInputChange = { viewModel.handleIntent(BrowserContract.Intent.UpdateUrlInput(it)) },
                 onUrlSubmit = { viewModel.handleIntent(BrowserContract.Intent.LoadUrl(it)) },
                 onBookmarkClick = { viewModel.handleIntent(BrowserContract.Intent.ToggleBookmark) },
                 onShowUrlBar = { viewModel.handleIntent(BrowserContract.Intent.ShowUrlBar) },
                 onHideUrlBar = { viewModel.handleIntent(BrowserContract.Intent.HideUrlBar) },
-                onSuggestionClick = { viewModel.handleIntent(BrowserContract.Intent.SelectSuggestion(it)) }
+                onSuggestionClick = { viewModel.handleIntent(BrowserContract.Intent.SelectSuggestion(it)) },
+                onClearInput = { viewModel.handleIntent(BrowserContract.Intent.ClearUrlInput) }
             )
             
-            // WebView 또는 북마크 화면
+            // WebView 또는 북마크 화면 또는 검색 화면
             Box(modifier = Modifier.weight(1f)) {
-                if (uiState.showBookmarks && !uiState.showUrlBar) {
+                when {
+                    // 검색 모드일 때는 WebView 숨기고 흰 배경만 표시
+                    uiState.showUrlBar -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.surface)
+                        )
+                    }
                     // 북마크 화면
-                    BookmarksView(
-                        bookmarks = uiState.bookmarks,
-                        onBookmarkClick = { viewModel.handleIntent(BrowserContract.Intent.SelectBookmark(it)) },
-                        onBookmarkDelete = { viewModel.handleIntent(BrowserContract.Intent.DeleteBookmark(it)) }
-                    )
-                } else {
+                    uiState.showBookmarks -> {
+                        BookmarksView(
+                            bookmarks = uiState.bookmarks,
+                            onBookmarkClick = { viewModel.handleIntent(BrowserContract.Intent.SelectBookmark(it)) },
+                            onBookmarkDelete = { viewModel.handleIntent(BrowserContract.Intent.DeleteBookmark(it)) }
+                        )
+                    }
                     // WebView
-                    BrowserWebView(
+                    else -> {
+                        BrowserWebView(
                         url = uiState.url,
                         onWebViewCreated = { webView = it },
                         onPageStarted = { url ->
@@ -198,33 +210,36 @@ fun BrowserScreen(
                             )
                         },
                         bridgeScript = bridgeScript
-                    )
-                    
-                    // 에러 화면
-                    uiState.error?.let { error ->
-                        ErrorOverlay(
-                            error = error.toMessage(),
-                            onDismiss = { viewModel.handleIntent(BrowserContract.Intent.ClearError) }
                         )
+                        
+                        // 에러 화면
+                        uiState.error?.let { error ->
+                            ErrorOverlay(
+                                error = error.toMessage(),
+                                onDismiss = { viewModel.handleIntent(BrowserContract.Intent.ClearError) }
+                            )
+                        }
                     }
                 }
             }
             
-            // 하단 네비게이션 바
-            BrowserBottomBar(
-                canGoBack = uiState.canGoBack,
-                canGoForward = uiState.canGoForward,
-                onBackClick = { webView?.goBack() },
-                onForwardClick = { webView?.goForward() },
-                onReloadClick = { 
-                    webView?.reload()
-                    viewModel.handleIntent(BrowserContract.Intent.Reload)
-                },
-                onHomeClick = {
-                    // 홈 버튼을 누르면 북마크 페이지로 이동
-                    viewModel.handleIntent(BrowserContract.Intent.ShowBookmarks)
-                }
-            )
+            // 하단 네비게이션 바 (북마크 화면에서는 숨김)
+            if (!uiState.showBookmarks) {
+                BrowserBottomBar(
+                    canGoBack = uiState.canGoBack,
+                    canGoForward = uiState.canGoForward,
+                    onBackClick = { webView?.goBack() },
+                    onForwardClick = { webView?.goForward() },
+                    onReloadClick = { 
+                        webView?.reload()
+                        viewModel.handleIntent(BrowserContract.Intent.Reload)
+                    },
+                    onHomeClick = {
+                        // 홈 버튼을 누르면 북마크 페이지로 이동
+                        viewModel.handleIntent(BrowserContract.Intent.ShowBookmarks)
+                    }
+                )
+            }
         }
     }
 }

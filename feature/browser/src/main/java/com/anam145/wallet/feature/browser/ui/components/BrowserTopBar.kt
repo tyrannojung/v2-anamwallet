@@ -13,6 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.*
@@ -27,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.anam145.wallet.core.ui.language.LocalStrings
 
 /**
  * 브라우저 상단 바
@@ -41,12 +44,14 @@ fun BrowserTopBar(
     showUrlBar: Boolean,
     urlInput: String,
     searchSuggestions: List<String>,
+    showBookmarks: Boolean = false,  // 북마크 화면 여부
     onUrlInputChange: (String) -> Unit,
     onUrlSubmit: (String) -> Unit,
     onBookmarkClick: () -> Unit,
     onShowUrlBar: () -> Unit,
     onHideUrlBar: () -> Unit,
-    onSuggestionClick: (String) -> Unit
+    onSuggestionClick: (String) -> Unit,
+    onClearInput: () -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
     
@@ -72,45 +77,77 @@ fun BrowserTopBar(
                         // URL 입력 모드
                         Row(
                             modifier = Modifier.fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            IconButton(onClick = onHideUrlBar) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Cancel"
-                                )
-                            }
-                            
+                            // 검색 입력 필드
                             OutlinedTextField(
                                 value = urlInput,
                                 onValueChange = onUrlInputChange,
                                 modifier = Modifier
                                     .weight(1f)
-                                    .focusRequester(focusRequester),
-                                placeholder = { Text(com.anam145.wallet.core.ui.language.LocalStrings.current.browserUrlPlaceholder) },
+                                    .focusRequester(focusRequester)
+                                    .padding(start = 8.dp)
+                                    .height(48.dp),  // 고정 높이로 텍스트 잘림 방지
+                                placeholder = { 
+                                    val strings = LocalStrings.current
+                                    Text(
+                                        text = strings.browserSearchPlaceholder,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                },
                                 singleLine = true,
+                                trailingIcon = {
+                                    if (urlInput.isNotEmpty()) {
+                                        IconButton(
+                                            onClick = onClearInput,
+                                            modifier = Modifier.size(24.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Clear,
+                                                contentDescription = "Clear",
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                    }
+                                },
                                 keyboardOptions = KeyboardOptions(
                                     imeAction = ImeAction.Go
                                 ),
                                 keyboardActions = KeyboardActions(
                                     onGo = {
-                                        val finalUrl = if (urlInput.startsWith("http://") || urlInput.startsWith("https://")) {
-                                            urlInput
-                                        } else if (urlInput.contains(".")) {
-                                            "https://$urlInput"
-                                        } else {
-                                            "https://duckduckgo.com/?q=$urlInput"
+                                        if (urlInput.isNotEmpty()) {
+                                            val finalUrl = if (urlInput.startsWith("http://") || urlInput.startsWith("https://")) {
+                                                urlInput
+                                            } else if (urlInput.contains(".")) {
+                                                "https://$urlInput"
+                                            } else {
+                                                "https://duckduckgo.com/?q=$urlInput"
+                                            }
+                                            onUrlSubmit(finalUrl)
                                         }
-                                        onUrlSubmit(finalUrl)
                                     }
                                 ),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                    unfocusedBorderColor = Color.Transparent,
-                                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                                )
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                                ),
+                                shape = RoundedCornerShape(24.dp),  // MetaMask처럼 둥근 모서리
+                                textStyle = MaterialTheme.typography.bodyMedium  // 텍스트 스타일 명시
                             )
+                            
+                            // Cancel 버튼 (오른쪽)
+                            TextButton(
+                                onClick = onHideUrlBar,
+                                modifier = Modifier.padding(end = 4.dp)
+                            ) {
+                                val strings = LocalStrings.current
+                                Text(strings.cancel)
+                            }
                         }
                         
                         LaunchedEffect(Unit) {
@@ -127,61 +164,82 @@ fun BrowserTopBar(
                                 .padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            if (isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp
-                                )
-                            } else {
+                            if (showBookmarks) {
+                                // 북마크 화면일 때: 검색 아이콘과 플레이스홀더만 표시
                                 Icon(
-                                    imageVector = Icons.Default.Lock,
+                                    imageVector = Icons.Default.Search,
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp),
-                                    tint = if (url.startsWith("https://")) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                    }
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                            }
-                            
-                            Spacer(modifier = Modifier.width(8.dp))
-                            
-                            Column(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                if (pageTitle.isNotEmpty()) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                val strings = LocalStrings.current
+                                Text(
+                                    text = strings.browserSearchPlaceholder,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            } else {
+                                // 웹 페이지 볼 때: 기존 UI
+                                if (isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Default.Lock,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                        tint = if (url.startsWith("https://")) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                        }
+                                    )
+                                }
+                                
+                                Spacer(modifier = Modifier.width(8.dp))
+                                
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    if (pageTitle.isNotEmpty()) {
+                                        Text(
+                                            text = pageTitle,
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = FontWeight.Medium,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
                                     Text(
-                                        text = pageTitle,
-                                        style = MaterialTheme.typography.labelMedium,
-                                        fontWeight = FontWeight.Medium,
+                                        text = url,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
                                 }
-                                Text(
-                                    text = url,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                            
-                            IconButton(onClick = onBookmarkClick) {
-                                Icon(
-                                    imageVector = if (isBookmarked) {
-                                        Icons.Default.Bookmark
-                                    } else {
-                                        Icons.Outlined.BookmarkBorder
-                                    },
-                                    contentDescription = if (isBookmarked) "Remove bookmark" else "Add bookmark",
-                                    tint = if (isBookmarked) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                    }
-                                )
+                                
+                                // 북마크 버튼 (웹 페이지에서만 표시)
+                                IconButton(onClick = onBookmarkClick) {
+                                    Icon(
+                                        imageVector = if (isBookmarked) {
+                                            Icons.Default.Bookmark
+                                        } else {
+                                            Icons.Outlined.BookmarkBorder
+                                        },
+                                        contentDescription = if (isBookmarked) "Remove bookmark" else "Add bookmark",
+                                        tint = if (isBookmarked) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -204,23 +262,49 @@ fun BrowserTopBar(
                 items(searchSuggestions) { suggestion ->
                     ListItem(
                         headlineContent = { 
+                            val strings = LocalStrings.current
+                            val displayText = when {
+                                suggestion == "Search on DuckDuckGo" -> {
+                                    if (urlInput.isEmpty()) {
+                                        strings.browserSearchDuckDuckGo
+                                    } else {
+                                        "${strings.browserSearchDuckDuckGo}: \"$urlInput\""
+                                    }
+                                }
+                                suggestion.startsWith("http") || suggestion.contains(".") -> {
+                                    suggestion
+                                }
+                                else -> suggestion
+                            }
                             Text(
-                                text = suggestion,
+                                text = displayText,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         },
                         leadingContent = {
                             Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = null
+                                imageVector = if (suggestion == "Search on DuckDuckGo" || suggestion.contains("DuckDuckGo")) {
+                                    Icons.Default.Search
+                                } else {
+                                    Icons.Default.Language
+                                },
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(20.dp)
                             )
                         },
-                        modifier = Modifier.clickable {
-                            onSuggestionClick(suggestion)
-                        }
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onSuggestionClick(suggestion)
+                            }
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        colors = ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        )
                     )
-                    HorizontalDivider()
                 }
             }
         }

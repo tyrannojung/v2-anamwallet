@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.anam145.wallet.core.ui.theme.ShapeCard
+import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.feature.browser.domain.model.Bookmark
 
 /**
@@ -51,7 +52,7 @@ fun BookmarksView(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                val strings = com.anam145.wallet.core.ui.language.LocalStrings.current
+                val strings = LocalStrings.current
                 Text(
                     text = strings.browserNoBookmarks,
                     style = MaterialTheme.typography.bodyLarge,

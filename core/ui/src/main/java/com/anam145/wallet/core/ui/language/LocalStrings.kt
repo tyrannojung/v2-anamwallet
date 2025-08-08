@@ -58,6 +58,9 @@ data class Strings(
     
     // Browser Screen
     val browserUrlPlaceholder: String = "URL 입력 또는 검색",
+    val browserSearchPlaceholder: String = "검색어 또는 주소 입력",
+    val cancel: String = "취소",
+    val browserSearchDuckDuckGo: String = "DuckDuckGo에서 검색",
     val browserNoBookmarks: String = "북마크가 없습니다",
     val browserNoBookmarksDescription: String = "웹사이트 방문 시 북마크를 추가하세요",
     val browserBookmarkAdded: String = "북마크가 추가되었습니다",
@@ -212,6 +215,9 @@ val EnglishStrings = Strings(
     
     // Browser Screen
     browserUrlPlaceholder = "Enter URL or search",
+    browserSearchPlaceholder = "Search or enter address",
+    cancel = "Cancel",
+    browserSearchDuckDuckGo = "Search on DuckDuckGo",
     browserNoBookmarks = "No bookmarks",
     browserNoBookmarksDescription = "Add bookmarks when visiting websites",
     browserBookmarkAdded = "Bookmark added",

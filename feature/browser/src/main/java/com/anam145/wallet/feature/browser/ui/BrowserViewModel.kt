@@ -85,6 +85,7 @@ class BrowserViewModel @Inject constructor(
             is BrowserContract.Intent.ShowUrlBar -> showUrlBar()
             is BrowserContract.Intent.HideUrlBar -> hideUrlBar()
             is BrowserContract.Intent.UpdateUrlInput -> updateUrlInput(intent.input)
+            BrowserContract.Intent.ClearUrlInput -> clearUrlInput()
             is BrowserContract.Intent.SelectSuggestion -> selectSuggestion(intent.suggestion)
             is BrowserContract.Intent.SelectBookmark -> selectBookmark(intent.bookmark)
             is BrowserContract.Intent.DeleteBookmark -> deleteBookmark(intent.bookmark)
@@ -154,10 +155,21 @@ class BrowserViewModel @Inject constructor(
     }
     
     private fun showUrlBar() {
+        // 검색 모드 진입 시 기본 제안 표시
+        val defaultSuggestions = if (_uiState.value.url.isNotEmpty() && _uiState.value.url != "about:blank") {
+            listOf(
+                "Search on DuckDuckGo",
+                _uiState.value.url  // 현재 페이지 URL
+            )
+        } else {
+            listOf("Search on DuckDuckGo")
+        }
+        
         _uiState.update { 
             it.copy(
                 showUrlBar = true,
-                urlInput = it.url
+                urlInput = "",  // 빈 입력창으로 시작
+                searchSuggestions = defaultSuggestions  // 기본 제안 표시
             )
         }
     }
@@ -187,21 +199,55 @@ class BrowserViewModel @Inject constructor(
     }
     
     private fun updateSearchSuggestions(query: String) {
-        // 임시 추천 목록 (추후 DuckDuckGo API로 대체)
-        val suggestions = listOf(
-            "https://duckduckgo.com/?q=$query",
-            query // 직접 URL 입력
-        )
+        val suggestions = when {
+            // 이미 완전한 URL인 경우
+            query.startsWith("http://") || query.startsWith("https://") -> {
+                listOf(query)  // URL 그대로 표시
+            }
+            // 도메인 형식인 경우
+            query.contains(".") -> {
+                listOf(query)  // 도메인 그대로 표시
+            }
+            // 일반 검색어인 경우
+            else -> {
+                listOf("Search \"$query\" on DuckDuckGo")  // DuckDuckGo 검색만
+            }
+        }
         _uiState.update { it.copy(searchSuggestions = suggestions) }
     }
     
     private fun selectSuggestion(suggestion: String) {
-        val url = if (suggestion.startsWith("http://") || suggestion.startsWith("https://")) {
-            suggestion
-        } else {
-            "https://duckduckgo.com/?q=$suggestion"
+        val url = when {
+            // 기본 DuckDuckGo 검색
+            suggestion == "Search on DuckDuckGo" -> {
+                // 입력값이 있으면 그걸로 검색, 없으면 DuckDuckGo 홈
+                val query = _uiState.value.urlInput
+                if (query.isNotEmpty()) {
+                    "https://duckduckgo.com/?q=$query"
+                } else {
+                    "https://duckduckgo.com"
+                }
+            }
+            // DuckDuckGo 검색
+            suggestion.startsWith("Search ") && suggestion.contains(" on DuckDuckGo") -> {
+                val query = suggestion.removePrefix("Search \"").removeSuffix("\" on DuckDuckGo")
+                "https://duckduckgo.com/?q=$query"
+            }
+            // 완전한 URL
+            suggestion.startsWith("http://") || suggestion.startsWith("https://") -> {
+                suggestion
+            }
+            // 도메인
+            suggestion.contains(".") -> {
+                "https://$suggestion"
+            }
+            else -> suggestion
         }
         loadUrl(url)
+    }
+    
+    private fun clearUrlInput() {
+        _uiState.update { it.copy(urlInput = "", searchSuggestions = emptyList()) }
     }
     
     private fun selectBookmark(bookmark: com.anam145.wallet.feature.browser.domain.model.Bookmark) {
