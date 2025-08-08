@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -54,6 +53,8 @@ class QRScannerActivity : ComponentActivity() {
         if (isGranted) {
             // 권한 승인됨
             Log.d(TAG, "Camera permission granted")
+            // UI 다시 그리기
+            setupQRScanner()
         } else {
             // 권한 거부됨
             Log.e(TAG, "Camera permission denied")
@@ -67,6 +68,23 @@ class QRScannerActivity : ComponentActivity() {
         
         cameraExecutor = Executors.newSingleThreadExecutor()
         
+        // 카메라 권한 확인
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                // 권한이 이미 있음
+                setupQRScanner()
+            }
+            else -> {
+                // 권한 요청
+                requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+        }
+    }
+    
+    private fun setupQRScanner() {
         // 옵션 파싱
         val optionsJson = intent.getStringExtra("options") ?: "{}"
         val options = try {
@@ -75,40 +93,27 @@ class QRScannerActivity : ComponentActivity() {
             JSONObject()
         }
         
-        val title = options.optString("title", "QR 코드 스캔")
-        val description = options.optString("description", "QR 코드를 스캔하세요")
+        val title = options.optString("title", "Scan QR Code")
+        val description = options.optString("description", "Scan a QR code")
         
-        // 카메라 권한 확인
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                // 권한이 이미 있음
-                setContent {
-                    AnamWalletTheme {
-                        QRScannerScreen(
-                            title = title,
-                            description = description,
-                            onQRCodeScanned = { qrData ->
-                                if (isScanning) {
-                                    isScanning = false
-                                    Log.d(TAG, "QR code scanned: $qrData")
-                                    MainBridgeService.handleQRScanResult(true, qrData)
-                                    finish()
-                                }
-                            },
-                            onCancel = {
-                                MainBridgeService.handleQRScanResult(false, "QR scan cancelled by user")
-                                finish()
-                            }
-                        )
+        setContent {
+            AnamWalletTheme {
+                QRScannerScreen(
+                    title = title,
+                    description = description,
+                    onQRCodeScanned = { qrData ->
+                        if (isScanning) {
+                            isScanning = false
+                            Log.d(TAG, "QR code scanned: $qrData")
+                            MainBridgeService.handleQRScanResult(true, qrData)
+                            finish()
+                        }
+                    },
+                    onCancel = {
+                        MainBridgeService.handleQRScanResult(false, "QR scan cancelled by user")
+                        finish()
                     }
-                }
-            }
-            else -> {
-                // 권한 요청
-                requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+                )
             }
         }
     }
@@ -138,7 +143,7 @@ fun QRScannerScreen(
                 title = { Text(title) },
                 navigationIcon = {
                     IconButton(onClick = onCancel) {
-                        Icon(Icons.Default.Close, contentDescription = "닫기")
+                        Icon(Icons.Default.Close, contentDescription = null)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -200,12 +205,7 @@ fun QRScannerScreen(
                         )
                         
                     } catch (exc: Exception) {
-                        Log.e("QRScanner", "Use case binding failed", exc)
-                        Toast.makeText(
-                            context,
-                            "카메라를 시작할 수 없습니다",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Log.e("QRScannerActivity", "Use case binding failed", exc)
                     }
                     
                 }, ContextCompat.getMainExecutor(context))
@@ -220,14 +220,12 @@ fun QRScannerScreen(
             ) {
                 Spacer(modifier = Modifier.height(100.dp))
                 
-                // 스캔 영역 표시
+                // 스캔 영역 표시 (현재는 빈 박스, 향후 가이드라인 추가 가능)
                 Box(
                     modifier = Modifier
                         .size(250.dp)
                         .background(Color.Transparent)
-                ) {
-                    // 스캔 영역 가이드라인
-                }
+                )
                 
                 Spacer(modifier = Modifier.weight(1f))
                 
@@ -260,7 +258,7 @@ fun QRScannerScreen(
                         contentColor = MaterialTheme.colorScheme.onSurface
                     )
                 ) {
-                    Text("취소")
+                    Text(text = com.anam145.wallet.core.ui.language.LocalStrings.current.cancel)
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
