@@ -86,21 +86,21 @@ class BrowserJavaScriptBridge(
      */
     fun sendUniversalResponse(requestId: String, response: String) {
         (context as? ComponentActivity)?.runOnUiThread {
-            // response를 JSON 문자열로 escape 처리
-            val escapedResponse = response
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\u2028", "\\u2028")
-                .replace("\u2029", "\\u2029")
+            // Base64 인코딩으로 안전하게 전달 (이스케이프 이슈 해결)
+            val base64Response = android.util.Base64.encodeToString(
+                response.toByteArray(Charsets.UTF_8),
+                android.util.Base64.NO_WRAP  // 개행 문자 없이
+            )
             
-            // v2.0: WalletBridge만 사용
+            // v2.0: WalletBridge만 사용 (Base64 디코딩 추가)
             val script = """
                 (function(){
                     if (window.WalletBridge && window.WalletBridge.handleResponse) {
                         try {
-                            const outer = JSON.parse("$escapedResponse");
+                            // Base64 디코딩 후 JSON 파싱
+                            const decodedString = atob('$base64Response');
+                            const outer = JSON.parse(decodedString);
+                            
                             // 엔벨로프 구조인지 확인하고 풀어내기
                             const rpcResponse = (outer && typeof outer === 'object' && 'responseData' in outer)
                                 ? JSON.parse(outer.responseData)  // 엔벨로프 언랩
