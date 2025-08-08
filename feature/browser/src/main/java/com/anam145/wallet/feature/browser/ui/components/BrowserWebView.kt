@@ -41,8 +41,13 @@ fun BrowserWebView(
     
     val webView = remember {
         WebView(context).apply {
-            // JavaScript Bridge 추가
-            addJavascriptInterface(jsBridge, "_native")
+            // JavaScript Bridge 추가 (v2.0)
+            // @JavascriptInterface 경고 억제: BrowserJavaScriptBridge 클래스에서
+            // universalBridge 메서드만 의도적으로 @JavascriptInterface를 가지고 있음.
+            // sendUniversalResponse와 webView 프로퍼티는 JavaScript에 노출되지 않으며,
+            // Native에서만 사용되는 것이 설계 의도임.
+            @Suppress("JavascriptInterface")
+            addJavascriptInterface(jsBridge, "WalletNative")  // v2.0: WalletNative만 제공
             tag = jsBridge
             jsBridge.webView = this
             layoutParams = ViewGroup.LayoutParams(
@@ -74,24 +79,23 @@ fun BrowserWebView(
                     super.onPageFinished(view, url)
                     url?.let { onPageFinished(it) }
                     
-                    // 페이지 로드 완료 후 브리지 주입
+                    // 페이지 로드 완료 후 블록체인 브리지만 주입 (v2.0)
                     view?.let { webView ->
-                        // 1. Universal Bridge 주입
-                        injectUniversalBridge(webView)
-                        
-                        // 2. 블록체인별 Bridge 스크립트 주입
+                        // Universal Bridge 주입 제거 - v2.0에서는 JS가 직접 구현
+                        // 블록체인별 Bridge 스크립트 주입 (WalletBridge 포함)
                         bridgeScript?.let { script ->
                             webView.evaluateJavascript(script) { result ->
-                                Log.d("BrowserWebView", "Bridge script injected (len=${script.length}) -> $result")
+                                Log.d("BrowserWebView", "Bridge script injected (v2.0) -> $result")
                             }
                         }
                         
-                        // 3. 디버깅: 주입 확인
+                        // 디버깅: v2.0 주입 확인
                         webView.evaluateJavascript("""
                             (function(){
-                                console.log('[DEBUG] has _anamBridge:', !!window._anamBridge);
-                                console.log('[DEBUG] has ethereum:', !!window.ethereum);
-                                console.log('[DEBUG] isAnamWallet:', window.ethereum && window.ethereum.isAnamWallet);
+                                console.log('[DEBUG v2.0] has WalletNative:', !!window.WalletNative);
+                                console.log('[DEBUG v2.0] has WalletBridge:', !!window.WalletBridge);
+                                console.log('[DEBUG v2.0] has ethereum:', !!window.ethereum);
+                                console.log('[DEBUG v2.0] isAnamWallet:', window.ethereum && window.ethereum.isAnamWallet);
                             })();
                         """.trimIndent(), null)
                     }
@@ -137,82 +141,6 @@ fun BrowserWebView(
     )
 }
 
-/**
- * Universal Bridge 스크립트 가져오기
- */
-internal fun getUniversalBridgeScript(): String {
-    return """
-        (function() {
-            if (window._anamBridge) return;
-            
-            console.log('[AnamWallet] Installing Universal Bridge');
-            
-            window._anamBridge = {
-                _callbacks: {},
-                _timeout: 30000,
-                
-                universalBridge: function(requestId, payload) {
-                    console.log('[Bridge] Request:', requestId, payload);
-                    
-                    return new Promise((resolve, reject) => {
-                        // 콜백 저장
-                        this._callbacks[requestId] = { resolve, reject };
-                        
-                        // Native 호출
-                        try {
-                            window._native.universalBridge(requestId, payload);
-                        } catch (e) {
-                            console.error('[Bridge] Native call failed:', e);
-                            reject(e);
-                            delete this._callbacks[requestId];
-                            return;
-                        }
-                        
-                        // 타임아웃 설정
-                        setTimeout(() => {
-                            if (this._callbacks[requestId]) {
-                                console.warn('[Bridge] Request timeout:', requestId);
-                                reject(new Error('Request timeout'));
-                                delete this._callbacks[requestId];
-                            }
-                        }, this._timeout);
-                    });
-                },
-                
-                handleResponse: function(requestId, response) {
-                    console.log('[Bridge] Response:', requestId, response);
-                    
-                    const callback = this._callbacks[requestId];
-                    if (!callback) {
-                        console.warn('[Bridge] No callback for:', requestId);
-                        return;
-                    }
-                    
-                    try {
-                        // Android now always passes parsed objects
-                        // response is guaranteed to be { jsonrpc, id, result | error }
-                        if (response.error) {
-                            callback.reject(response.error);
-                        } else {
-                            callback.resolve(response);
-                        }
-                    } catch (e) {
-                        console.error('[Bridge] Response handling error:', e);
-                        callback.reject(e);
-                    }
-                    
-                    delete this._callbacks[requestId];
-                }
-            };
-            
-            console.log('[AnamWallet] Universal Bridge ready');
-        })();
-    """.trimIndent()
-}
-
-/**
- * 기본 Universal Bridge 주입
- */
-private fun injectUniversalBridge(webView: WebView?) {
-    webView?.evaluateJavascript(getUniversalBridgeScript(), null)
-}
+// v2.0: Universal Bridge 스크립트 제거됨
+// 이제 블록체인 개발자가 dapp-bridge.js에서 WalletBridge를 직접 구현합니다.
+// Native는 WalletNative 인터페이스만 제공하고, 나머지는 JavaScript가 처리합니다.

@@ -48,7 +48,7 @@ import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.theme.ShapeCard
 import com.anam145.wallet.feature.browser.domain.model.Bookmark
 import com.anam145.wallet.feature.browser.ui.BrowserContract
-import com.anam145.wallet.feature.browser.ui.components.getUniversalBridgeScript
+// v2.0: getUniversalBridgeScript import 제거됨 (더 이상 Native에서 주입하지 않음)
 import com.anam145.wallet.feature.browser.ui.BrowserViewModel
 import com.anam145.wallet.feature.browser.ui.components.*
 import kotlinx.coroutines.launch
@@ -118,19 +118,7 @@ fun BrowserScreen(
                             Log.d("BrowserScreen", "Bridge loaded late, reloading page: $currentUrl")
                             view.reload()
                         } else {
-                            // 그렇지 않으면 즉시 주입
-                            // 먼저 Universal Bridge가 있는지 확인하고 없으면 주입
-                            view.evaluateJavascript(
-                                """
-                                (function() {
-                                    if (!window._anamBridge) {
-                                        ${getUniversalBridgeScript()}
-                                    }
-                                })();
-                                """.trimIndent(),
-                                null
-                            )
-                            // 그 다음 blockchain bridge 주입
+                            // v2.0: blockchain bridge만 주입 (WalletBridge 포함)
                             view.evaluateJavascript(effect.script, null)
                         }
                     }
