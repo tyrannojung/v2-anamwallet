@@ -80,6 +80,9 @@ data class Strings(
     val mainSectionApps: String = "앱",
     val mainAddMoreServices: String = "더 많은 서비스 보기",
     val mainNoAppsInstalled: String = "설치된 앱이 없습니다",
+    val mainNoBlockchainsInstalled: String = "설치된 블록체인이 없습니다",
+    val mainEmptyStateTitle: String = "ANAM 지갑에 오신 것을 환영합니다",
+    val mainEmptyStateDescription: String = "하단의 허브 탭에서 앱과 블록체인을 추가할 수 있습니다",
     val syncingApps: String = "앱을 준비 중입니다...",
     
     // Common
@@ -237,6 +240,9 @@ val EnglishStrings = Strings(
     mainSectionApps = "Apps",
     mainAddMoreServices = "View more services",
     mainNoAppsInstalled = "No apps installed",
+    mainNoBlockchainsInstalled = "No blockchains installed",
+    mainEmptyStateTitle = "Welcome to ANAM Wallet",
+    mainEmptyStateDescription = "You can add apps and blockchains from the Hub tab below",
     syncingApps = "Preparing apps...",
     
     // Common

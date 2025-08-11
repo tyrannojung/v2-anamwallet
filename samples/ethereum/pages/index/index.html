@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coin Wallet</title>
+    <link rel="stylesheet" href="../../app.css" />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Wallet Creation Screen -->
+      <div id="wallet-creation" class="wallet-screen" style="display: none;">
+        <div class="creation-content">
+          <img src="../../assets/icons/app_icon.png" alt="Coin Logo" class="coin-logo-large" />
+          <h1 class="creation-title">Coin Wallet</h1>
+          <p class="creation-description">Create a secure Coin wallet</p>
+          
+          <button class="create-wallet-btn" onclick="createWallet()">
+            Create New Wallet
+          </button>
+          
+          <div class="divider">
+            <span>or</span>
+          </div>
+          
+          <div class="import-section">
+            <h3>Import Wallet</h3>
+            
+            <!-- Import from Mnemonic -->
+            <div class="import-option" id="mnemonic-import">
+              <h4>Recover with Mnemonic</h4>
+              <textarea 
+                id="mnemonic-input" 
+                class="import-input" 
+                placeholder="Enter 12 or 24 words separated by spaces"
+                rows="3"
+              ></textarea>
+              <button class="import-btn" onclick="importFromMnemonic()">
+                Import from Mnemonic
+              </button>
+            </div>
+            
+            <!-- Import from Private Key -->
+            <div class="import-option" id="privatekey-import">
+              <h4>Recover with Private Key</h4>
+              <input 
+                type="password"
+                id="privatekey-input" 
+                class="import-input" 
+                placeholder="Enter your private key"
+              />
+              <button class="import-btn" onclick="importFromPrivateKey()">
+                Import from Private Key
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Wallet Screen -->
+      <div id="wallet-main" class="wallet-screen" style="display: none;">
+        <!-- Header -->
+        <header class="header">
+          <div class="header-content">
+            <div class="logo">
+              <img src="../../assets/icons/app_icon.png" alt="Coin Logo" class="coin-logo" />
+              <span class="logo-text">Coin</span>
+            </div>
+            <button class="reset-wallet-btn" onclick="resetWallet()" title="Reset Wallet">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2.5 10C2.5 14.1421 5.85786 17.5 10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C7.51088 2.5 5.31615 3.76957 4.01111 5.68889L5.55556 5.68889" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Balance Card -->
+        <div class="card balance-card">
+          <div class="balance-header">
+            <span class="balance-label">Mainnet</span>
+            <span class="network-status" id="network-status">●</span>
+          </div>
+          <div class="balance-amount">
+            <div class="coin-balance">
+              <span id="balance-display">0.0000</span>
+              <span class="coin-unit">COIN</span>
+            </div>
+            <div class="fiat-value" id="fiat-value">≈ $0.00</div>
+          </div>
+          
+          <!-- Address Display -->
+          <div class="address-container">
+            <div class="address-label">Address</div>
+            <div class="address-display" id="address-display">
+              Loading...
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button class="action-btn" onclick="navigateToSend()">
+              <span>Send</span>
+            </button>
+            <button class="action-btn" onclick="navigateToReceive()">
+              <span>Receive</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Transaction History Section -->
+        <section class="transactions-section">
+          <h2 class="section-title">Recent Transactions</h2>
+          <div class="tx-list">
+            <!-- Transaction 1 -->
+            <div class="tx-item">
+              <div class="tx-icon send">↑</div>
+              <div class="tx-details">
+                <div class="tx-type">Sent</div>
+                <div class="tx-address">0x4B20...3E8a</div>
+              </div>
+              <div class="tx-amount">
+                <div class="tx-eth send">-0.5 ETH</div>
+                <div class="tx-time">2 hours ago</div>
+              </div>
+            </div>
+            
+            <!-- Transaction 2 -->
+            <div class="tx-item">
+              <div class="tx-icon receive">↓</div>
+              <div class="tx-details">
+                <div class="tx-type">Received</div>
+                <div class="tx-address">0x9F8c...7D2e</div>
+              </div>
+              <div class="tx-amount">
+                <div class="tx-eth receive">+1.2 ETH</div>
+                <div class="tx-time">5 hours ago</div>
+              </div>
+            </div>
+            
+            <!-- Transaction 3 -->
+            <div class="tx-item">
+              <div class="tx-icon send">↑</div>
+              <div class="tx-details">
+                <div class="tx-type">Swap</div>
+                <div class="tx-address">Uniswap V3</div>
+              </div>
+              <div class="tx-amount">
+                <div class="tx-eth send">-0.8 ETH</div>
+                <div class="tx-time">1 day ago</div>
+              </div>
+            </div>
+
+            <!-- Transaction 4 -->
+            <div class="tx-item">
+              <div class="tx-icon receive">↓</div>
+              <div class="tx-details">
+                <div class="tx-type">Received</div>
+                <div class="tx-address">0x7A5c...9B1d</div>
+              </div>
+              <div class="tx-amount">
+                <div class="tx-eth receive">+2.5 ETH</div>
+                <div class="tx-time">3 days ago</div>
+              </div>
+            </div>
+
+            <!-- Transaction 5 -->
+            <div class="tx-item">
+              <div class="tx-icon send">↑</div>
+              <div class="tx-details">
+                <div class="tx-type">Contract</div>
+                <div class="tx-address">OpenSea</div>
+              </div>
+              <div class="tx-amount">
+                <div class="tx-eth send">-0.025 ETH</div>
+                <div class="tx-time">1 week ago</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+    <!-- Required Libraries -->
+    <!-- Ethers.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    
+    <!-- App Common Code -->
+    <script src="../../app.js"></script>
+    
+    <!-- Main Logic -->
+    <script src="index.js"></script>
+  </body>
+</html>

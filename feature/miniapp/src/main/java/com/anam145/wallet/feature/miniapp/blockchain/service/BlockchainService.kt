@@ -132,10 +132,22 @@ class BlockchainService : Service() {
                         """.trimIndent()
                     } else {
                         // 기존 트랜잭션 요청 (하위 호환성)
+                        // transactionData 필드가 있으면 파싱하여 전달
+                        val transactionDataStr = requestData.optString("transactionData")
+                        val eventDetail = if (transactionDataStr.isNotEmpty()) {
+                            // transactionData를 파싱하여 requestId와 함께 전달
+                            val transactionJson = JSONObject(transactionDataStr)
+                            transactionJson.put("requestId", requestId)
+                            transactionJson.toString()
+                        } else {
+                            // 기존 방식대로 전체 요청 전달
+                            requestJson
+                        }
+                        
                         """
                         (function() {
                             const event = new CustomEvent('transactionRequest', {
-                                detail: $requestJson
+                                detail: $eventDetail
                             });
                             window.dispatchEvent(event);
                         })();

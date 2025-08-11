@@ -310,7 +310,7 @@ class WebAppViewModel @Inject constructor(
                 
                 // TransactionRequest 생성 - 원본 데이터를 그대로 전달
                 val request = TransactionRequest(
-                    requestId = transactionData.optString("requestId", "req_${System.currentTimeMillis()}"),
+                    requestId = "req_${System.currentTimeMillis()}", // requestId는 항상 새로 생성
                     blockchainId = activeBlockchainId,
                     transactionData = transactionJson  // 원본 JSON 문자열 그대로
                 )

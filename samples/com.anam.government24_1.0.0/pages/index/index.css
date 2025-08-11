@@ -1,0 +1,112 @@
+/* 정부24 인덱스 페이지 스타일 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px 0;
+  background: white;
+  margin: 0 -16px 24px -16px;
+}
+
+.logo-image {
+  height: 32px;
+  width: auto;
+}
+
+.header .divider {
+  color: #ddd;
+  font-size: 20px;
+}
+
+/* 로그인 카드 */
+.login-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 40px;
+  margin: 0 auto 32px;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-bottom: 30px;
+}
+
+.login-button {
+  width: 80%;
+  height: 56px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.login-button:hover {
+  background-color: #357abd;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.login-button:active {
+  transform: translateY(0);
+}
+
+/* 로그인 안내 문구 */
+.login-notice {
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 20px;
+  line-height: 1.6;
+}
+
+/* 인기 서비스 그리드 */
+.popular-services {
+  margin-bottom: 32px;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.service-item {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.service-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.service-item:active {
+  transform: scale(0.98);
+}
+
+.service-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.service-name {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}

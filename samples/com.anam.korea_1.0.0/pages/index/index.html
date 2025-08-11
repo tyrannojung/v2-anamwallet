@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Korea University</title>
+    <link rel="stylesheet" href="../../app.css" />
+    <link rel="stylesheet" href="index.css" />
+    <script src="../../app.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <img
+            src="../../assets/images/ku-logo.png"
+            alt="Korea University"
+            class="logo-image"
+          />
+          <div class="header-text">
+            <h1 class="university-name">KOREA UNIVERSITY</h1>
+            <p class="university-motto">Liberty, Justice, Truth</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Login Card -->
+      <div class="login-card">
+        <h2 class="login-title">
+          Access your academic records<br />
+          and certificates online.
+        </h2>
+        <button class="login-button" onclick="handleLogin()">Login with Student ID</button>
+        <p class="login-notice">
+          Student ID authentication required<br />
+          to access academic services.
+        </p>
+      </div>
+
+      <!-- Academic Services -->
+      <section class="popular-services">
+        <h2 class="section-title">Academic Services</h2>
+        <div class="service-grid">
+          <div
+            class="service-item"
+            onclick="handleServiceClick('Transcript')">
+            <div class="service-icon">📊</div>
+            <span class="service-name">Transcript</span>
+          </div>
+          <div
+            class="service-item"
+            onclick="handleServiceClick('Certificate of Enrollment')">
+            <div class="service-icon">📜</div>
+            <span class="service-name">Certificate of Enrollment</span>
+          </div>
+          <div
+            class="service-item"
+            onclick="handleServiceClick('Certificate of Graduation')">
+            <div class="service-icon">🎓</div>
+            <span class="service-name">Certificate of Graduation</span>
+          </div>
+          <div
+            class="service-item"
+            onclick="handleServiceClick('Certificate of Expected Graduation')">
+            <div class="service-icon">📅</div>
+            <span class="service-name">Certificate of Expected Graduation</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="index.js"></script>
+  </body>
+</html>

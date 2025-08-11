@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Payment Complete</title>
+    <link rel="stylesheet" href="../../app.css">
+    <link rel="stylesheet" href="success.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 성공 아이콘 -->
+        <div class="success-icon-container">
+            <div class="success-icon">
+                <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                    <circle cx="30" cy="30" r="30" fill="#4CAF50"/>
+                    <path d="M20 30l8 8 16-16" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 성공 메시지 -->
+        <div class="success-message">
+            <h2>Payment has been completed!</h2>
+            <p class="amount-info">Payment Amount: <span id="payment-amount">0.00000001 ETH</span></p>
+        </div>
+
+        <!-- 트랜잭션 정보 -->
+        <div class="transaction-info">
+            <div class="info-item">
+                <span class="info-label">Transaction Hash</span>
+                <div class="tx-hash-container">
+                    <span id="tx-hash" class="tx-hash">-</span>
+                    <button class="copy-button" onclick="copyTxHash()" title="Copy">
+                        📋
+                    </button>
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Network</span>
+                <span id="network-name">Ethereum Sepolia</span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Status</span>
+                <span class="status-confirmed">Confirmed</span>
+            </div>
+        </div>
+
+        <!-- 버튼 -->
+        <div class="button-container">
+            <button class="home-button" onclick="handleHome()">
+                Back to Home
+            </button>
+        </div>
+    </div>
+
+    <script src="success.js"></script>
+</body>
+</html>

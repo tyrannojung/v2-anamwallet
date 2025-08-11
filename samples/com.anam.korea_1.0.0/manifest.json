@@ -1,0 +1,12 @@
+{
+  "app_id": "com.anam.korea",
+  "type": "app",
+  "version": "1.0.0",
+  "name": "Korea University",
+  "icon": "assets/icons/app_icon.png",
+  "pages": [
+    "pages/index/index",
+    "pages/payment/payment",
+    "pages/success/success"
+  ]
+}

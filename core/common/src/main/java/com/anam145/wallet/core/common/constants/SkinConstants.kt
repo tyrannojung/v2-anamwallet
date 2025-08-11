@@ -25,9 +25,7 @@ object SkinConstants {
      */
     val DEFAULT_SKIN_MINIAPPS = mapOf(
         Skin.ANAM to listOf(
-            "com.anam.bitcoin",
-            "com.anam.ethereum",
-            "com.anam.government24",
+            // 빈 상태 테스트를 위해 임시로 비워둠
         ),
         Skin.BUSAN to listOf(
             "com.anam.bitcoin",

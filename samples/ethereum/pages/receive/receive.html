@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Receive Coin</title>
+    <link rel="stylesheet" href="../../app.css" />
+    <link rel="stylesheet" href="receive.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="receive-screen">
+        <!-- Header -->
+        <header class="header">
+          <button class="back-btn" onclick="goBack()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <h1 class="header-title">Receive <span class="coin-symbol">COIN</span></h1>
+          <div style="width: 24px;"></div>
+        </header>
+
+        <!-- Content -->
+        <div class="receive-content">
+          <div class="qr-section">
+            <div class="qr-container" id="qr-code">
+              <!-- QR code will be generated here -->
+            </div>
+          </div>
+
+          <div class="address-section">
+            <div class="address-label">Address</div>
+            <div class="receive-address-box">
+              <span id="receive-address">Loading...</span>
+              <button class="copy-btn" onclick="copyAddress()">Copy</button>
+            </div>
+          </div>
+
+          <div class="receive-info">
+            <p>You can send <strong class="coin-name">COIN</strong> to this address.</p>
+            <p class="receive-warning">Sending other coins may result in permanent loss.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Required Libraries -->
+    <!-- QR Code Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- App Common Code -->
+    <script src="../../app.js"></script>
+    
+    <!-- Main Logic -->
+    <script src="receive.js"></script>
+  </body>
+</html>

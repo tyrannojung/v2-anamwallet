@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Send Coin</title>
+    <link rel="stylesheet" href="../../app.css" />
+    <link rel="stylesheet" href="send.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="send-screen">
+        <!-- Header -->
+        <header class="header">
+          <button class="back-btn" onclick="goBack()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <h1 class="header-title">Send <span class="coin-symbol">COIN</span></h1>
+          <div style="width: 24px;"></div>
+        </header>
+
+        <!-- Form Content -->
+        <div class="send-content">
+          <div class="form-group">
+            <label for="recipient-address">Recipient Address</label>
+            <input 
+              type="text" 
+              id="recipient-address" 
+              class="form-input" 
+              placeholder="Enter recipient's address"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="send-amount">Amount</label>
+            <input 
+              type="number" 
+              id="send-amount" 
+              class="form-input" 
+              placeholder="0.0000"
+              step="0.0001"
+            />
+            <span class="input-hint">Available: <span id="available-balance">0.0000</span> <span class="coin-symbol">COIN</span></span>
+          </div>
+          
+          <div class="form-group">
+            <label for="tx-fee">Fee</label>
+            <select id="tx-fee" class="form-input">
+              <option value="low">Slow (Low)</option>
+              <option value="medium" selected>Normal (Medium)</option>
+              <option value="high">Fast (High)</option>
+            </select>
+          </div>
+
+          <div class="button-group">
+            <button class="send-confirm-btn" onclick="confirmSend()">
+              Confirm Send
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Required Libraries -->
+    <!-- Ethers.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    
+    <!-- App Common Code -->
+    <script src="../../app.js"></script>
+    
+    <!-- Main Logic -->
+    <script src="send.js"></script>
+  </body>
+</html>

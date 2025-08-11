@@ -1,0 +1,139 @@
+/* Korea University Index Page Styles */
+.header {
+  padding: 20px 0;
+  background: linear-gradient(135deg, var(--ku-crimson) 0%, var(--ku-light-crimson) 100%);
+  margin: 0 -16px 24px -16px;
+  box-shadow: 0 4px 12px rgba(139, 0, 41, 0.2);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 16px;
+}
+
+.header-text {
+  color: white;
+  text-align: left;
+}
+
+.university-name {
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.university-motto {
+  font-size: 12px;
+  opacity: 0.9;
+  margin: 2px 0 0 0;
+  font-style: italic;
+}
+
+.logo-image {
+  height: 48px;
+  width: auto;
+  filter: brightness(0) invert(1);
+}
+
+.header .divider {
+  color: #ddd;
+  font-size: 20px;
+}
+
+/* 로그인 카드 */
+.login-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 40px;
+  margin: 0 auto 32px;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-bottom: 30px;
+}
+
+.login-button {
+  width: 80%;
+  height: 56px;
+  background: linear-gradient(135deg, var(--ku-crimson) 0%, var(--ku-light-crimson) 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
+
+.login-button:hover {
+  background: linear-gradient(135deg, var(--ku-light-crimson) 0%, var(--ku-crimson) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 0, 41, 0.3);
+}
+
+.login-button:active {
+  transform: translateY(0);
+}
+
+/* Login Notice */
+.login-notice {
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 20px;
+  line-height: 1.6;
+}
+
+/* Academic Services Grid */
+.popular-services {
+  margin-bottom: 32px;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.service-item {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.service-item:hover {
+  box-shadow: 0 4px 12px rgba(139, 0, 41, 0.15);
+  border: 1px solid rgba(139, 0, 41, 0.1);
+}
+
+.service-item:active {
+  transform: scale(0.98);
+}
+
+.service-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.service-name {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
