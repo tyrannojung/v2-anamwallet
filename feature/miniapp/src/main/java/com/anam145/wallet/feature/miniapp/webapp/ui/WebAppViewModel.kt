@@ -101,6 +101,9 @@ class WebAppViewModel @Inject constructor(
             is WebAppContract.Intent.RequestVP -> requestVP(intent.vpRequest)
             is WebAppContract.Intent.DismissVPBottomSheet -> dismissVPBottomSheet()
             is WebAppContract.Intent.SelectCredential -> selectCredential(intent.credentialId)
+            is WebAppContract.Intent.ApproveTransaction -> approveTransaction()
+            is WebAppContract.Intent.RejectTransaction -> rejectTransaction()
+            is WebAppContract.Intent.DismissTransactionApproval -> dismissTransactionApproval()
             is WebAppContract.Intent.RetryServiceConnection -> retryServiceConnection()
             is WebAppContract.Intent.DismissError -> dismissError()
             is WebAppContract.Intent.NavigateBack -> navigateBack()
@@ -238,24 +241,64 @@ class WebAppViewModel @Inject constructor(
      * 
      * 역할:
      * - WebView의 JavaScript에서 전달된 트랜잭션 요청 처리
-     * - 활성 블록체인으로 트랜잭션 요청 전달
-     * - 결과를 다시 JavaScript로 전달
+     * - 트랜잭션 승인 UI 표시
+     * - 사용자 승인 후 활성 블록체인으로 전달
      * 
      * 동작:
      * 1. 서비스 연결 상태 확인
-     * 2. 활성 블록체인 ID 조회
-     * 3. TransactionRequest 생성 및 전송
-     * 4. 응답을 WebView로 전달
+     * 2. 활성 블록체인 정보 조회
+     * 3. 트랜잭션 승인 바텀시트 표시
+     * 4. 사용자 승인/거절 처리
      */
     private fun requestTransaction(transactionData: JSONObject) {
+        Log.d(TAG, "requestTransaction called with: $transactionData")
         viewModelScope.launch {
             // 서비스 연결 확인
             if (!_uiState.value.isServiceConnected) {
+                Log.e(TAG, "Service not connected")
                 _effect.emit(WebAppContract.Effect.ShowError("서비스가 연결되지 않았습니다"))
                 return@launch
             }
             
             try {
+                // 활성 블록체인 정보 가져오기
+                val activeBlockchainId = when (val result = getActiveBlockchainIdUseCase()) {
+                    is MiniAppResult.Success -> result.data
+                    is MiniAppResult.Error -> {
+                        Log.e(TAG, "No active blockchain")
+                        _effect.emit(WebAppContract.Effect.ShowError("활성화된 블록체인이 없습니다"))
+                        return@launch
+                    }
+                }
+                
+                Log.d(TAG, "Active blockchain: $activeBlockchainId, name: ${_uiState.value.activeBlockchainName}")
+                
+                // 트랜잭션 승인 바텀시트 표시
+                Log.d(TAG, "Showing transaction approval bottom sheet")
+                _uiState.update {
+                    it.copy(
+                        showTransactionApproval = true,
+                        pendingTransactionJson = transactionData.toString()
+                    )
+                }
+                
+            } catch (e: Exception) {
+                Log.e(TAG, "Error processing transaction request", e)
+                _effect.emit(WebAppContract.Effect.ShowError("트랜잭션 요청 처리 실패"))
+            }
+        }
+    }
+    
+    /**
+     * 트랜잭션을 승인합니다.
+     */
+    private fun approveTransaction() {
+        viewModelScope.launch {
+            val transactionJson = _uiState.value.pendingTransactionJson ?: return@launch
+            
+            try {
+                val transactionData = JSONObject(transactionJson)
+                
                 // 활성 블록체인 ID 가져오기
                 val activeBlockchainId = when (val result = getActiveBlockchainIdUseCase()) {
                     is MiniAppResult.Success -> result.data
@@ -269,8 +312,16 @@ class WebAppViewModel @Inject constructor(
                 val request = TransactionRequest(
                     requestId = transactionData.optString("requestId", "req_${System.currentTimeMillis()}"),
                     blockchainId = activeBlockchainId,
-                    transactionData = transactionData.toString()  // 원본 JSON 문자열 그대로
+                    transactionData = transactionJson  // 원본 JSON 문자열 그대로
                 )
+                
+                // 바텀시트 닫기
+                _uiState.update {
+                    it.copy(
+                        showTransactionApproval = false,
+                        pendingTransactionJson = null
+                    )
+                }
                 
                 // 트랜잭션 요청
                 when (val result = requestTransactionUseCase(request)) {
@@ -299,10 +350,9 @@ class WebAppViewModel @Inject constructor(
                         // Toast 메시지 표시
                         _effect.emit(WebAppContract.Effect.ShowError(errorMessage))
                         
-                        // JavaScript로도 에러 전달
-                        val errorResponse = """{"requestId": "${request.requestId}", "error": "$errorMessage"}"""
+                        // JavaScript로 에러 전달
                         _effect.emit(
-                            WebAppContract.Effect.SendTransactionResponse(errorResponse)
+                            WebAppContract.Effect.SendTransactionError(errorMessage)
                         )
                     }
                 }
@@ -310,6 +360,41 @@ class WebAppViewModel @Inject constructor(
                 Log.e(TAG, "Error processing transaction request", e)
                 _effect.emit(WebAppContract.Effect.ShowError("트랜잭션 요청 처리 중 오류 발생"))
             }
+        }
+    }
+    
+    /**
+     * 트랜잭션을 거절합니다.
+     */
+    private fun rejectTransaction() {
+        viewModelScope.launch {
+            // 바텀시트 닫기
+            _uiState.update {
+                it.copy(
+                    showTransactionApproval = false,
+                    pendingTransactionJson = null
+                )
+            }
+            
+            // JavaScript로 거절 이벤트 전송
+            _effect.emit(WebAppContract.Effect.SendTransactionError("User rejected transaction"))
+        }
+    }
+    
+    /**
+     * 트랜잭션 승인 바텀시트를 닫습니다.
+     */
+    private fun dismissTransactionApproval() {
+        _uiState.update {
+            it.copy(
+                showTransactionApproval = false,
+                pendingTransactionJson = null
+            )
+        }
+        
+        // 사용자가 취소한 경우 에러 이벤트 전송
+        viewModelScope.launch {
+            _effect.emit(WebAppContract.Effect.SendTransactionError("User cancelled"))
         }
     }
     

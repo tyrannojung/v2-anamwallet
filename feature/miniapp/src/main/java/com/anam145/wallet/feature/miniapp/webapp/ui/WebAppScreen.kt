@@ -18,6 +18,7 @@ import com.anam145.wallet.feature.miniapp.webapp.ui.components.WebAppWebView
 import com.anam145.wallet.feature.miniapp.webapp.ui.components.ErrorContent
 import com.anam145.wallet.feature.miniapp.webapp.ui.components.ServiceConnectionCard
 import com.anam145.wallet.feature.miniapp.webapp.ui.components.VPBottomSheet
+import com.anam145.wallet.feature.miniapp.webapp.ui.components.TransactionApprovalBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -117,6 +118,19 @@ private fun WebAppScreenContent(
                     
                     webView?.evaluateJavascript(script, null)
                 }
+                is WebAppContract.Effect.SendTransactionError -> {
+                    // 트랜잭션 에러를 JavaScript로 전달
+                    val script = """
+                        (function() {
+                            const event = new CustomEvent('transactionError', {
+                                detail: { error: '${effect.error}' }
+                            });
+                            window.dispatchEvent(event);
+                        })();
+                    """.trimIndent()
+                    
+                    webView?.evaluateJavascript(script, null)
+                }
                 else -> {
                     // Activity에서 처리
                 }
@@ -205,6 +219,25 @@ private fun WebAppScreenContent(
                 },
                 onDismiss = {
                     viewModel.handleIntent(WebAppContract.Intent.DismissVPBottomSheet)
+                }
+            )
+        }
+    }
+    
+    // 트랜잭션 승인 바텀시트
+    if (uiState.showTransactionApproval) {
+        uiState.pendingTransactionJson?.let { transactionJson ->
+            TransactionApprovalBottomSheet(
+                blockchainName = uiState.activeBlockchainName ?: "Blockchain",
+                transactionJson = transactionJson,
+                onApprove = {
+                    viewModel.handleIntent(WebAppContract.Intent.ApproveTransaction)
+                },
+                onReject = {
+                    viewModel.handleIntent(WebAppContract.Intent.RejectTransaction)
+                },
+                onDismiss = {
+                    viewModel.handleIntent(WebAppContract.Intent.DismissTransactionApproval)
                 }
             )
         }
