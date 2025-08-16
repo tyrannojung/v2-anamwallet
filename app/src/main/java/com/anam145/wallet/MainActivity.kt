@@ -227,7 +227,7 @@ fun AnamWalletApp(
                                 AnamNavRoute.Settings -> strings.headerTitleSettings
                                 else -> strings.headerTitle
                             },
-                            showBlockchainStatus = currentRoute == AnamNavRoute.Main.route,
+                            showBlockchainStatus = true,  // 모든 화면에서 블록체인 상태 표시
                             activeBlockchainName = activeBlockchain?.name,
                             onBlockchainClick = if (activeBlockchain != null) {
                                 {
