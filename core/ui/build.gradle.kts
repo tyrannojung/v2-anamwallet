@@ -60,6 +60,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     
+    // Navigation Compose - AnimationUtils에서 필요
+    implementation(libs.androidx.navigation.compose)
+    
     // 기타 필수 라이브러리
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

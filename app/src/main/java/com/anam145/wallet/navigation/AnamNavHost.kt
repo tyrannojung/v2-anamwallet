@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anam145.wallet.ui.language.LanguageViewModel
+import com.anam145.wallet.core.ui.navigation.animatedComposable
 
 /**
  * ANAM Wallet의 메인 Navigation Host
@@ -48,7 +49,7 @@ fun AnamNavHost(
         // ========== Bottom Navigation 화면들 ==========
         
         // 메인 화면
-        composable(route = AnamNavRoute.Main.route) {
+        animatedComposable(route = AnamNavRoute.Main.route) {
             val context = LocalContext.current
             val uiState by mainViewModel.uiState.collectAsState()
             val currentSkin = uiState.currentSkin
@@ -73,29 +74,29 @@ fun AnamNavHost(
         }
         
         // 허브 화면
-        composable(route = AnamNavRoute.Hub.route) {
+        animatedComposable(route = AnamNavRoute.Hub.route) {
             HubScreen()
         }
         
         // 브라우저 화면
-        composable(route = AnamNavRoute.Browser.route) {
+        animatedComposable(route = AnamNavRoute.Browser.route) {
             BrowserScreen()
         }
         
         // 신원 화면 (Nested Navigation)
-        composable(route = AnamNavRoute.Identity.route) {
+        animatedComposable(route = AnamNavRoute.Identity.route) {
             IdentityNavHost()
         }
         
         // 설정 화면
-        composable(route = AnamNavRoute.Settings.route) {
+        animatedComposable(route = AnamNavRoute.Settings.route) {
             SettingsScreen()
         }
         
         // ========== 상세 화면들 ==========
         
         // 미니앱 상세 화면
-        composable(
+        animatedComposable(
             route = AnamNavRoute.MiniAppDetail.route,
             arguments = listOf(
                 navArgument("appId") { 
@@ -108,7 +109,7 @@ fun AnamNavHost(
         }
         
         // 모듈 상세 화면
-        composable(
+        animatedComposable(
             route = AnamNavRoute.ModuleDetail.route,
             arguments = listOf(
                 navArgument("moduleId") { 
@@ -126,7 +127,7 @@ fun AnamNavHost(
         // ========== 인증 화면들 ==========
         
         // 로그인 화면
-        composable(route = AnamNavRoute.Login.route) {
+        animatedComposable(route = AnamNavRoute.Login.route) {
             LoginScreen(
                 onNavigateToMain = {
                     navController.navigate(AnamNavRoute.Main.route) {
@@ -137,7 +138,7 @@ fun AnamNavHost(
         }
         
         // 비밀번호 설정 화면
-        composable(route = AnamNavRoute.SetupPassword.route) {
+        animatedComposable(route = AnamNavRoute.SetupPassword.route) {
             SetupPasswordScreen(
                 onNavigateToMain = {
                     navController.navigate(AnamNavRoute.Main.route) {
