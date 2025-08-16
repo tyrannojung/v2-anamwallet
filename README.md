@@ -102,7 +102,6 @@ git clone https://github.com/anam145/v2-anamwallet.git
 ### UI/UX
 
 - **Material Design 3**: Latest design system
-- **Dark Mode**: Full dark mode support
 - **Multilingual**: Real-time Korean/English switching
 
 ## Supported Features
@@ -111,7 +110,6 @@ git clone https://github.com/anam145/v2-anamwallet.git
 
 - Ethereum blockchain
 - Government24 integration
-- Dark mode
 - Multilingual (Korean/English)
 
 ### Recently Added

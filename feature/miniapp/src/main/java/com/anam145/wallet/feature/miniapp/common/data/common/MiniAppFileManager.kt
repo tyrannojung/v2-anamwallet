@@ -159,6 +159,14 @@ class MiniAppFileManager @Inject constructor(
                 pages.add(pagesArray.getString(i))
             }
             
+            // Bridge 설정 파싱 (선택적)
+            val bridgeConfig = jsonObject.optJSONObject("bridge")?.let { bridgeJson ->
+                val scriptPath = bridgeJson.optString("script")
+                if (scriptPath.isNotEmpty()) {
+                    com.anam145.wallet.core.common.model.BridgeConfig(script = scriptPath)
+                } else null
+            }
+            
             val manifest = MiniAppManifest(
                 appId = jsonObject.getString("app_id"),  // manifest.json에는 app_id로 되어 있음
                 name = jsonObject.getString("name"),
@@ -166,7 +174,8 @@ class MiniAppFileManager @Inject constructor(
                 type = jsonObject.getString("type"),
                 mainPage = jsonObject.optString("main_page").takeIf { it.isNotEmpty() },
                 pages = pages,
-                permissions = emptyList()
+                permissions = emptyList(),
+                bridge = bridgeConfig
             )
             
             MiniAppResult.Success(manifest)
@@ -188,6 +197,29 @@ class MiniAppFileManager @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load icon for $appId", e)
             null
+        }
+    }
+    
+    /**
+     * 브릿지 스크립트 파일 로드
+     * @param appId 미니앱 ID
+     * @param scriptPath 스크립트 파일 경로 (manifest.json의 bridge.script 값)
+     * @return 스크립트 내용 또는 에러
+     */
+    suspend fun loadBridgeScript(appId: String, scriptPath: String): MiniAppResult<String> = withContext(Dispatchers.IO) {
+        try {
+            val scriptFile = File(context.filesDir, "${MiniAppConstants.MINIAPP_INSTALL_DIR}/$appId/$scriptPath")
+            if (!scriptFile.exists()) {
+                Log.e(TAG, "Bridge script file not found: $scriptPath for $appId")
+                return@withContext MiniAppResult.Error.FileNotFound("$appId/$scriptPath")
+            }
+            
+            val scriptContent = scriptFile.readText()
+            Log.d(TAG, "Bridge script loaded successfully for $appId: ${scriptContent.length} bytes")
+            MiniAppResult.Success(scriptContent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load bridge script for $appId", e)
+            MiniAppResult.Error.FileLoadFailed("$appId/$scriptPath", e)
         }
     }
     

@@ -219,6 +219,10 @@ class MainViewModel @Inject constructor(
                             "미니앱을 찾을 수 없습니다: ${result.appId}"
                         is MiniAppResult.Error.UninstallFailed ->
                             "앱 삭제 실패: ${result.appId}"
+                        is MiniAppResult.Error.FileNotFound ->
+                            "파일을 찾을 수 없습니다: ${result.path}"
+                        is MiniAppResult.Error.FileLoadFailed ->
+                            "파일 로드 실패: ${result.path}"
                         is MiniAppResult.Error.UnknownError ->
                             "알 수 없는 오류: ${result.message}"
                         is MiniAppResult.Error.Unknown ->

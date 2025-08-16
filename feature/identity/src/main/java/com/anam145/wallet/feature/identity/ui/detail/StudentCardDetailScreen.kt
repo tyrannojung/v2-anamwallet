@@ -1,5 +1,6 @@
 package com.anam145.wallet.feature.identity.ui.detail
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -25,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.theme.*
+import com.anam145.wallet.feature.identity.R as IdentityR
 
 /**
  * 학생증 상세 화면
@@ -173,19 +177,14 @@ private fun CardDetailBody(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // 프로필 이미지
-        Box(
+        Image(
+            painter = painterResource(id = IdentityR.drawable.ic_photo),
+            contentDescription = "Profile Photo",
             modifier = Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFE0E0E0)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = strings.identityPhoto,
-                fontSize = 14.sp,
-                color = Color.Gray
-            )
-        }
+                .size(width = 80.dp, height = 100.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.Crop
+        )
         
         Spacer(modifier = Modifier.height(20.dp))
         
@@ -261,19 +260,14 @@ private fun CardDetailBody(
                     defaultElevation = 2.dp
                 )
             ) {
-                Box(
+                Image(
+                    painter = painterResource(id = IdentityR.drawable.ic_qr),
+                    contentDescription = "QR Code",
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(5.dp)
-                        .background(Color(0xFFE0E0E0)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "QR",
-                        fontSize = 12.sp,
-                        color = Color.Gray
-                    )
-                }
+                        .padding(5.dp),
+                    contentScale = ContentScale.Fit
+                )
             }
             
             // QR 텍스트

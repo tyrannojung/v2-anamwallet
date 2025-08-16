@@ -86,6 +86,24 @@ sealed interface MiniAppResult<out T> {
         data class UninstallFailed(val appId: String) : Error
         
         /**
+         * 파일을 찾을 수 없음
+         * 
+         * @property path 찾을 수 없는 파일 경로
+         */
+        data class FileNotFound(val path: String) : Error
+        
+        /**
+         * 파일 로드 실패
+         * 
+         * @property path 로드 실패한 파일 경로
+         * @property cause 실패 원인
+         */
+        data class FileLoadFailed(
+            val path: String,
+            val cause: Throwable
+        ) : Error
+        
+        /**
          * 알 수 없는 에러
          * 
          * @property message 에러 메시지

@@ -24,7 +24,6 @@ v2-anamwallet/
 │   ├── common/                  # Pure Kotlin module (no Android deps)
 │   │   ├── model/               # Shared domain models
 │   │   │   ├── Language.kt      # Language enum
-│   │   │   ├── ThemeMode.kt     # Theme enum
 │   │   │   ├── MiniApp.kt       # MiniApp domain model
 │   │   │   └── MiniAppType.kt   # MiniApp type enum
 │   │   └── result/              # Custom Result types

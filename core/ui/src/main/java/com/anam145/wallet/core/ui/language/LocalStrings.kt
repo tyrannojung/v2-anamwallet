@@ -53,14 +53,36 @@ data class Strings(
     // Feature Screen Messages
     val mainScreenTitle: String = "홈 대시보드",
     val hubScreenTitle: String = "허브 화면",
-    val browserScreenTitle: String = "브라우저 화면",
+    val browserScreenTitle: String = "브라우저",
     val identityScreenTitle: String = "디지털 신분증 화면",
+    
+    // Browser Screen
+    val browserUrlPlaceholder: String = "URL 입력 또는 검색",
+    val browserSearchPlaceholder: String = "검색어 또는 주소 입력",
+    val cancel: String = "취소",
+    val browserSearchDuckDuckGo: String = "DuckDuckGo에서 검색",
+    val browserNoBookmarks: String = "북마크가 없습니다",
+    val browserNoBookmarksDescription: String = "웹사이트 방문 시 북마크를 추가하세요",
+    val browserBookmarkAdded: String = "북마크가 추가되었습니다",
+    val browserBookmarkRemoved: String = "북마크가 삭제되었습니다",
+    val browserDeleteBookmarkTitle: String = "북마크 삭제",
+    val browserDeleteBookmarkMessage: String = "%s을(를) 북마크에서 삭제하시겠습니까?",
+    val browserPageLoadError: String = "페이지를 불러올 수 없습니다",
+    val browserGoBack: String = "뒤로 가기",
+    val browserGoForward: String = "앞으로 가기",
+    val browserReload: String = "새로고침",
+    val browserHome: String = "홈",
+    val browserCancel: String = "취소",
+    val browserDelete: String = "삭제",
     
     // Main Screen
     val mainSectionBlockchain: String = "블록체인",
     val mainSectionApps: String = "앱",
     val mainAddMoreServices: String = "더 많은 서비스 보기",
     val mainNoAppsInstalled: String = "설치된 앱이 없습니다",
+    val mainNoBlockchainsInstalled: String = "설치된 블록체인이 없습니다",
+    val mainEmptyStateTitle: String = "ANAM 지갑에 오신 것을 환영합니다",
+    val mainEmptyStateDescription: String = "하단의 허브 탭에서 앱과 블록체인을 추가할 수 있습니다",
     val syncingApps: String = "앱을 준비 중입니다...",
     
     // Common
@@ -148,8 +170,7 @@ data class Strings(
     val identityIssued: String = "발급완료",
     val identityAllIssued: String = "모든 신분증이 발급되었습니다.",
     val identityNoIssuedIds: String = "발급된 모바일 신분증이 없습니다.",
-    val dismiss: String = "닫기",
-    val cancel: String = "취소"
+    val dismiss: String = "닫기"
 )
 
 /**
@@ -192,14 +213,36 @@ val EnglishStrings = Strings(
     // Feature Screen Messages
     mainScreenTitle = "Home Dashboard",
     hubScreenTitle = "Hub Screen",
-    browserScreenTitle = "Browser Screen",
+    browserScreenTitle = "Browser",
     identityScreenTitle = "Digital ID Screen",
+    
+    // Browser Screen
+    browserUrlPlaceholder = "Enter URL or search",
+    browserSearchPlaceholder = "Search or enter address",
+    cancel = "Cancel",
+    browserSearchDuckDuckGo = "Search on DuckDuckGo",
+    browserNoBookmarks = "No bookmarks",
+    browserNoBookmarksDescription = "Add bookmarks when visiting websites",
+    browserBookmarkAdded = "Bookmark added",
+    browserBookmarkRemoved = "Bookmark removed",
+    browserDeleteBookmarkTitle = "Delete Bookmark",
+    browserDeleteBookmarkMessage = "Delete %s from bookmarks?",
+    browserPageLoadError = "Unable to load page",
+    browserGoBack = "Go back",
+    browserGoForward = "Go forward",
+    browserReload = "Reload",
+    browserHome = "Home",
+    browserCancel = "Cancel",
+    browserDelete = "Delete",
     
     // Main Screen
     mainSectionBlockchain = "Blockchain",
     mainSectionApps = "Apps",
     mainAddMoreServices = "View more services",
     mainNoAppsInstalled = "No apps installed",
+    mainNoBlockchainsInstalled = "No blockchains installed",
+    mainEmptyStateTitle = "Welcome to ANAM Wallet",
+    mainEmptyStateDescription = "You can add apps and blockchains from the Hub tab below",
     syncingApps = "Preparing apps...",
     
     // Common
@@ -287,8 +330,7 @@ val EnglishStrings = Strings(
     identityIssued = "Issued",
     identityAllIssued = "All IDs have been issued.",
     identityNoIssuedIds = "No digital IDs have been issued yet.",
-    dismiss = "Dismiss",
-    cancel = "Cancel"
+    dismiss = "Dismiss"
 )
 
 /**

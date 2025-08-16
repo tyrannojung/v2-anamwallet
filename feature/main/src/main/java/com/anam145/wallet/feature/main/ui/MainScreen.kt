@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -113,14 +114,22 @@ fun MainScreen(
             }
             else -> {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    MiniAppList(
-                        blockchainApps = uiState.blockchainApps,
-                        regularApps = uiState.regularApps,
-                        activeBlockchainId = uiState.activeBlockchainId,
-                        sectionOrder = uiState.sectionOrder,
-                        onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
-                        onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) }
-                    )
+                    // 두 리스트가 모두 비어있을 때 전체 빈 상태 표시
+                    if (uiState.blockchainApps.isEmpty() && uiState.regularApps.isEmpty()) {
+                        EmptyStateView(
+                            strings = strings,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        MiniAppList(
+                            blockchainApps = uiState.blockchainApps,
+                            regularApps = uiState.regularApps,
+                            activeBlockchainId = uiState.activeBlockchainId,
+                            sectionOrder = uiState.sectionOrder,
+                            onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
+                            onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) }
+                        )
+                    }
                     
                     // 테마별 일러스트레이션 표시
                     ThemeIllustration(
@@ -198,15 +207,29 @@ private fun BlockchainSection(
     onBlockchainClick: (MiniApp) -> Unit,
     strings: Strings
 ) {
-    if (blockchainApps.isNotEmpty()) {
-        Text(
-            text = strings.mainSectionBlockchain,
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.SemiBold
-            ),
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
-        )
-        
+    Text(
+        text = strings.mainSectionBlockchain,
+        style = MaterialTheme.typography.titleMedium.copy(
+            fontWeight = FontWeight.SemiBold
+        ),
+        modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+    )
+    
+    if (blockchainApps.isEmpty()) {
+        // 블록체인이 없을 때 메시지 표시
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp),  // BlockchainCard와 동일한 높이
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = strings.mainNoBlockchainsInstalled,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    } else {
         LazyRow(
             contentPadding = PaddingValues(horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -524,6 +547,63 @@ private fun MiniAppIcon(
             modifier = Modifier.size(iconSize),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+@Composable
+private fun EmptyStateView(
+    strings: Strings,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // 지갑 아이콘
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(60.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.AccountBalanceWallet,
+                contentDescription = null,
+                modifier = Modifier.size(60.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        // 제목
+        Text(
+            text = strings.mainEmptyStateTitle,
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontWeight = FontWeight.SemiBold
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
+        )
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        // 설명
+        Text(
+            text = strings.mainEmptyStateDescription,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+        
+        // 하단 여백 (bottom navigation 고려)
+        Spacer(modifier = Modifier.height(80.dp))
     }
 }
 

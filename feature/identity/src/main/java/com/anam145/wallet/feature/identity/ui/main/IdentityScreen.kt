@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,7 @@ import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.theme.*
 import com.anam145.wallet.feature.identity.domain.model.CredentialType
 import com.anam145.wallet.feature.identity.domain.model.IssuedCredential
+import com.anam145.wallet.feature.identity.R as IdentityR
 import com.anam145.wallet.feature.identity.ui.main.IdentityContract
 import com.anam145.wallet.feature.identity.ui.main.IdentityViewModel
 import com.anam145.wallet.feature.identity.ui.util.debouncedClickable
@@ -281,19 +283,14 @@ private fun StudentCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // 프로필 사진
-                Box(
+                Image(
+                    painter = painterResource(id = IdentityR.drawable.ic_photo),
+                    contentDescription = "Profile Photo",
                     modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFE0E0E0)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = strings.identityPhoto,
-                        fontSize = 10.sp,
-                        color = Color.Gray
-                    )
-                }
+                        .size(width = 50.dp, height = 62.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
                 
                 Spacer(modifier = Modifier.width(15.dp))
                 
@@ -456,19 +453,14 @@ private fun DriverLicenseCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // 프로필 사진
-                Box(
+                Image(
+                    painter = painterResource(id = IdentityR.drawable.ic_photo),
+                    contentDescription = "Profile Photo",
                     modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFE0E0E0)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = strings.identityPhoto,
-                        fontSize = 10.sp,
-                        color = Color.Gray
-                    )
-                }
+                        .size(width = 50.dp, height = 62.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
                 
                 Spacer(modifier = Modifier.width(15.dp))
                 

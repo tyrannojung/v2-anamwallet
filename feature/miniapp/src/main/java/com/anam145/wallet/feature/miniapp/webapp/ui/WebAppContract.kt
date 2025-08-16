@@ -25,6 +25,8 @@ interface WebAppContract {
      * @property showVPBottomSheet VP 바텀시트 표시 여부
      * @property vpRequestData VP 요청 데이터
      * @property credentials 신분증 목록
+     * @property showTransactionApproval 트랜잭션 승인 바텀시트 표시 여부
+     * @property pendingTransactionJson 대기 중인 트랜잭션 JSON
      */
     data class State(
         val appId: String = "",
@@ -38,7 +40,9 @@ interface WebAppContract {
         val webUrl: String? = null,
         val showVPBottomSheet: Boolean = false,
         val vpRequestData: VPRequestData? = null,
-        val credentials: List<CredentialInfo> = emptyList()
+        val credentials: List<CredentialInfo> = emptyList(),
+        val showTransactionApproval: Boolean = false,
+        val pendingTransactionJson: String? = null
     )
     
     /**
@@ -67,6 +71,15 @@ interface WebAppContract {
         /** 신분증 선택 */
         data class SelectCredential(val credentialId: String) : Intent
         
+        /** 트랜잭션 승인 */
+        object ApproveTransaction : Intent
+        
+        /** 트랜잭션 거절 */
+        object RejectTransaction : Intent
+        
+        /** 트랜잭션 승인 바텀시트 닫기 */
+        object DismissTransactionApproval : Intent
+        
         /** 서비스 재연결 시도 */
         object RetryServiceConnection : Intent
         
@@ -83,6 +96,9 @@ interface WebAppContract {
     sealed interface Effect {
         /** JavaScript 실행하여 결제 응답 전달 */
         data class SendTransactionResponse(val responseJson: String) : Effect
+        
+        /** JavaScript 실행하여 트랜잭션 에러 전달 */
+        data class SendTransactionError(val error: String) : Effect
         
         /** JavaScript 실행하여 VP 응답 전달 */
         data class SendVPResponse(val vpJson: String) : Effect

@@ -113,14 +113,46 @@ class BlockchainService : Service() {
                 
                 // WebView에 이벤트 전달
                 handler.post {
-                    val script = """
+                    // Universal Request 확인
+                    val payload = requestData.optString("payload")
+                    val isUniversalRequest = payload.isNotEmpty()
+                    
+                    val script = if (isUniversalRequest) {
+                        // Universal Bridge 요청
+                        """
                         (function() {
-                            const event = new CustomEvent('transactionRequest', {
-                                detail: $requestJson
+                            const event = new CustomEvent('universalRequest', {
+                                detail: {
+                                    requestId: '$requestId',
+                                    payload: '$payload'
+                                }
                             });
                             window.dispatchEvent(event);
                         })();
-                    """.trimIndent()
+                        """.trimIndent()
+                    } else {
+                        // 기존 트랜잭션 요청 (하위 호환성)
+                        // transactionData 필드가 있으면 파싱하여 전달
+                        val transactionDataStr = requestData.optString("transactionData")
+                        val eventDetail = if (transactionDataStr.isNotEmpty()) {
+                            // transactionData를 파싱하여 requestId와 함께 전달
+                            val transactionJson = JSONObject(transactionDataStr)
+                            transactionJson.put("requestId", requestId)
+                            transactionJson.toString()
+                        } else {
+                            // 기존 방식대로 전체 요청 전달
+                            requestJson
+                        }
+                        
+                        """
+                        (function() {
+                            const event = new CustomEvent('transactionRequest', {
+                                detail: $eventDetail
+                            });
+                            window.dispatchEvent(event);
+                        })();
+                        """.trimIndent()
+                    }
                     
                     activeBlockchainWebView?.evaluateJavascript(script) { result ->
                         Log.d(TAG, "Event dispatched to blockchain: $result")
