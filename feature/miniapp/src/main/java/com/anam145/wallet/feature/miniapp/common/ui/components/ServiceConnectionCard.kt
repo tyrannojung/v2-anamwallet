@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.miniapp.blockchain.ui.components
+package com.anam145.wallet.feature.miniapp.common.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -6,11 +6,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.anam145.wallet.core.ui.language.LocalStrings
 
 @Composable
 fun ServiceConnectionCard(
     onRetry: () -> Unit
 ) {
+    val strings = LocalStrings.current
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -27,11 +30,11 @@ fun ServiceConnectionCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "서비스 연결 끊김",
+                text = strings.serviceDisconnected,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
             TextButton(onClick = onRetry) {
-                Text("재연결")
+                Text(strings.retry)
             }
         }
     }

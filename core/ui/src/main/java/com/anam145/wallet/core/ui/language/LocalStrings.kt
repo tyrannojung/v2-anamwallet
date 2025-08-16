@@ -130,6 +130,11 @@ data class Strings(
     val skinBusan: String = "부산",
     val skinLA: String = "LA",
     
+    // Service Connection
+    val serviceDisconnected: String = "서비스 연결 끊김",
+    val retry: String = "재연결",
+    val tryAgain: String = "다시 시도",
+    
     // Identity (DID) Screen
     val identityMobileDriverLicense: String = "모바일 운전면허증",
     val identityMobileStudentId: String = "모바일 학생증",
@@ -289,6 +294,11 @@ val EnglishStrings = Strings(
     skinSeoul = "Seoul",
     skinBusan = "Busan",
     skinLA = "LA",
+    
+    // Service Connection
+    serviceDisconnected = "Service connection lost",
+    retry = "Retry",
+    tryAgain = "Try again",
     
     // Identity (DID) Screen
     identityMobileDriverLicense = "Mobile Driver's License",

@@ -15,8 +15,8 @@ import com.anam145.wallet.core.common.model.Language
 import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
 import androidx.compose.runtime.CompositionLocalProvider
 import com.anam145.wallet.feature.miniapp.blockchain.ui.components.BlockchainWebView
-import com.anam145.wallet.feature.miniapp.blockchain.ui.components.ErrorContent
-import com.anam145.wallet.feature.miniapp.blockchain.ui.components.ServiceConnectionCard
+import com.anam145.wallet.feature.miniapp.common.ui.components.ErrorContent
+import com.anam145.wallet.feature.miniapp.common.ui.components.ServiceConnectionCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

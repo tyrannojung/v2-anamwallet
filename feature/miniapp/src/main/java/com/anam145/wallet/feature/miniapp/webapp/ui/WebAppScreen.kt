@@ -15,8 +15,8 @@ import com.anam145.wallet.core.common.model.Language
 import com.anam145.wallet.feature.miniapp.common.data.common.MiniAppFileManager
 import androidx.compose.runtime.CompositionLocalProvider
 import com.anam145.wallet.feature.miniapp.webapp.ui.components.WebAppWebView
-import com.anam145.wallet.feature.miniapp.webapp.ui.components.ErrorContent
-import com.anam145.wallet.feature.miniapp.webapp.ui.components.ServiceConnectionCard
+import com.anam145.wallet.feature.miniapp.common.ui.components.ErrorContent
+import com.anam145.wallet.feature.miniapp.common.ui.components.ServiceConnectionCard
 import com.anam145.wallet.feature.miniapp.webapp.ui.components.VPBottomSheet
 import com.anam145.wallet.feature.miniapp.webapp.ui.components.TransactionApprovalBottomSheet
 
