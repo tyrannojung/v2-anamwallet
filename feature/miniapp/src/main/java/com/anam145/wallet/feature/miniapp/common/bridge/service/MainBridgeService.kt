@@ -20,8 +20,10 @@ import com.anam145.wallet.feature.miniapp.IBlockchainService
 import com.anam145.wallet.feature.miniapp.IKeystoreCallback
 import com.anam145.wallet.feature.miniapp.IKeystoreDecryptCallback
 import com.anam145.wallet.feature.miniapp.IMainBridgeService
+import com.anam145.wallet.feature.miniapp.IQRScannerCallback
 import com.anam145.wallet.feature.miniapp.IUniversalCallback
 import com.anam145.wallet.feature.miniapp.blockchain.service.BlockchainService
+import com.anam145.wallet.feature.miniapp.qrscanner.ui.QRScannerActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -38,6 +40,32 @@ class MainBridgeService : Service() {
     
     companion object {
         private const val TAG = "MainBridgeService"
+        private const val QR_SCANNER_REQUEST_CODE = 10001
+        
+        // QR Scanner 콜백을 정적으로 관리
+        @Volatile
+        private var qrScannerCallback: IQRScannerCallback? = null
+        
+        fun handleQRScanResult(success: Boolean, data: String) {
+            Log.d(TAG, "handleQRScanResult - success: $success, data: $data")
+            
+            val callback = qrScannerCallback
+            if (callback != null) {
+                try {
+                    if (success) {
+                        callback.onSuccess(data)
+                    } else {
+                        callback.onError(data)
+                    }
+                } catch (e: RemoteException) {
+                    Log.e(TAG, "Error sending QR scan result", e)
+                } finally {
+                    qrScannerCallback = null
+                }
+            } else {
+                Log.w(TAG, "No QR scanner callback available")
+            }
+        }
     }
     
     @Inject
@@ -250,6 +278,31 @@ class MainBridgeService : Service() {
                     } catch (callbackError: RemoteException) {
                         Log.e(TAG, "Failed to send error callback", callbackError)
                     }
+                }
+            }
+        }
+        
+        override fun scanQRCode(options: String, callback: IQRScannerCallback) {
+            Log.d(TAG, "scanQRCode called with options: $options")
+            
+            try {
+                // 콜백 저장
+                qrScannerCallback = callback
+                
+                // QRScannerActivity 시작
+                val intent = Intent(this@MainBridgeService, QRScannerActivity::class.java).apply {
+                    putExtra("options", options)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                
+                startActivity(intent)
+                
+            } catch (e: Exception) {
+                Log.e(TAG, "Error launching QR Scanner", e)
+                try {
+                    callback.onError("Failed to launch QR Scanner: ${e.message}")
+                } catch (callbackError: RemoteException) {
+                    Log.e(TAG, "Failed to send error callback", callbackError)
                 }
             }
         }
