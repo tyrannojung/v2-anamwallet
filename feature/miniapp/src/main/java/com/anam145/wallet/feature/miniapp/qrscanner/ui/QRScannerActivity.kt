@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.theme.AnamWalletTheme
 import com.anam145.wallet.feature.miniapp.common.bridge.service.MainBridgeService
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -258,7 +259,7 @@ fun QRScannerScreen(
                         contentColor = MaterialTheme.colorScheme.onSurface
                     )
                 ) {
-                    Text(text = com.anam145.wallet.core.ui.language.LocalStrings.current.cancel)
+                    Text(text = LocalStrings.current.cancel)
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
