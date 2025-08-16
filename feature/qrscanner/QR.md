@@ -10,29 +10,31 @@ ANAM Wallet의 QR Scanner API는 블록체인 미니앱에서 QR 코드를 스�
 
 ```javascript
 // QR Scanner 호출
-window.anamUI.scanQRCode(JSON.stringify({
-    title: "QR 코드 스캔",        // 선택사항: 스캐너 화면 제목
-    description: "지갑 주소 또는 개인키 QR 코드를 스캔하세요" // 선택사항: 설명 텍스트
-}));
+window.anamUI.scanQRCode(
+  JSON.stringify({
+    title: "QR 코드 스캔", // 선택사항: 스캐너 화면 제목
+    description: "지갑 주소 또는 개인키 QR 코드를 스캔하세요", // 선택사항: 설명 텍스트
+  })
+);
 ```
 
 ### 2. 스캔 결과 받기
 
 ```javascript
 // 이벤트 리스너 등록
-window.addEventListener('qrScanned', function(event) {
-    if (event.detail.success) {
-        // 스캔 성공
-        const qrData = event.detail.data; // 스캔된 원본 데이터
-        console.log("QR Data:", qrData);
-        
-        // 데이터 파싱은 미니앱에서 처리
-        // 예: Ethereum 주소, JSON 데이터, URL 등
-    } else {
-        // 스캔 실패 또는 취소
-        const error = event.detail.error;
-        console.error("Scan failed:", error);
-    }
+window.addEventListener("qrScanned", function (event) {
+  if (event.detail.success) {
+    // 스캔 성공
+    const qrData = event.detail.data; // 스캔된 원본 데이터
+    console.log("QR Data:", qrData);
+
+    // 데이터 파싱은 미니앱에서 처리
+    // 예: Ethereum 주소, JSON 데이터, URL 등
+  } else {
+    // 스캔 실패 또는 취소
+    const error = event.detail.error;
+    console.error("Scan failed:", error);
+  }
 });
 ```
 
@@ -41,6 +43,7 @@ window.addEventListener('qrScanned', function(event) {
 API는 QR 코드의 원본 데이터를 그대로 반환합니다. 데이터 파싱은 미니앱에서 처리해야 합니다.
 
 **예시:**
+
 - `"0x1234567890abcdef..."` - Ethereum 주소
 - `"bitcoin:1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"` - Bitcoin URI
 - `'{"type":"wallet","address":"0x..."}'` - JSON 데이터
@@ -62,12 +65,12 @@ sequenceDiagram
     B->>M: AIDL: scanQRCode(options, callback)
     M->>M: 콜백 저장
     M->>Q: startActivity(intent)
-    
+
     alt 권한이 없는 경우
         Q->>Q: 카메라 권한 요청
         Q->>Q: 사용자 승인/거부
     end
-    
+
     Q->>C: 카메라 실행
     C->>Q: QR 코드 감지
     Q->>M: MainBridgeService.handleQRScanResult()
@@ -83,13 +86,13 @@ graph TB
         A[BlockchainActivity<br/>WebView]
         B[BlockchainUIJavaScriptBridge]
     end
-    
+
     subgraph ":main 프로세스"
         C[MainBridgeService]
         D[QRScannerActivity]
         E[Camera + ML Kit]
     end
-    
+
     A -->|JavaScript| B
     B -->|AIDL| C
     C -->|Intent| D
@@ -114,7 +117,7 @@ fun scanQRCode(optionsJson: String) {
             // JavaScript 이벤트 발생
             sendQRScanResult(true, qrData, null)
         }
-        
+
         override fun onError(errorMessage: String) {
             sendQRScanResult(false, null, errorMessage)
         }
@@ -144,7 +147,7 @@ interface IMainBridgeService {
 companion object {
     @Volatile
     private var qrScannerCallback: IQRScannerCallback? = null
-    
+
     fun handleQRScanResult(success: Boolean, data: String) {
         qrScannerCallback?.let { callback ->
             if (success) {
@@ -181,7 +184,7 @@ private val requestPermissionLauncher = registerForActivityResult(
 private fun processImageProxy(imageProxy: ImageProxy, onQRCodeScanned: (String) -> Unit) {
     val scanner = BarcodeScanning.getClient()
     val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-    
+
     scanner.process(image)
         .addOnSuccessListener { barcodes ->
             for (barcode in barcodes) {
@@ -205,19 +208,19 @@ private fun processImageProxy(imageProxy: ImageProxy, onQRCodeScanned: (String) 
 ### 에러 처리 예시
 
 ```javascript
-window.addEventListener('qrScanned', function(event) {
-    if (!event.detail.success) {
-        switch(event.detail.error) {
-            case "Camera permission is required":
-                alert("카메라 권한이 필요합니다.");
-                break;
-            case "QR scan cancelled by user":
-                // 사용자가 취소함
-                break;
-            default:
-                console.error("QR scan error:", event.detail.error);
-        }
+window.addEventListener("qrScanned", function (event) {
+  if (!event.detail.success) {
+    switch (event.detail.error) {
+      case "Camera permission is required":
+        alert("카메라 권한이 필요합니다.");
+        break;
+      case "QR scan cancelled by user":
+        // 사용자가 취소함
+        break;
+      default:
+        console.error("QR scan error:", event.detail.error);
     }
+  }
 });
 ```
 
@@ -251,18 +254,18 @@ Ethereum 미니앱에서는 QR 코드 스캔 후 자동으로 Send 페이지로 
 ```javascript
 // index.js - QR 데이터 분석
 function analyzeQRData(data) {
-    // 이더리움 주소 감지 시 Send 페이지로 자동 이동
-    if (data.startsWith("0x") && data.length === 42) {
-        navigateToSendWithAddress(data);
-        return;
-    }
-    
-    // Ethereum URI 형식 처리
-    if (data.startsWith("ethereum:")) {
-        const address = data.split(":")[1].split("?")[0];
-        navigateToSendWithAddress(address);
-        return;
-    }
+  // 이더리움 주소 감지 시 Send 페이지로 자동 이동
+  if (data.startsWith("0x") && data.length === 42) {
+    navigateToSendWithAddress(data);
+    return;
+  }
+
+  // Ethereum URI 형식 처리
+  if (data.startsWith("ethereum:")) {
+    const address = data.split(":")[1].split("?")[0];
+    navigateToSendWithAddress(address);
+    return;
+  }
 }
 ```
 
@@ -271,12 +274,12 @@ function analyzeQRData(data) {
 ```javascript
 // index.js - Send 페이지로 이동하며 주소 전달
 function navigateToSendWithAddress(address) {
-    console.log("Navigating to send page with address:", address);
-    
-    // URL 파라미터로 주소 전달
-    window.anamUI.navigateTo(
-        `pages/send/send?address=${encodeURIComponent(address)}`
-    );
+  console.log("Navigating to send page with address:", address);
+
+  // URL 파라미터로 주소 전달
+  window.anamUI.navigateTo(
+    `pages/send/send?address=${encodeURIComponent(address)}`
+  );
 }
 ```
 
@@ -285,31 +288,31 @@ function navigateToSendWithAddress(address) {
 ```javascript
 // send.js - URL 파라미터에서 주소 추출 및 자동 입력
 function checkUrlParameters() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const address = urlParams.get('address');
-    
-    if (address) {
-        // 주소 입력란에 자동 입력
-        document.getElementById('recipient-address').value = address;
-        
-        // 사용자에게 알림
-        showToast("QR 코드에서 주소를 가져왔습니다");
-        
-        // 금액 입력란으로 포커스 이동
-        document.getElementById('send-amount').focus();
-    }
+  const urlParams = new URLSearchParams(window.location.search);
+  const address = urlParams.get("address");
+
+  if (address) {
+    // 주소 입력란에 자동 입력
+    document.getElementById("recipient-address").value = address;
+
+    // 사용자에게 알림
+    showToast("QR 코드에서 주소를 가져왔습니다");
+
+    // 금액 입력란으로 포커스 이동
+    document.getElementById("send-amount").focus();
+  }
 }
 ```
 
 ### 지원하는 QR 데이터 형식 및 자동 처리
 
-| 형식 | 예시 | 자동 처리 |
-|------|------|----------|
-| Ethereum 주소 | `0x1234567890abcdef...` | Send 페이지 이동 + 주소 자동 입력 |
-| Ethereum URI | `ethereum:0x1234...?amount=0.1` | Send 페이지 이동 + 주소 자동 입력 |
-| 개인키 | 64자 hex 문자열 | 보안 경고 표시 |
-| JSON 데이터 | `{"type":"wallet","address":"0x..."}` | 파싱 후 처리 |
-| URL | `https://example.com/wallet/0x1234` | URL 파싱 |
+| 형식          | 예시                                  | 자동 처리                         |
+| ------------- | ------------------------------------- | --------------------------------- |
+| Ethereum 주소 | `0x1234567890abcdef...`               | Send 페이지 이동 + 주소 자동 입력 |
+| Ethereum URI  | `ethereum:0x1234...?amount=0.1`       | Send 페이지 이동 + 주소 자동 입력 |
+| 개인키        | 64자 hex 문자열                       | 보안 경고 표시                    |
+| JSON 데이터   | `{"type":"wallet","address":"0x..."}` | 파싱 후 처리                      |
+| URL           | `https://example.com/wallet/0x1234`   | URL 파싱                          |
 
 ### 전체 사용 플로우
 
@@ -319,11 +322,3 @@ function checkUrlParameters() {
 4. **주소 자동 입력** → 받는 사람 주소란 채움
 5. **금액 입력** → 사용자는 금액만 입력
 6. **전송** → 트랜잭션 실행
-
-## 향후 개선 가능 사항
-
-1. QR 코드 생성 API 추가
-2. 갤러리에서 QR 이미지 선택 기능
-3. 멀티 QR 코드 스캔 지원
-4. 스캔 영역 커스터마이징
-5. QR 코드에 금액 정보 포함 지원
