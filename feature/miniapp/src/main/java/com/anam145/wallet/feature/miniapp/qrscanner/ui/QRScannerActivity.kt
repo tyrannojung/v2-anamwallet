@@ -259,7 +259,7 @@ fun QRScannerScreen(
                         contentColor = MaterialTheme.colorScheme.onSurface
                     )
                 ) {
-                    Text(text = LocalStrings.current.cancel)
+                    Text(text = "Cancel")
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
