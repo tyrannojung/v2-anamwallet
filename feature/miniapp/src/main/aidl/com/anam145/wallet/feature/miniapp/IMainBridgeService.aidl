@@ -4,6 +4,7 @@ package com.anam145.wallet.feature.miniapp;
 import com.anam145.wallet.feature.miniapp.IBlockchainCallback;
 import com.anam145.wallet.feature.miniapp.IKeystoreCallback;
 import com.anam145.wallet.feature.miniapp.IKeystoreDecryptCallback;
+import com.anam145.wallet.feature.miniapp.IQRScannerCallback;
 
 /**
  * 메인 브릿지 서비스와 통신하기 위한 AIDL 인터페이스
@@ -53,4 +54,12 @@ interface IMainBridgeService {
      * @param callback 결과 콜백
      */
     void decryptKeystore(String keystoreJson, IKeystoreDecryptCallback callback);
+    
+    /**
+     * QR 코드 스캔 요청
+     * 
+     * @param options 스캔 옵션 (JSON 형식)
+     * @param callback 결과 콜백
+     */
+    void scanQRCode(String options, IQRScannerCallback callback);
 }

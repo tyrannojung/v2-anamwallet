@@ -13,6 +13,7 @@ import com.anam145.wallet.core.common.model.MiniAppManifest
 import com.anam145.wallet.feature.miniapp.IKeystoreCallback
 import com.anam145.wallet.feature.miniapp.IKeystoreDecryptCallback
 import com.anam145.wallet.feature.miniapp.IMainBridgeService
+import com.anam145.wallet.feature.miniapp.IQRScannerCallback
 import com.anam145.wallet.feature.miniapp.common.bridge.service.MainBridgeService
 import com.google.gson.Gson
 
@@ -228,6 +229,53 @@ class BlockchainUIJavaScriptBridge(
     
     private fun sendDecryptError(error: String) {
         sendDecryptResult(false, null, null, error)
+    }
+    
+    @JavascriptInterface
+    fun scanQRCode(optionsJson: String) {
+        Log.d(TAG, "scanQRCode called with options: $optionsJson")
+        
+        val service = mainBridgeService
+        if (service == null) {
+            sendQRScanError("Service not connected")
+            return
+        }
+        
+        try {
+            service.scanQRCode(optionsJson, object : IQRScannerCallback.Stub() {
+                override fun onSuccess(qrData: String) {
+                    Log.d(TAG, "QR code scanned successfully")
+                    sendQRScanResult(true, qrData, null)
+                }
+                
+                override fun onError(errorMessage: String) {
+                    Log.e(TAG, "QR scan failed: $errorMessage")
+                    sendQRScanResult(false, null, errorMessage)
+                }
+            })
+        } catch (e: Exception) {
+            Log.e(TAG, "Error calling scanQRCode", e)
+            sendQRScanError(e.message ?: "Unknown error")
+        }
+    }
+    
+    private fun sendQRScanResult(success: Boolean, data: String?, error: String?) {
+        (context as? ComponentActivity)?.runOnUiThread {
+            webView?.let { web ->
+                val script = if (success) {
+                    val dataJson = gson.toJson(data)
+                    "window.dispatchEvent(new CustomEvent('qrScanned', { detail: { success: true, data: $dataJson } }));"
+                } else {
+                    val errorJson = gson.toJson(error)
+                    "window.dispatchEvent(new CustomEvent('qrScanned', { detail: { success: false, error: $errorJson } }));"
+                }
+                web.evaluateJavascript(script, null)
+            }
+        }
+    }
+    
+    private fun sendQRScanError(error: String) {
+        sendQRScanResult(false, null, error)
     }
     
     fun destroy() {

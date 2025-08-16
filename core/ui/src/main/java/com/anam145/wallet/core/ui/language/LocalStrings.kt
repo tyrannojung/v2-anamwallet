@@ -148,7 +148,8 @@ data class Strings(
     val identityIssued: String = "발급완료",
     val identityAllIssued: String = "모든 신분증이 발급되었습니다.",
     val identityNoIssuedIds: String = "발급된 모바일 신분증이 없습니다.",
-    val dismiss: String = "닫기"
+    val dismiss: String = "닫기",
+    val cancel: String = "취소"
 )
 
 /**
@@ -286,7 +287,8 @@ val EnglishStrings = Strings(
     identityIssued = "Issued",
     identityAllIssued = "All IDs have been issued.",
     identityNoIssuedIds = "No digital IDs have been issued yet.",
-    dismiss = "Dismiss"
+    dismiss = "Dismiss",
+    cancel = "Cancel"
 )
 
 /**
