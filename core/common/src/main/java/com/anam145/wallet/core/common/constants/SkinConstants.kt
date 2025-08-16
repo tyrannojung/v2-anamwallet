@@ -45,6 +45,11 @@ object SkinConstants {
         Skin.LA to listOf(
             "com.anam.bitcoin",
             "com.anam.ethereum",
+            "com.la.airbnb",
+            "com.la.tapla",
+            "com.la.uber",
+            "com.la.universal",
+            "com.la.yelp"
         )
     )
     
