@@ -271,38 +271,23 @@ private fun DriverCardDetailBody(
             
             Spacer(modifier = Modifier.height(15.dp))
             
-            // 갱신 정보
-            Row(
+            // 적성검사 기간 (갱신 제거 - 한국 운전면허증에는 적성검사만 있음)
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = strings.identityAptitudeTest,
-                        fontSize = 12.sp,
-                        color = Color(0xFF999999)
-                    )
-                    Text(
-                        text = driverLicense.expiryDate,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF666666)
-                    )
-                }
-                
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = strings.identityRenewal,
-                        fontSize = 12.sp,
-                        color = Color(0xFF999999)
-                    )
-                    Text(
-                        text = driverLicense.expiryDate,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF666666)
-                    )
-                }
+                Text(
+                    text = strings.identityAptitudeTest,
+                    fontSize = 12.sp,
+                    color = Color(0xFF999999)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = driverLicense.expiryDate,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF666666)
+                )
             }
             
             Spacer(modifier = Modifier.height(20.dp))

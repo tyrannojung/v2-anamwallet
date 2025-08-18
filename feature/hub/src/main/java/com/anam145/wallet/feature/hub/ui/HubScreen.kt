@@ -100,7 +100,10 @@ private fun HubAppsList(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Tab Row - 헤더 바로 아래 붙임
+        // Header와 TabRow 사이 여백 (Identity의 헤더 아래 여백과 동일)
+        Spacer(modifier = Modifier.height(20.dp))
+        
+        // Tab Row
         TabRow(
             selectedTabIndex = selectedTab,
             containerColor = MaterialTheme.colorScheme.surface

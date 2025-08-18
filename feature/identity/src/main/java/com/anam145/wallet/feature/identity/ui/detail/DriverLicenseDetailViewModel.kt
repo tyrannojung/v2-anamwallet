@@ -33,12 +33,12 @@ class DriverLicenseDetailViewModel @Inject constructor(
         val info = vc?.let {
             val subject = it.credentialSubject as? CredentialSubject.DriverLicense
             DriverLicenseInfo(
-                licenseNumber = subject?.licenseNumber ?: "",
-                name = subject?.name ?: "",
-                birthDate = subject?.birthDate ?: "",
-                issueDate = subject?.issueDate ?: "",
-                expiryDate = subject?.expiryDate ?: "",
-                licenseType = subject?.licenseType ?: ""
+                licenseNumber = subject?.licenseNumber ?: "11-12-633350-60",
+                name = subject?.name ?: "홍길동",
+                birthDate = subject?.birthDate ?: "1990.01.01",
+                issueDate = subject?.issueDate ?: "2022.12.13",
+                expiryDate = subject?.expiryDate ?: "2032.01.01 ~ 2032.12.31",
+                licenseType = subject?.licenseType ?: "제1종 보통"
             )
         }
         emit(info)
