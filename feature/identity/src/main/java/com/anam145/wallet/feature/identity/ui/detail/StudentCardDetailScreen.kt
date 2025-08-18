@@ -80,15 +80,15 @@ fun StudentCardDetailScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f)
-                .padding(top = 8.dp),
-            contentAlignment = Alignment.Center
+                .weight(1f),  // padding 제거하여 카드를 위로 올림
+            contentAlignment = Alignment.TopCenter  // Center → TopCenter로 변경
         ) {
             // 학생증 카드
             Card(
                 modifier = Modifier
                     .width(350.dp)
-                    .padding(20.dp),
+                    .fillMaxHeight(0.95f)  // 화면 높이의 95% 사용
+                    .padding(horizontal = 20.dp, vertical = 10.dp),  // 상하 패딩 줄임
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White

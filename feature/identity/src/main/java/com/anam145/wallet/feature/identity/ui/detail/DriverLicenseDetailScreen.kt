@@ -80,15 +80,15 @@ fun DriverLicenseDetailScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f)
-                .padding(top = 8.dp),
-            contentAlignment = Alignment.Center
+                .weight(1f),  // padding 제거하여 카드를 위로 올림
+            contentAlignment = Alignment.TopCenter  // Center → TopCenter로 변경
         ) {
             // 운전면허증 카드
             Card(
                 modifier = Modifier
                     .width(350.dp)
-                    .padding(20.dp),
+                    .fillMaxHeight(0.95f)  // 화면 높이의 95% 사용
+                    .padding(horizontal = 20.dp, vertical = 10.dp),  // 상하 패딩 줄임
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White
@@ -190,7 +190,7 @@ private fun DriverCardDetailBody(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(30.dp),
+            .padding(horizontal = 30.dp, vertical = 20.dp),  // 상하 패딩 줄임 30dp → 20dp
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // 프로필 이미지
@@ -203,7 +203,7 @@ private fun DriverCardDetailBody(
             contentScale = ContentScale.Crop
         )
         
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(15.dp))  // 20dp → 15dp
         
         // 운전자 이름
         Text(
@@ -222,18 +222,18 @@ private fun DriverCardDetailBody(
             color = Color(0xFF666666)
         )
         
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(15.dp))  // 20dp → 15dp
         
         // 면허 정보 섹션
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 20.dp),
+                .padding(vertical = 15.dp),  // 20dp → 15dp
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Divider(color = Color(0xFFF0F0F0))
             
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(15.dp))  // 20dp → 15dp
             
             // 면허 종류
             Row(
@@ -269,7 +269,7 @@ private fun DriverCardDetailBody(
                 }
             }
             
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(12.dp))  // 15dp → 12dp
             
             // 적성검사 기간 (갱신 제거 - 한국 운전면허증에는 적성검사만 있음)
             Column(
@@ -290,12 +290,12 @@ private fun DriverCardDetailBody(
                 )
             }
             
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(15.dp))  // 20dp → 15dp
             
             Divider(color = Color(0xFFF0F0F0))
         }
         
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(5.dp))  // 10dp → 5dp
         
         // QR 섹션
         Row(

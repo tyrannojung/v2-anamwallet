@@ -100,10 +100,7 @@ private fun HubAppsList(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Header와 TabRow 사이 여백 (Identity의 헤더 아래 여백과 동일)
-        Spacer(modifier = Modifier.height(20.dp))
-        
-        // Tab Row
+        // Tab Row - 블록체인 상태가 있을 때는 바로 붙임
         TabRow(
             selectedTabIndex = selectedTab,
             containerColor = MaterialTheme.colorScheme.surface
