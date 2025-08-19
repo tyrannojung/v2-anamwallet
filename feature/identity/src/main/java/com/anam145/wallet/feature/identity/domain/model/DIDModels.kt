@@ -134,6 +134,7 @@ data class IssuedCredential(
     val type: CredentialType,
     val vcId: String,
     val issuanceDate: String,
+    val name: String? = null,
     val studentNumber: String? = null,
     val licenseNumber: String? = null,
     val university: String? = null,

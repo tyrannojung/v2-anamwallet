@@ -103,8 +103,8 @@ fun Header(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 8.dp)
-                        .padding(bottom = 8.dp)
+                        .padding(horizontal = 24.dp)
+                        .padding(top = 8.dp, bottom = 12.dp)  // 상단은 작게, 하단은 적당히
                 ) {
                     BlockchainStatusChip(
                         blockchainName = activeBlockchainName ?: "",

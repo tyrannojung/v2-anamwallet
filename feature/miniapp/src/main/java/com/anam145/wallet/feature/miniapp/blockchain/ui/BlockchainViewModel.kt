@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import com.anam145.wallet.core.common.extension.resolveEntryPoint
 
@@ -64,6 +65,9 @@ class BlockchainViewModel @Inject constructor(
             viewModelScope.launch {
                 _uiState.update { it.copy(blockchainId = blockchainId, isLoading = true) }
                 
+                // 10초 타임아웃 설정
+                startConnectionTimeout()
+                
                 // 매니페스트 로드
                 when (val result = loadMiniAppManifestUseCase(blockchainId)) {
                     is MiniAppResult.Success -> {
@@ -104,6 +108,22 @@ class BlockchainViewModel @Inject constructor(
 
 
     /**
+     * 서비스 연결 타임아웃을 시작합니다.
+     * 10초 후에도 서비스가 연결되지 않으면 타임아웃 플래그를 설정합니다.
+     */
+    private fun startConnectionTimeout() {
+        viewModelScope.launch {
+            delay(10000) // 10초 대기
+            
+            // 10초 후에도 서비스가 연결되지 않았으면 타임아웃 설정
+            if (!_uiState.value.isServiceConnected) {
+                _uiState.update { it.copy(connectionTimeout = true) }
+                Log.d(TAG, "Service connection timeout after 10 seconds")
+            }
+        }
+    }
+
+    /**
      * 블록체인 서비스 연결 상태를 지속적으로 관찰합니다.
      * 
      * 역할:
@@ -130,8 +150,12 @@ class BlockchainViewModel @Inject constructor(
                 val previousState = _uiState.value.isServiceConnected
                 _uiState.update { it.copy(isServiceConnected = isConnected) }
                 
-                // 서비스가 새로 연결되었을 때 활성화 상태 재확인
+                // 서비스가 새로 연결되었을 때
                 if (!previousState && isConnected) {
+                    // 타임아웃 플래그 초기화 (연결 성공했으므로)
+                    _uiState.update { it.copy(connectionTimeout = false) }
+                    
+                    // 활성화 상태 재확인
                     _uiState.value.blockchainId.let { blockchainId ->
                         checkIfActivated(blockchainId)
                     }

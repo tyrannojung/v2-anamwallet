@@ -16,6 +16,7 @@ interface BlockchainContract {
      * @property manifest 블록체인 매니페스트
      * @property isLoading 로딩 상태
      * @property isServiceConnected 서비스 연결 상태
+     * @property connectionTimeout 서비스 연결 타임아웃 (10초) 여부
      * @property error 에러 메시지
      * @property webViewReady WebView 준비 상태
      * @property isActivated 블록체인 활성화 상태
@@ -25,6 +26,7 @@ interface BlockchainContract {
         val manifest: MiniAppManifest? = null,
         val isLoading: Boolean = true,
         val isServiceConnected: Boolean = false,
+        val connectionTimeout: Boolean = false,
         val error: String? = null,
         val webViewReady: Boolean = false,
         val isActivated: Boolean = false,

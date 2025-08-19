@@ -299,7 +299,7 @@ private fun StudentCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = strings.identitySampleName,
+                        text = credential.name ?: strings.identitySampleName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.Black
@@ -469,7 +469,7 @@ private fun DriverLicenseCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = strings.identitySampleName,
+                        text = credential.name ?: strings.identitySampleName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.Black
@@ -478,7 +478,7 @@ private fun DriverLicenseCard(
                     Spacer(modifier = Modifier.height(4.dp))
                     
                     Text(
-                        text = credential.licenseNumber ?: "11-22-333333-44",
+                        text = credential.licenseNumber ?: "11-12-633350-60",
                         fontSize = 14.sp,
                         color = Color(0xFF666666)
                     )

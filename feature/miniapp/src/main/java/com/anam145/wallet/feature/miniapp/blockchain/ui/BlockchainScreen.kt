@@ -113,8 +113,8 @@ private fun BlockchainScreenContent(
                 }
             }
             
-            // 서비스 연결 상태 표시
-            if (!uiState.isServiceConnected && !uiState.isLoading) {
+            // 서비스 연결 상태 표시 (10초 타임아웃 후에만 표시)
+            if (!uiState.isServiceConnected && uiState.connectionTimeout) {
                 ServiceConnectionCard(
                     onRetry = {
                         viewModel.handleIntent(BlockchainContract.Intent.RetryServiceConnection)

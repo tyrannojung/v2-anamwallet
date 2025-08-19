@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.anam145.wallet.core.ui.navigation.animatedComposable
 import com.anam145.wallet.feature.identity.ui.main.IdentityScreen
 import com.anam145.wallet.feature.identity.ui.issue.IssueSelectScreen
 import com.anam145.wallet.feature.identity.ui.detail.StudentCardDetailScreen
@@ -31,7 +32,7 @@ fun IdentityNavHost(
         modifier = modifier
     ) {
         // 메인 Identity 화면
-        composable(route = IdentityRoute.Main.route) {
+        animatedComposable(route = IdentityRoute.Main.route) {
             IdentityScreen(
                 onNavigateToStudentCard = { vcId ->
                     navController.navigate(IdentityRoute.StudentCard.createRoute(vcId)) {
@@ -52,7 +53,7 @@ fun IdentityNavHost(
         }
         
         // 발급 선택 화면
-        composable(route = IdentityRoute.IssueSelect.route) {
+        animatedComposable(route = IdentityRoute.IssueSelect.route) {
             IssueSelectScreen(
                 onBackClick = {
                     navController.popBackStack()
@@ -61,7 +62,7 @@ fun IdentityNavHost(
         }
         
         // 학생증 상세 화면
-        composable(
+        animatedComposable(
             route = IdentityRoute.StudentCard.route,
             arguments = listOf(
                 navArgument("vcId") { type = NavType.StringType }
@@ -77,7 +78,7 @@ fun IdentityNavHost(
         }
         
         // 운전면허증 상세 화면
-        composable(
+        animatedComposable(
             route = IdentityRoute.DriverLicense.route,
             arguments = listOf(
                 navArgument("vcId") { type = NavType.StringType }

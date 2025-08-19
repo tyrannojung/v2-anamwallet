@@ -80,15 +80,15 @@ fun StudentCardDetailScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f)
-                .padding(top = 8.dp),
-            contentAlignment = Alignment.Center
+                .weight(1f),  // padding 제거하여 카드를 위로 올림
+            contentAlignment = Alignment.TopCenter  // Center → TopCenter로 변경
         ) {
             // 학생증 카드
             Card(
                 modifier = Modifier
                     .width(350.dp)
-                    .padding(20.dp),
+                    .fillMaxHeight(0.95f)  // 화면 높이의 95% 사용
+                    .padding(horizontal = 20.dp, vertical = 10.dp),  // 상하 패딩 줄임
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White
@@ -173,7 +173,7 @@ private fun CardDetailBody(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(30.dp),
+            .padding(horizontal = 30.dp, vertical = 20.dp),  // 운전면허증과 동일하게 조정
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // 프로필 이미지
@@ -186,7 +186,7 @@ private fun CardDetailBody(
             contentScale = ContentScale.Crop
         )
         
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(15.dp))  // 20dp → 15dp (운전면허증과 동일)
         
         // 학생 이름
         Text(
@@ -205,27 +205,20 @@ private fun CardDetailBody(
             color = Color(0xFF666666)
         )
         
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(15.dp))  // 20dp → 15dp (운전면허증과 동일)
         
-        // 학과 정보 섹션
+        // 학과 정보 섹션 (고정 높이)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .height(140.dp)  // 고정 높이 증가 120dp → 140dp
+                .padding(vertical = 15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center  // 수직 중앙 정렬
         ) {
             Divider(color = Color(0xFFF0F0F0))
             
-            Spacer(modifier = Modifier.height(20.dp))
-            
-            Text(
-                text = studentCard.university,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFF888888)
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.weight(1f))
             
             Text(
                 text = studentCard.department,
@@ -234,17 +227,18 @@ private fun CardDetailBody(
                 color = Color(0xFF888888)
             )
             
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.weight(1f))
             
             Divider(color = Color(0xFFF0F0F0))
         }
         
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(5.dp))  // 10dp → 5dp (운전면허증과 동일)
         
-        // QR 섹션
+        // QR 섹션 (고정 높이)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(70.dp)  // 고정 높이 감소 80dp → 70dp
                 .padding(top = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween

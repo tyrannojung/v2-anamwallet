@@ -107,6 +107,7 @@ class DIDLocalDataSource @Inject constructor(
                             type = CredentialType.STUDENT_CARD,
                             vcId = vc.id,
                             issuanceDate = vc.issuanceDate,
+                            name = subject.name,
                             studentNumber = subject.studentNumber,
                             university = subject.university,
                             department = subject.department
@@ -132,6 +133,7 @@ class DIDLocalDataSource @Inject constructor(
                             type = CredentialType.DRIVER_LICENSE,
                             vcId = vc.id,
                             issuanceDate = vc.issuanceDate,
+                            name = subject.name,
                             licenseNumber = subject.licenseNumber
                         )
                     )

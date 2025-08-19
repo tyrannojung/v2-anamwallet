@@ -37,53 +37,50 @@ fun HubScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
-    Scaffold(
-        floatingActionButton = {
-            // 로딩 중이 아닐 때만 FAB 표시
-            if (!uiState.isLoading) {
-                FloatingActionButton(
-                    onClick = {
-                        viewModel.handleIntent(HubContract.HubIntent.RefreshMiniApps)
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
+        when {
+            uiState.isLoading && uiState.hubApps.isEmpty() -> {
+                LoadingContent()
+            }
+            uiState.error != null && uiState.hubApps.isEmpty() -> {
+                ErrorContent(
+                    error = uiState.error ?: "Error loading apps",
+                    onRetry = { viewModel.handleIntent(HubContract.HubIntent.RefreshMiniApps) }
+                )
+            }
+            else -> {
+                // 항상 HubAppsList를 표시 (비어있어도 탭은 보이도록)
+                HubAppsList(
+                    apps = uiState.hubApps,
+                    loadingAppIds = uiState.loadingAppIds,
+                    onInstallClick = { appId ->
+                        viewModel.handleIntent(HubContract.HubIntent.InstallMiniApp(appId))
                     },
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "Refresh"
-                    )
-                }
+                    onUninstallClick = { appId ->
+                        viewModel.handleIntent(HubContract.HubIntent.UninstallMiniApp(appId))
+                    }
+                )
             }
         }
-    ) { paddingValues ->
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            when {
-                uiState.isLoading && uiState.hubApps.isEmpty() -> {
-                    LoadingContent()
-                }
-                uiState.error != null && uiState.hubApps.isEmpty() -> {
-                    ErrorContent(
-                        error = uiState.error ?: "Error loading apps",
-                        onRetry = { viewModel.handleIntent(HubContract.HubIntent.RefreshMiniApps) }
-                    )
-                }
-                else -> {
-                    // 항상 HubAppsList를 표시 (비어있어도 탭은 보이도록)
-                    HubAppsList(
-                        apps = uiState.hubApps,
-                        loadingAppIds = uiState.loadingAppIds,
-                        onInstallClick = { appId ->
-                            viewModel.handleIntent(HubContract.HubIntent.InstallMiniApp(appId))
-                        },
-                        onUninstallClick = { appId ->
-                            viewModel.handleIntent(HubContract.HubIntent.UninstallMiniApp(appId))
-                        }
-                    )
-                }
+        
+        // FAB를 Box의 오른쪽 하단에 배치
+        if (!uiState.isLoading) {
+            FloatingActionButton(
+                onClick = {
+                    viewModel.handleIntent(HubContract.HubIntent.RefreshMiniApps)
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = "Refresh"
+                )
             }
         }
     }
@@ -103,7 +100,7 @@ private fun HubAppsList(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Tab Row
+        // Tab Row - 블록체인 상태가 있을 때는 바로 붙임
         TabRow(
             selectedTabIndex = selectedTab,
             containerColor = MaterialTheme.colorScheme.surface
