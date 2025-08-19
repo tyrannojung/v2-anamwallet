@@ -44,14 +44,7 @@ class SkinDataStore @Inject constructor(
         .map { preferences ->
             val skinName = preferences[SELECTED_SKIN_KEY] ?: SkinConstants.DEFAULT_SKIN.name
             try {
-                val skin = Skin.valueOf(skinName)
-                // SEOUL이나 LA 스킨이 저장되어 있으면 ANAM으로 마이그레이션
-                if (skinName == "SEOUL" || skinName == "LA") {
-                    Log.w("SkinDataStore", "Migrating deprecated skin $skinName to ANAM")
-                    SkinConstants.DEFAULT_SKIN
-                } else {
-                    skin
-                }
+                Skin.valueOf(skinName)
             } catch (e: IllegalArgumentException) {
                 // 잘못된 스킨 이름이 저장된 경우 기본값 반환
                 Log.e("SkinDataStore", "Invalid skin name: $skinName, using default", e)
@@ -206,12 +199,6 @@ class SkinDataStore @Inject constructor(
     suspend fun validateAndRepairSkinData() {
         context.skinDataStore.edit { preferences ->
             val skinName = preferences[SELECTED_SKIN_KEY]
-            
-            // SEOUL이나 LA 스킨이 저장되어 있으면 ANAM으로 변경
-            if (skinName == "SEOUL" || skinName == "LA") {
-                Log.w("SkinDataStore", "Migrating deprecated skin $skinName to ANAM")
-                preferences[SELECTED_SKIN_KEY] = SkinConstants.DEFAULT_SKIN.name
-            }
             
             // 스킨 이름이 유효한지 확인
             if (skinName != null) {

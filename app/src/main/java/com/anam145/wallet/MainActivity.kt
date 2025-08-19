@@ -223,7 +223,7 @@ fun AnamWalletApp(
                                 AnamNavRoute.Main -> strings.headerTitleMain
                                 AnamNavRoute.Hub -> strings.headerTitleHub
                                 AnamNavRoute.Browser -> strings.headerTitleBrowser
-                                AnamNavRoute.Identity -> strings.headerTitleIdentity
+                                // AnamNavRoute.Identity -> strings.headerTitleIdentity  // DID 기능 임시 비활성화
                                 AnamNavRoute.Settings -> strings.headerTitleSettings
                                 else -> strings.headerTitle
                             },

@@ -49,11 +49,12 @@ object NavigationConfig {
             unselectedIcon = Icons.Outlined.Language,
             labelKey = "browser"
         ),
-        AnamNavRoute.Identity to NavIconInfo(
-            selectedIcon = Icons.Filled.QrCode,
-            unselectedIcon = Icons.Outlined.QrCode,
-            labelKey = "identity"
-        ),
+        // DID 기능 임시 비활성화
+        // AnamNavRoute.Identity to NavIconInfo(
+        //     selectedIcon = Icons.Filled.QrCode,
+        //     unselectedIcon = Icons.Outlined.QrCode,
+        //     labelKey = "identity"
+        // ),
         AnamNavRoute.Settings to NavIconInfo(
             selectedIcon = Icons.Filled.Settings,
             unselectedIcon = Icons.Outlined.Settings,
@@ -69,7 +70,7 @@ object NavigationConfig {
         AnamNavRoute.Main,
         AnamNavRoute.Hub,
         AnamNavRoute.Browser,
-        AnamNavRoute.Identity,
+        // AnamNavRoute.Identity,  // DID 기능 임시 비활성화
         AnamNavRoute.Settings
     )
     
