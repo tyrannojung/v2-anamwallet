@@ -12,7 +12,7 @@ import com.anam145.wallet.feature.main.ui.MainViewModel
 import com.anam145.wallet.feature.hub.ui.HubScreen
 import com.anam145.wallet.feature.browser.ui.BrowserScreen
 // import com.anam145.wallet.feature.identity.navigation.IdentityNavHost  // DID 기능 임시 비활성화
-import com.anam145.wallet.feature.settings.ui.SettingsScreen
+import com.anam145.wallet.feature.settings.navigation.SettingsNavHost
 import com.anam145.wallet.feature.miniapp.webapp.WebAppActivity
 import com.anam145.wallet.feature.miniapp.blockchain.BlockchainActivity
 import com.anam145.wallet.feature.auth.ui.login.LoginScreen
@@ -89,9 +89,9 @@ fun AnamNavHost(
         //     IdentityNavHost()
         // }
         
-        // 설정 화면
+        // 설정 화면 (Nested Navigation)
         animatedComposable(route = AnamNavRoute.Settings.route) {
-            SettingsScreen()
+            SettingsNavHost()
         }
         
         // ========== 상세 화면들 ==========

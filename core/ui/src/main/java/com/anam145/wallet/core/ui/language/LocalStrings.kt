@@ -175,7 +175,20 @@ data class Strings(
     val identityIssued: String = "발급완료",
     val identityAllIssued: String = "모든 신분증이 발급되었습니다.",
     val identityNoIssuedIds: String = "발급된 모바일 신분증이 없습니다.",
-    val dismiss: String = "닫기"
+    val dismiss: String = "닫기",
+    
+    // Help Screen
+    val helpTitle: String = "도움말",
+    val helpPasswordTitle: String = "앱 비밀번호 설정",
+    val helpPasswordContent: String = "ANAM Wallet을 처음 실행하면 앱 보호를 위한 비밀번호 설정이 필요합니다. 최소 8자 이상의 비밀번호를 설정하세요. 이 비밀번호는 앱 접근 시 매번 필요하며, 분실 시 앱을 재설치해야 하므로 안전하게 보관하세요.",
+    val helpMiniAppTitle: String = "미니앱 설치 및 관리",
+    val helpMiniAppContent: String = "하단 네비게이션의 '허브' 탭에서 다양한 블록체인 지갑과 웹 서비스를 설치할 수 있습니다. 설치하고 싶은 미니앱을 선택하여 '설치' 버튼을 누르면 메인 화면에 추가됩니다. 설치된 미니앱은 메인 화면에서 바로 실행할 수 있습니다.",
+    val helpBlockchainTitle: String = "블록체인 지갑 사용",
+    val helpBlockchainContent: String = "메인 화면에서 원하는 블록체인 지갑(Bitcoin, Ethereum 등)을 선택하면 해당 지갑으로 이동합니다. 각 지갑에서는 잔액 확인, 송금, 수신 주소 생성 등의 기능을 사용할 수 있습니다. 활성 블록체인은 상단 헤더에 표시되며, 탭하여 빠르게 전환할 수 있습니다.",
+    val helpBrowserTitle: String = "웹 브라우저",
+    val helpBrowserContent: String = "하단 네비게이션의 '브라우저' 탭을 통해 웹사이트와 DApp에 접근할 수 있습니다. 북마크 기능을 지원하며, 자주 방문하는 사이트를 저장하여 빠르게 접속할 수 있습니다.",
+    val helpLanguageTitle: String = "언어 및 스킨 변경",
+    val helpLanguageContent: String = "설정' 탭에서 앱의 언어(한국어/English)와 스킨(ANAM/Busan)을 변경할 수 있습니다. 스킨에 따라 기본 설치되는 미니앱과 UI 테마가 달라집니다."
 )
 
 /**
@@ -340,7 +353,20 @@ val EnglishStrings = Strings(
     identityIssued = "Issued",
     identityAllIssued = "All IDs have been issued.",
     identityNoIssuedIds = "No digital IDs have been issued yet.",
-    dismiss = "Dismiss"
+    dismiss = "Dismiss",
+    
+    // Help Screen
+    helpTitle = "Help",
+    helpPasswordTitle = "Setting App Password",
+    helpPasswordContent = "When you first launch ANAM Wallet, you need to set a password to protect your app. Set a password with at least 8 characters. This password is required every time you access the app. If lost, you must reinstall the app, so keep it safe.",
+    helpMiniAppTitle = "Installing and Managing Mini-Apps",
+    helpMiniAppContent = "You can install various blockchain wallets and web services from the 'Hub' tab in the bottom navigation. Select the mini-app you want to install and press the 'Install' button to add it to your main screen. Installed mini-apps can be launched directly from the main screen.",
+    helpBlockchainTitle = "Using Blockchain Wallets",
+    helpBlockchainContent = "Select your desired blockchain wallet (Bitcoin, Ethereum, etc.) from the main screen to access it. Each wallet provides features like balance checking, sending funds, and generating receiving addresses. The active blockchain is displayed in the header and can be quickly switched by tapping.",
+    helpBrowserTitle = "Web Browser",
+    helpBrowserContent = "Access websites and DApps through the 'Browser' tab in the bottom navigation. Bookmark functionality is supported, allowing you to save and quickly access frequently visited sites.",
+    helpLanguageTitle = "Language and Skin Settings",
+    helpLanguageContent = "Change the app's language (Korean/English) and skin (ANAM/Busan) in the 'Settings' tab. Different skins come with different default mini-apps and UI themes."
 )
 
 /**
