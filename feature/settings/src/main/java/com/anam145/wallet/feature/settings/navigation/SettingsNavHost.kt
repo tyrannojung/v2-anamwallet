@@ -9,6 +9,9 @@ import androidx.navigation.compose.rememberNavController
 import com.anam145.wallet.core.ui.navigation.animatedComposable
 import com.anam145.wallet.feature.settings.ui.SettingsScreen
 import com.anam145.wallet.feature.settings.ui.help.HelpScreen
+import com.anam145.wallet.feature.settings.ui.faq.FAQScreen
+import com.anam145.wallet.feature.settings.ui.appinfo.AppInfoScreen
+import com.anam145.wallet.feature.settings.ui.license.LicenseScreen
 
 /**
  * Settings 기능의 Nested Navigation Host
@@ -62,40 +65,31 @@ fun SettingsNavHost(
             )
         }
         
-        // FAQ 화면 (TODO)
+        // FAQ 화면
         animatedComposable(route = SettingsRoute.FAQ.route) {
-            // TODO: FAQScreen 구현
-            /*
             FAQScreen(
                 onBackClick = {
                     navController.popBackStack()
                 }
             )
-            */
         }
         
-        // 앱 정보 화면 (TODO)
+        // 앱 정보 화면
         animatedComposable(route = SettingsRoute.AppInfo.route) {
-            // TODO: AppInfoScreen 구현
-            /*
             AppInfoScreen(
                 onBackClick = {
                     navController.popBackStack()
                 }
             )
-            */
         }
         
-        // 라이선스 화면 (TODO)
+        // 라이선스 화면
         animatedComposable(route = SettingsRoute.License.route) {
-            // TODO: LicenseScreen 구현
-            /*
             LicenseScreen(
                 onBackClick = {
                     navController.popBackStack()
                 }
             )
-            */
         }
     }
 }

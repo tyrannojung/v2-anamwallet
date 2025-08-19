@@ -188,7 +188,45 @@ data class Strings(
     val helpBrowserTitle: String = "웹 브라우저",
     val helpBrowserContent: String = "하단 네비게이션의 '브라우저' 탭을 통해 웹사이트와 DApp에 접근할 수 있습니다. 북마크 기능을 지원하며, 자주 방문하는 사이트를 저장하여 빠르게 접속할 수 있습니다.",
     val helpLanguageTitle: String = "언어 및 스킨 변경",
-    val helpLanguageContent: String = "설정' 탭에서 앱의 언어(한국어/English)와 스킨(ANAM/Busan)을 변경할 수 있습니다. 스킨에 따라 기본 설치되는 미니앱과 UI 테마가 달라집니다."
+    val helpLanguageContent: String = "설정' 탭에서 앱의 언어(한국어/English)와 스킨(ANAM/Busan)을 변경할 수 있습니다. 스킨에 따라 기본 설치되는 미니앱과 UI 테마가 달라집니다.",
+    
+    // FAQ Screen
+    val faqTitle: String = "자주 묻는 질문",
+    val faqQuestion1: String = "미니앱이란 무엇인가요?",
+    val faqAnswer1: String = "미니앱은 ANAM Wallet 내에서 독립적으로 실행되는 작은 애플리케이션입니다. 블록체인 지갑(Bitcoin, Ethereum 등)과 웹 서비스(Government24, 부산카드 등)를 미니앱 형태로 설치하여 사용할 수 있습니다. 각 미니앱은 별도의 프로세스에서 실행되어 보안성과 안정성이 보장됩니다.",
+    val faqQuestion2: String = "새로운 블록체인 지갑을 추가하려면 어떻게 하나요?",
+    val faqAnswer2: String = "하단 네비게이션의 '허브' 탭에서 원하는 블록체인 미니앱을 찾아 '설치' 버튼을 누르면 됩니다. 설치된 미니앱은 메인 화면에 나타나며, 탭하여 바로 사용할 수 있습니다. 필요 없는 미니앱은 언제든지 제거할 수 있습니다.",
+    val faqQuestion3: String = "앱 비밀번호를 잊어버렸어요. 어떻게 해야 하나요?",
+    val faqAnswer3: String = "보안상의 이유로 앱 비밀번호는 복구할 수 없습니다. 앱을 삭제하고 재설치해야 하며, 이 경우 모든 데이터가 초기화됩니다. 따라서 비밀번호는 안전한 곳에 별도로 보관하시기 바랍니다.",
+    val faqQuestion4: String = "여러 개의 블록체인을 동시에 사용할 수 있나요?",
+    val faqAnswer4: String = "네, 가능합니다. ANAM Wallet은 모듈형 구조로 설계되어 여러 블록체인 미니앱을 동시에 설치하고 관리할 수 있습니다. 상단 헤더에서 현재 활성화된 블록체인을 확인하고, 탭하여 빠르게 전환할 수 있습니다.",
+    val faqQuestion5: String = "스킨이 무엇이며, 어떻게 변경하나요?",
+    val faqAnswer5: String = "스킨은 앱의 테마와 기본 설치 미니앱을 결정합니다. 'ANAM'과 'Busan' 스킨을 제공하며, 설정 화면에서 변경할 수 있습니다. Busan 스킨은 부산 지역 서비스가 기본 설치되고, 앱 섹션이 먼저 표시됩니다.",
+    val faqQuestion6: String = "미니앱이 업데이트되면 어떻게 알 수 있나요?",
+    val faqAnswer6: String = "허브에서 설치된 미니앱의 업데이트를 확인할 수 있습니다. 새 버전이 있으면 업데이트 버튼이 표시되며, 탭하여 최신 버전으로 업데이트할 수 있습니다.",
+    val faqQuestion7: String = "오프라인에서도 사용할 수 있나요?",
+    val faqAnswer7: String = "설치된 미니앱은 오프라인에서도 기본 기능을 사용할 수 있습니다. 단, 잔액 조회나 트랜잭션 전송 같은 네트워크가 필요한 기능은 인터넷 연결이 필요합니다.",
+    val faqQuestion8: String = "브라우저의 북마크는 어디에 저장되나요?",
+    val faqAnswer8: String = "북마크는 앱 내부에 안전하게 저장됩니다. 브라우저 하단의 북마크 아이콘을 탭하여 추가/제거할 수 있으며, 북마크 목록에서 저장된 사이트에 빠르게 접속할 수 있습니다.",
+    
+    // App Info Screen
+    val appInfoTitle: String = "앱 정보",
+    val appInfoVersion: String = "버전",
+    val appInfoDescription: String = "ANAM Wallet은 사용자 맞춤형 모듈성을 핵심 원칙으로 하는 혁신적인 암호화폐 지갑입니다. 단순한 기능이 아닌 근본 철학으로서, 사용자가 원하는 블록체인을 추가하고 불필요한 것은 제거하여 자신에게 완벽하게 맞는 지갑을 만들 수 있습니다. 더 이상 여러 지갑을 관리하거나 업데이트를 기다릴 필요가 없습니다.\n\n개방성을 위해 설계된 ANAM Wallet은 누구나 친숙한 웹 표준(HTML, CSS, JavaScript)으로 모듈을 만들고 배포할 수 있어 생태계의 빠른 성장을 촉진합니다.\n\n이러한 개방성은 완벽한 보안으로 뒷받침됩니다. 특허 받은 멀티 프로세스 격리 기술로 모든 모듈이 독립된 샌드박스 프로세스와 전용 메모리에서 실행되며, 메인 프로세스가 모든 통신을 중재합니다. 악의적인 모듈도 다른 모듈의 개인키나 데이터에 접근할 수 없습니다.\n\n블록체인을 넘어 ANAM Wallet은 애플리케이션 모듈과 분산 신원(DID)을 지원합니다. 통합 API가 모든 것을 연결하여 어떤 서비스든 블록체인과 상호작용할 수 있습니다. 인증과 결제가 하나의 안전한 인터페이스를 통해 이루어집니다.\n\nANAM Wallet은 Web3를 실용적으로 만들어 블록체인 기술과 실제 서비스를 연결합니다.",
+    val appInfoDeveloper: String = "개발자",
+    val appInfoDeveloperName: String = "ANAM Labs",
+    val appInfoWebsite: String = "웹사이트",
+    val appInfoWebsiteUrl: String = "https://anamwallet.com",
+    val appInfoContact: String = "문의",
+    val appInfoContactEmail: String = "support@anamwallet.com",
+    
+    // License Screen
+    val licenseTitle: String = "오픈소스 라이선스",
+    val licenseCopyright: String = "Copyright © 2024 ANAM Labs. All rights reserved.",
+    val licenseIntro: String = "이 애플리케이션은 다음의 오픈소스 라이브러리를 사용합니다:",
+    val licenseApache: String = "Apache License 2.0",
+    val licenseMit: String = "MIT License",
+    val licenseViewLicense: String = "라이선스 보기"
 )
 
 /**
@@ -366,7 +404,45 @@ val EnglishStrings = Strings(
     helpBrowserTitle = "Web Browser",
     helpBrowserContent = "Access websites and DApps through the 'Browser' tab in the bottom navigation. Bookmark functionality is supported, allowing you to save and quickly access frequently visited sites.",
     helpLanguageTitle = "Language and Skin Settings",
-    helpLanguageContent = "Change the app's language (Korean/English) and skin (ANAM/Busan) in the 'Settings' tab. Different skins come with different default mini-apps and UI themes."
+    helpLanguageContent = "Change the app's language (Korean/English) and skin (ANAM/Busan) in the 'Settings' tab. Different skins come with different default mini-apps and UI themes.",
+    
+    // FAQ Screen
+    faqTitle = "FAQ",
+    faqQuestion1 = "What are mini-apps?",
+    faqAnswer1 = "Mini-apps are small applications that run independently within ANAM Wallet. You can install and use blockchain wallets (Bitcoin, Ethereum, etc.) and web services (Government24, Busan Card, etc.) as mini-apps. Each mini-app runs in a separate process, ensuring security and stability.",
+    faqQuestion2 = "How do I add a new blockchain wallet?",
+    faqAnswer2 = "Go to the 'Hub' tab in the bottom navigation, find the blockchain mini-app you want, and press the 'Install' button. Installed mini-apps appear on the main screen and can be accessed immediately by tapping. You can remove unnecessary mini-apps at any time.",
+    faqQuestion3 = "I forgot my app password. What should I do?",
+    faqAnswer3 = "For security reasons, the app password cannot be recovered. You must delete and reinstall the app, which will reset all data. Therefore, please keep your password in a safe place.",
+    faqQuestion4 = "Can I use multiple blockchains simultaneously?",
+    faqAnswer4 = "Yes, you can. ANAM Wallet is designed with a modular architecture that allows you to install and manage multiple blockchain mini-apps simultaneously. You can check the currently active blockchain in the header and quickly switch by tapping.",
+    faqQuestion5 = "What are skins and how do I change them?",
+    faqAnswer5 = "Skins determine the app's theme and default installed mini-apps. We provide 'ANAM' and 'Busan' skins, which can be changed in the Settings screen. The Busan skin comes with Busan regional services pre-installed and displays the apps section first.",
+    faqQuestion6 = "How do I know when mini-apps are updated?",
+    faqAnswer6 = "You can check for updates to installed mini-apps in the Hub. If a new version is available, an update button will appear, which you can tap to update to the latest version.",
+    faqQuestion7 = "Can I use the app offline?",
+    faqAnswer7 = "Installed mini-apps can use basic functions offline. However, features that require network access, such as balance checking or transaction sending, need an internet connection.",
+    faqQuestion8 = "Where are browser bookmarks stored?",
+    faqAnswer8 = "Bookmarks are securely stored within the app. You can add/remove bookmarks by tapping the bookmark icon at the bottom of the browser, and quickly access saved sites from the bookmark list.",
+    
+    // App Info Screen
+    appInfoTitle = "App Info",
+    appInfoVersion = "Version",
+    appInfoDescription = "AnamWallet is a revolutionary cryptocurrency wallet built on user-configurable modularity—its core principle, not just a feature. Users create wallets that fit them perfectly, adding the blockchains they want and removing the ones they don't. No more juggling multiple wallets or waiting on vendor updates.\n\nEngineered for openness, AnamWallet lets anyone build and deploy modules with familiar web standards (HTML, CSS, JavaScript), fueling rapid ecosystem growth.\n\nThis openness is reinforced by absolute security: our patented multi-process isolation runs every module in its own sandboxed process with dedicated memory, while the main process mediates all communication. Even a malicious module can't touch other modules' private keys or data.\n\nBeyond blockchain, AnamWallet supports application modules and Decentralized Identifiers (DID). A unified API ties everything together so any service can interact with blockchains. Authentication and payments flow through one secure interface.\n\nAnamWallet makes Web3 practical—bridging blockchain technology with real-world services.",
+    appInfoDeveloper = "Developer",
+    appInfoDeveloperName = "ANAM Labs",
+    appInfoWebsite = "Website",
+    appInfoWebsiteUrl = "https://anamwallet.com",
+    appInfoContact = "Contact",
+    appInfoContactEmail = "support@anamwallet.com",
+    
+    // License Screen
+    licenseTitle = "Open Source Licenses",
+    licenseCopyright = "Copyright © 2024 ANAM Labs. All rights reserved.",
+    licenseIntro = "This application uses the following open source libraries:",
+    licenseApache = "Apache License 2.0",
+    licenseMit = "MIT License",
+    licenseViewLicense = "View License"
 )
 
 /**
