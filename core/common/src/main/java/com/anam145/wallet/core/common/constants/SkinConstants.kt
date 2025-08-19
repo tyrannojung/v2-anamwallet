@@ -25,31 +25,15 @@ object SkinConstants {
      */
     val DEFAULT_SKIN_MINIAPPS = mapOf(
         Skin.ANAM to listOf(
-            // 빈 상태 테스트를 위해 임시로 비워둠
+            "com.anam.bitcoin",
+            "com.anam.ethereum",
+            "com.anam.government24"
         ),
         Skin.BUSAN to listOf(
             "com.anam.bitcoin",
+            "com.anam.ethereum",
             "com.busan.bonmedia",
-            "com.busan.card",
-            "com.busan.holdem",
             "com.busan.ilbo"
-        ),
-        Skin.SEOUL to listOf(
-            "com.anam.ethereum",
-            "com.seoul.bike",
-            "com.seoul.culture",
-            "com.seoul.news",
-            "com.seoul.sto",
-            "com.seoul.visitseoul"
-        ),
-        Skin.LA to listOf(
-            "com.anam.bitcoin",
-            "com.anam.ethereum",
-            "com.la.airbnb",
-            "com.la.tapla",
-            "com.la.uber",
-            "com.la.universal",
-            "com.la.yelp"
         )
     )
     
@@ -65,8 +49,6 @@ object SkinConstants {
      */
     val DEFAULT_SECTION_ORDERS = mapOf(
         Skin.ANAM to SectionOrder.BLOCKCHAIN_FIRST,
-        Skin.BUSAN to SectionOrder.APPS_FIRST,
-        Skin.SEOUL to SectionOrder.BLOCKCHAIN_FIRST,
-        Skin.LA to SectionOrder.BLOCKCHAIN_FIRST
+        Skin.BUSAN to SectionOrder.APPS_FIRST
     )
 }

@@ -18,9 +18,7 @@ import com.anam145.wallet.feature.main.R
 /**
  * 테마별 일러스트레이션을 표시하는 컴포저블
  * 
- * - SEOUL: 서울 특색 일러스트 (남산타워, 한강 등)
  * - BUSAN: 부산 특색 일러스트 (광안대교, 해운대 등)
- * - LA: LA 특색 일러스트 (헐리우드 사인, 팜트리 등)
  * - ANAM: 일러스트 없음
  */
 @Composable
@@ -29,23 +27,6 @@ fun ThemeIllustration(
     modifier: Modifier = Modifier
 ) {
     when (skin) {
-        Skin.SEOUL -> {
-            Box(
-                modifier = modifier,
-                contentAlignment = Alignment.BottomEnd
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.illustration_seoul),
-                    contentDescription = "Seoul Theme Illustration",
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .aspectRatio(1f)
-                        .padding(16.dp)
-                        .alpha(0.3f),
-                    contentScale = ContentScale.Fit
-                )
-            }
-        }
         Skin.BUSAN -> {
             Box(
                 modifier = modifier,
@@ -54,23 +35,6 @@ fun ThemeIllustration(
                 Image(
                     painter = painterResource(id = R.drawable.illustration_busan),
                     contentDescription = "Busan Theme Illustration",
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .aspectRatio(1f)
-                        .padding(16.dp)
-                        .alpha(0.3f),
-                    contentScale = ContentScale.Fit
-                )
-            }
-        }
-        Skin.LA -> {
-            Box(
-                modifier = modifier,
-                contentAlignment = Alignment.BottomEnd
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.illustration_la),
-                    contentDescription = "LA Theme Illustration",
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .aspectRatio(1f)
