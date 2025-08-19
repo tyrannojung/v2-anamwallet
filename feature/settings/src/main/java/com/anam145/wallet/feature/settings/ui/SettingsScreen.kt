@@ -23,6 +23,10 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
+    onNavigateToHelp: () -> Unit = {},
+    onNavigateToFAQ: () -> Unit = {},
+    onNavigateToAppInfo: () -> Unit = {},
+    onNavigateToLicense: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -34,16 +38,16 @@ fun SettingsScreen(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 SettingsContract.SettingsEffect.NavigateToHelp -> {
-                    // TODO: 도움말 화면으로 이동
+                    onNavigateToHelp()
                 }
                 SettingsContract.SettingsEffect.NavigateToFAQ -> {
-                    // TODO: FAQ 화면으로 이동
+                    onNavigateToFAQ()
                 }
                 SettingsContract.SettingsEffect.NavigateToAppInfo -> {
-                    // TODO: 앱 정보 화면으로 이동
+                    onNavigateToAppInfo()
                 }
                 SettingsContract.SettingsEffect.NavigateToLicense -> {
-                    // TODO: 라이선스 화면으로 이동
+                    onNavigateToLicense()
                 }
             }
         }
