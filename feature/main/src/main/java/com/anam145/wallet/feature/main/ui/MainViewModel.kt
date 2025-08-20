@@ -202,9 +202,22 @@ class MainViewModel @Inject constructor(
                     }
                 }
                 is MiniAppResult.Error -> {
+                    // NoAppsInstalled는 에러가 아니라 정상 상태 (빈 목록)
+                    if (result is MiniAppResult.Error.NoAppsInstalled) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = null,  // 에러 메시지 표시하지 않음
+                                regularApps = emptyList(),
+                                blockchainApps = emptyList()
+                            )
+                        }
+                        return@launch
+                    }
+                    
                     val errorMessage = when (result) {
                         is MiniAppResult.Error.NoAppsInstalled -> 
-                            "설치된 앱이 없습니다"
+                            "No apps installed"  // 실제로는 위에서 처리되어 여기 도달 안함
                         is MiniAppResult.Error.ScanFailed -> 
                             "앱 스캔 실패: ${result.cause.message}"
                         is MiniAppResult.Error.InstallationFailed ->

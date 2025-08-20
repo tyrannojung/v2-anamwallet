@@ -42,8 +42,8 @@ class MiniAppFileManager @Inject constructor(
                 // 파일명이 .zip으로 끝나는 경우에만 처리
                 if (zipFileName.endsWith(MiniAppConstants.ZIP_EXTENSION)) {
                     // zip 파일명에서 appId 추출
-                    // 예: "bitcoin_v1.0.zip" → "bitcoin"
-                    val appId = zipFileName.substringBeforeLast("_")
+                    // 예: "com.anam.bitcoin.zip" → "com.anam.bitcoin"
+                    val appId = zipFileName.removeSuffix(MiniAppConstants.ZIP_EXTENSION)
                     // 해당 앱을 assets에서 설치
                     installFromAssets(appId, zipFileName)
                 }

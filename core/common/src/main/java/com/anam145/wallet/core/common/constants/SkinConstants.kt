@@ -25,13 +25,14 @@ object SkinConstants {
      */
     val DEFAULT_SKIN_MINIAPPS = mapOf(
         Skin.ANAM to listOf(
-
+            // ANAM 월렛은 기본 앱 없음
         ),
         Skin.BUSAN to listOf(
-            "com.anam.bitcoin",
-            "com.anam.ethereum",
-            "com.busan.bonmedia",
-            "com.busan.ilbo"
+            // Assets에 추가된 4개 앱
+            "com.anam.eiz0nffb4oau0raw",
+            "com.anam.h9xkm40xo4ebvi2y",
+            "com.anam.jpnzrp311utb5wrj",
+            "com.anam.vrrpi9dsrp5go70e"
         )
     )
     
