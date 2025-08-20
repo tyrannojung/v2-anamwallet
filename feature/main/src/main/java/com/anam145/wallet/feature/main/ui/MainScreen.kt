@@ -118,6 +118,7 @@ fun MainScreen(
                     if (uiState.blockchainApps.isEmpty() && uiState.regularApps.isEmpty()) {
                         EmptyStateView(
                             strings = strings,
+                            currentSkin = uiState.currentSkin,
                             modifier = Modifier.fillMaxSize()
                         )
                     } else {
@@ -553,6 +554,7 @@ private fun MiniAppIcon(
 @Composable
 private fun EmptyStateView(
     strings: Strings,
+    currentSkin: Skin,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -582,9 +584,12 @@ private fun EmptyStateView(
         
         Spacer(modifier = Modifier.height(32.dp))
         
-        // 제목
+        // 제목 (스킨에 따라 다른 메시지)
         Text(
-            text = strings.mainEmptyStateTitle,
+            text = when (currentSkin) {
+                Skin.BUSAN -> strings.mainEmptyStateTitleBusan
+                else -> strings.mainEmptyStateTitle
+            },
             style = MaterialTheme.typography.headlineSmall.copy(
                 fontWeight = FontWeight.SemiBold
             ),
