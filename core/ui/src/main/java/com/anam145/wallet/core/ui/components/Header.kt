@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.anam145.wallet.core.ui.language.LocalStrings
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
+import com.anam145.wallet.core.common.model.Skin
 
 /**
  * ANAM Wallet 공통 헤더 컴포넌트
@@ -40,6 +42,7 @@ import androidx.compose.ui.graphics.Color
  * @param showBlockchainStatus 블록체인 상태 표시 여부
  * @param activeBlockchainName 활성 블록체인 이름
  * @param onBlockchainClick 블록체인 칩 클릭 콜백
+ * @param skin 현재 스킨 (부산 스킨일 때 색상 변경)
  */
 @Composable
 fun Header(
@@ -48,14 +51,40 @@ fun Header(
     onBackClick: (() -> Unit)? = null,
     showBlockchainStatus: Boolean = false,
     activeBlockchainName: String? = null,
-    onBlockchainClick: (() -> Unit)? = null
+    onBlockchainClick: (() -> Unit)? = null,
+    skin: Skin = Skin.ANAM
 ) {
-    // 헤더 배경색 고정 (테마와 무관)
-    val fixedBackgroundColor = Color(0xFFFCFCFC)
+    // 부산 스킨일 때 그라데이션 색상, 아니면 고정 배경색
+    val backgroundColor = if (skin == Skin.BUSAN) {
+        null // Surface에서 그라데이션 처리
+    } else {
+        Color(0xFFFCFCFC)
+    }
     
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = fixedBackgroundColor
+    val textColor = if (skin == Skin.BUSAN) {
+        Color.White
+    } else {
+        Color(0xFF1C1B1F)
+    }
+    
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(
+                if (skin == Skin.BUSAN) {
+                    Modifier.background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFF5AABDB), // 부산 하늘색
+                                Color(0xFFACCDEC), // 부산 연한 하늘색
+                                Color(0xFFAECDEC).copy(alpha = 0.5f) // 부산 연한 민트색
+                            )
+                        )
+                    )
+                } else {
+                    Modifier.background(backgroundColor ?: Color(0xFFFCFCFC))
+                }
+            )
     ) {
         Column(
             modifier = Modifier
@@ -77,17 +106,18 @@ fun Header(
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            tint = textColor
                         )
                     }
                 }
                 
-                // 타이틀 (고정 색상)
+                // 타이틀 (스킨에 따라 색상 변경)
                 Text(
                     text = title,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1C1B1F),  // 고정된 텍스트 색상
+                    color = textColor,  // 스킨에 따른 텍스트 색상
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = if (showBackButton) 48.dp else 0.dp)

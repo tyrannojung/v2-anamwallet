@@ -145,12 +145,12 @@ fun BusanCustomScreenV5() {
                             .padding(top = 16.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.Transparent,
+                            containerColor = Color.White,
                             contentColor = tokens.busanBlue
                         ),
                         border = BorderStroke(
-                            width = 1.5.dp,
-                            color = tokens.busanSkyBlue.copy(alpha = 0.6f)
+                            width = 1.dp,
+                            color = tokens.busanLightBlue.copy(alpha = 0.3f)
                         )
                     ) {
                         Icon(
