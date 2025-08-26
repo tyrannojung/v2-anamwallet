@@ -115,7 +115,7 @@ fun MainScreen(
             else -> {
                 // 부산 스킨일 때 커스텀 디자인 표시 (테스트용)
                 if (uiState.currentSkin == Skin.BUSAN) {
-                    BusanCustomScreenV6()  // V6 테스트
+                    BusanCustomScreenV5()  // V5 최종 선택
                 } else {
                     Box(modifier = Modifier.fillMaxSize()) {
                         // 두 리스트가 모두 비어있을 때 전체 빈 상태 표시

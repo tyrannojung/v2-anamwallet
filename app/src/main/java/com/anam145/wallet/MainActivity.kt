@@ -235,8 +235,7 @@ fun AnamWalletApp(
                                         MainContract.MainIntent.ClickBlockchainApp(activeBlockchain)
                                     )
                                 }
-                            } else null,
-                            skin = skin  // 스킨 전달
+                            } else null
                         )
                     }
                 },
