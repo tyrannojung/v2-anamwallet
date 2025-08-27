@@ -1,5 +1,9 @@
 package com.anam145.wallet.feature.main.ui
 
+import com.anam145.wallet.core.common.model.MiniApp
+import android.graphics.BitmapFactory
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.foundation.Image
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -40,6 +44,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
 
 /**
  * 부산 월렛 커스텀 화면 V5
@@ -71,12 +82,23 @@ data class BusanTokensV5(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BusanCustomScreenV5() {
+fun BusanCustomScreenV5(
+    blockchainApps: List<MiniApp> = emptyList(),
+    regularApps: List<MiniApp> = emptyList(),
+    activeBlockchainId: String? = null,
+    onBlockchainClick: (MiniApp) -> Unit = {},
+    onRegularAppClick: (MiniApp) -> Unit = {}
+) {
     val listState = rememberLazyListState()
     val tokens = remember { BusanTokensV5() }
     
-    // 선택된 블록체인 상태
-    var selectedBlockchain by remember { mutableStateOf("Bitcoin") }
+    // 현재 활성화된 블록체인 찾기
+    val activeBlockchain = blockchainApps.find { it.appId == activeBlockchainId }
+    
+    // 선택된 블록체인 상태 (실제 활성 블록체인 이름 사용)
+    var selectedBlockchain by remember(activeBlockchain) { 
+        mutableStateOf(activeBlockchain?.name ?: "Bitcoin") 
+    }
     
     // 애니메이션 트리거
     var isVisible by remember { mutableStateOf(false) }
@@ -112,7 +134,10 @@ fun BusanCustomScreenV5() {
                     selectedBlockchain = selectedBlockchain,
                     onBlockchainSelected = { selectedBlockchain = it },
                     tokens = tokens,
-                    isVisible = isVisible
+                    isVisible = isVisible,
+                    blockchainApps = blockchainApps,
+                    activeBlockchainId = activeBlockchainId,
+                    onBlockchainClick = onBlockchainClick
                 )
             }
             
@@ -120,7 +145,8 @@ fun BusanCustomScreenV5() {
             item(key = "active_asset") {
                 ActiveDigitalAssetCard(
                     tokens = tokens,
-                    isVisible = isVisible
+                    isVisible = isVisible,
+                    activeBlockchain = activeBlockchain
                 )
             }
             
@@ -135,7 +161,11 @@ fun BusanCustomScreenV5() {
             // 시민 서비스 그리드와 다운로드 버튼
             item(key = "service_section") {
                 Column {
-                    CitizenServiceGrid(tokens = tokens)
+                    CitizenServiceGrid(
+                        tokens = tokens,
+                        regularApps = regularApps,
+                        onRegularAppClick = onRegularAppClick
+                    )
                     
                     // 더 많은 모듈 다운로드 버튼
                     OutlinedButton(
@@ -179,9 +209,11 @@ private fun BlockchainSelector(
     selectedBlockchain: String,
     onBlockchainSelected: (String) -> Unit,
     tokens: BusanTokensV5,
-    isVisible: Boolean
+    isVisible: Boolean,
+    blockchainApps: List<MiniApp> = emptyList(),
+    activeBlockchainId: String? = null,
+    onBlockchainClick: (MiniApp) -> Unit = {}
 ) {
-    val blockchains = listOf("Bitcoin", "Ethereum", "Solana")
     var expanded by remember { mutableStateOf(false) }
     
     val alpha by animateFloatAsState(
@@ -213,7 +245,24 @@ private fun BlockchainSelector(
                 value = selectedBlockchain,
                 onValueChange = { },
                 readOnly = true,
-                label = { Text("블록체인 선택", fontSize = 14.sp) },
+                label = { 
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = tokens.busanBlue,
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            "ACTIVE",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            letterSpacing = 0.04.em
+                        )
+                    }
+                },
                 trailingIcon = {
                     Icon(
                         Icons.Default.ArrowDropDown,
@@ -239,51 +288,47 @@ private fun BlockchainSelector(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                blockchains.forEach { blockchain ->
+                blockchainApps.forEach { miniApp ->
+                    val isActive = miniApp.appId == activeBlockchainId
+                    
                     DropdownMenuItem(
                         text = {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                // 블록체인 아이콘
-                                Box(
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .background(
-                                            color = when (blockchain) {
-                                                "Bitcoin" -> tokens.bitcoin.copy(alpha = 0.15f)
-                                                "Ethereum" -> tokens.ethereum.copy(alpha = 0.15f)
-                                                else -> tokens.blue.copy(alpha = 0.15f)
-                                            },
-                                            shape = CircleShape
-                                        ),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        when (blockchain) {
-                                            "Bitcoin" -> "₿"
-                                            "Ethereum" -> "Ξ"
-                                            else -> "S"
-                                        },
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = when (blockchain) {
-                                            "Bitcoin" -> tokens.bitcoin
-                                            "Ethereum" -> tokens.ethereum
-                                            else -> tokens.blue
-                                        }
+                                // 블록체인 아이콘 - 실제 아이콘 사용
+                                MiniAppIcon(
+                                    miniApp = miniApp,
+                                    modifier = Modifier.size(24.dp),
+                                    contentDescription = miniApp.name
+                                )
+                                Text(
+                                    miniApp.name,
+                                    fontSize = 14.sp,
+                                    fontWeight = if (isActive) FontWeight.Bold else FontWeight.Medium,
+                                    color = if (isActive) tokens.busanBlue else Color.Unspecified
+                                )
+                                
+                                // 현재 활성화된 블록체인 표시
+                                if (isActive) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Icon(
+                                        Icons.Default.CheckCircle,
+                                        contentDescription = "활성화됨",
+                                        modifier = Modifier.size(18.dp),
+                                        tint = tokens.busanSkyBlue
                                     )
                                 }
-                                Text(
-                                    blockchain,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
                             }
                         },
                         onClick = {
-                            onBlockchainSelected(blockchain)
+                            // 이미 활성화된 블록체인이면 아무것도 안함
+                            if (!isActive) {
+                                onBlockchainSelected(miniApp.name)
+                                onBlockchainClick(miniApp)
+                            }
                             expanded = false
                         }
                     )
@@ -306,7 +351,8 @@ private fun BlockchainSelector(
 @Composable
 private fun ActiveDigitalAssetCard(
     tokens: BusanTokensV5,
-    isVisible: Boolean
+    isVisible: Boolean,
+    activeBlockchain: MiniApp? = null
 ) {
     val scale by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0.95f,
@@ -376,38 +422,39 @@ private fun ActiveDigitalAssetCard(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            // 비트코인 아이콘
-                            Box(
+                            // 블록체인 아이콘 - 실제 아이콘 사용
+                            activeBlockchain?.let { app ->
+                                MiniAppIcon(
+                                    miniApp = app,
+                                    modifier = Modifier.size(48.dp),
+                                    contentDescription = app.name
+                                )
+                            } ?: Box(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .background(
-                                        brush = Brush.linearGradient(
-                                            colors = listOf(
-                                                tokens.bitcoin.copy(alpha = 0.2f),
-                                                tokens.bitcoin.copy(alpha = 0.1f)
-                                            )
-                                        ),
-                                        shape = CircleShape
+                                        Color(0xFFE0E0E0),
+                                        CircleShape
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    "₿",
+                                    "?",
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = tokens.bitcoin.copy(alpha = 0.8f)
+                                    color = Color(0xFF757575)
                                 )
                             }
                             
                             Column {
                                 Text(
-                                    "Bitcoin",
+                                    activeBlockchain?.name ?: "No Blockchain",
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = tokens.black
                                 )
                                 Text(
-                                    "com.anam.bitcoin",
+                                    activeBlockchain?.appId ?: "No ID",
                                     fontSize = 12.sp,
                                     color = tokens.gray,
                                     letterSpacing = 0.02.em
@@ -456,7 +503,12 @@ private fun ActiveDigitalAssetCard(
                         letterSpacing = 0.04.em
                     )
                     Text(
-                        "0.0024 BTC",
+                        when {
+                            activeBlockchain?.name?.contains("Bitcoin", ignoreCase = true) == true -> "0.0024 BTC"
+                            activeBlockchain?.name?.contains("Ethereum", ignoreCase = true) == true -> "1.2345 ETH"
+                            activeBlockchain?.name?.contains("Solana", ignoreCase = true) == true -> "50.0 SOL"
+                            else -> "0.0 TOKENS"
+                        },
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = tokens.black,
@@ -552,12 +604,26 @@ private fun InactiveAssetCard(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun CitizenServiceGrid(tokens: BusanTokensV5) {
-    val services = remember {
-        listOf(
-            BusanCitizenServiceV5("부산일보", "🗞️"),
-            BusanCitizenServiceV5("본미디어", "📺")
-        )
+private fun CitizenServiceGrid(
+    tokens: BusanTokensV5,
+    regularApps: List<MiniApp> = emptyList(),
+    onRegularAppClick: (MiniApp) -> Unit = {}
+) {
+    // 실제 앱 데이터를 BusanCitizenServiceV5 형식으로 변환
+    val services = remember(regularApps) {
+        regularApps.map { app ->
+            BusanCitizenServiceV5(
+                name = app.name,
+                emoji = when {
+                    app.name.contains("일보", ignoreCase = true) -> "🗞️"
+                    app.name.contains("미디어", ignoreCase = true) -> "📺"
+                    app.name.contains("카드", ignoreCase = true) -> "💳"
+                    app.name.contains("홀덤", ignoreCase = true) -> "🃏"
+                    else -> "📱"
+                },
+                miniApp = app
+            )
+        }
     }
     
     // 서비스 개수에 따라 높이 동적 계산
@@ -583,7 +649,10 @@ private fun CitizenServiceGrid(tokens: BusanTokensV5) {
             CitizenServiceCard(
                 service = service,
                 tokens = tokens,
-                modifier = Modifier.animateItem()
+                modifier = Modifier.animateItem(),
+                onClick = { 
+                    service.miniApp?.let { onRegularAppClick(it) }
+                }
             )
         }
     }
@@ -593,7 +662,8 @@ private fun CitizenServiceGrid(tokens: BusanTokensV5) {
 private fun CitizenServiceCard(
     service: BusanCitizenServiceV5,
     tokens: BusanTokensV5,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -610,7 +680,7 @@ private fun CitizenServiceCard(
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
-                onClick = { /* 서비스 실행 */ }
+                onClick = onClick
             ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -632,7 +702,14 @@ private fun CitizenServiceCard(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
+                // 실제 앱 아이콘 표시, 없으면 emoji 사용
+                service.miniApp?.let { app ->
+                    MiniAppIcon(
+                        miniApp = app,
+                        modifier = Modifier.size(32.dp),
+                        contentDescription = app.name
+                    )
+                } ?: Text(
                     service.emoji,
                     fontSize = 20.sp
                 )
@@ -683,5 +760,53 @@ private fun SectionHeader(
 // 데이터 클래스
 private data class BusanCitizenServiceV5(
     val name: String,
-    val emoji: String
+    val emoji: String,
+    val miniApp: MiniApp? = null
 )
+
+// MiniApp 아이콘 로드 컴포저블
+@Composable
+private fun MiniAppIcon(
+    miniApp: MiniApp,
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null
+) {
+    var bitmap by remember { mutableStateOf<android.graphics.Bitmap?>(null) }
+    
+    LaunchedEffect(miniApp.iconPath) {
+        miniApp.iconPath?.let { path ->
+            withContext(Dispatchers.IO) {
+                try {
+                    val iconFile = File(path)
+                    if (iconFile.exists()) {
+                        bitmap = BitmapFactory.decodeFile(path)
+                    }
+                } catch (e: Exception) {
+                    // Icon loading failed
+                }
+            }
+        }
+    }
+    
+    bitmap?.let {
+        Image(
+            bitmap = it.asImageBitmap(),
+            contentDescription = contentDescription,
+            modifier = modifier,
+            contentScale = ContentScale.Fit
+        )
+    } ?: Box(
+        modifier = modifier.background(
+            Color(0xFFE0E0E0),
+            RoundedCornerShape(8.dp)
+        ),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = miniApp.name.firstOrNull()?.uppercase() ?: "?",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF757575)
+        )
+    }
+}

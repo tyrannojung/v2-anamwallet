@@ -241,7 +241,7 @@ private fun HubAppCard(
             ) {
                 if (app.icon.isNotEmpty()) {
                     val fullIconUrl = if (app.icon.startsWith("/")) {
-                        "https://anamhub.xyz${app.icon}"
+                        "http://10.0.2.2:9090${app.icon}"
                     } else {
                         app.icon
                     }

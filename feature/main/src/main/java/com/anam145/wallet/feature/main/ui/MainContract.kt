@@ -29,8 +29,11 @@ interface MainContract {
      * 사용자 의도 - 사용자의 액션
      */
     sealed interface MainIntent {
-        /** 블록체인 앱 클릭 */
+        /** 블록체인 앱 클릭 - 전환 + UI 표시 */
         data class ClickBlockchainApp(val miniApp: MiniApp) : MainIntent
+        
+        /** 블록체인 전환만 - UI 표시 없이 백그라운드에서 전환 */
+        data class SwitchBlockchain(val miniApp: MiniApp) : MainIntent
         
         /** 일반 앱 클릭 */
         data class ClickRegularApp(val miniApp: MiniApp) : MainIntent
