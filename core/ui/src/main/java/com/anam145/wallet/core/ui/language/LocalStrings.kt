@@ -91,6 +91,13 @@ data class Strings(
     val loading: String = "로딩 중...",
     val activated: String = "활성화됨",
     val active: String = "활성",
+    val balance: String = "잔액",
+    val viewDetail: String = "상세보기",
+    
+    // Busan Skin
+    val blockchainSwitch: String = "블록체인 전환",
+    val changeCurrentBlockchain: String = "현재 블록체인을 변경합니다",
+    val busanServices: String = "부산 서비스",
     
     // Auth - Login Screen
     val loginTitle: String = "비밀번호를 입력하여 지갑에 접근하세요",
@@ -308,6 +315,13 @@ val EnglishStrings = Strings(
     loading = "Loading...",
     activated = "Activated",
     active = "Active",
+    balance = "Balance",
+    viewDetail = "View Details",
+    
+    // Busan Skin
+    blockchainSwitch = "Switch Blockchain",
+    changeCurrentBlockchain = "Change the current blockchain",
+    busanServices = "Busan Services",
     
     // Auth - Login Screen
     loginTitle = "Enter password to access your wallet",

@@ -51,6 +51,7 @@ import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import com.anam145.wallet.core.ui.language.LocalStrings
 
 /**
  * 부산 월렛 커스텀 화면 V5
@@ -92,6 +93,7 @@ fun BusanScreen(
 ) {
     val listState = rememberLazyListState()
     val tokens = remember { BusanTokensV5() }
+    val strings = LocalStrings.current
     
     // 현재 활성화된 블록체인 찾기
     val activeBlockchain = blockchainApps.find { it.appId == activeBlockchainId }
@@ -157,7 +159,7 @@ fun BusanScreen(
             // 시민 서비스 섹션
             item(key = "service_header") {
                 SectionHeader(
-                    title = "부산 서비스",
+                    title = strings.busanServices,
                     tokens = tokens
                 )
             }
@@ -194,7 +196,7 @@ fun BusanScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "더 많은 모듈 다운받기",
+                            strings.mainAddMoreServices,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Medium,
                             letterSpacing = 0.02.em
@@ -218,6 +220,7 @@ private fun BlockchainSelector(
     activeBlockchainId: String? = null,
     onBlockchainClick: (MiniApp) -> Unit = {}
 ) {
+    val strings = LocalStrings.current
     var expanded by remember { mutableStateOf(false) }
     
     val alpha by animateFloatAsState(
@@ -233,7 +236,7 @@ private fun BlockchainSelector(
     ) {
         // 셀렉터 위에 설명 추가
         Text(
-            "활성 블록체인 전환",
+            strings.blockchainSwitch,
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = tokens.busanBlue.copy(alpha = 0.8f),
@@ -320,7 +323,7 @@ private fun BlockchainSelector(
                                     Spacer(modifier = Modifier.weight(1f))
                                     Icon(
                                         Icons.Default.CheckCircle,
-                                        contentDescription = "활성화됨",
+                                        contentDescription = strings.activated,
                                         modifier = Modifier.size(18.dp),
                                         tint = tokens.busanSkyBlue
                                     )
@@ -342,7 +345,7 @@ private fun BlockchainSelector(
         
         // 셀렉터 아래에 보조 설명 추가
         Text(
-            "현재 활성화된 블록체인을 변경합니다",
+            strings.changeCurrentBlockchain,
             fontSize = 11.sp,
             color = tokens.gray.copy(alpha = 0.7f),
             fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
@@ -359,6 +362,7 @@ private fun ActiveDigitalAssetCard(
     activeBlockchain: MiniApp? = null,
     onViewDetail: () -> Unit = {}
 ) {
+    val strings = LocalStrings.current
     val scale by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0.95f,
         animationSpec = spring(
@@ -473,7 +477,7 @@ private fun ActiveDigitalAssetCard(
                         onClick = { /* 상세 화면으로 이동 */ },
                         label = { 
                             Text(
-                                "활성화됨",
+                                strings.activated,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -481,7 +485,7 @@ private fun ActiveDigitalAssetCard(
                         leadingIcon = {
                             Icon(
                                 Icons.Default.CheckCircle,
-                                contentDescription = "활성화됨",
+                                contentDescription = strings.activated,
                                 modifier = Modifier.size(14.dp)
                             )
                         },
@@ -502,7 +506,7 @@ private fun ActiveDigitalAssetCard(
                 // 잔액 정보
                 Column {
                     Text(
-                        "잔액",
+                        strings.balance,
                         fontSize = 12.sp,
                         color = tokens.gray,
                         letterSpacing = 0.04.em
@@ -534,7 +538,7 @@ private fun ActiveDigitalAssetCard(
                     enabled = activeBlockchain != null
                 ) {
                     Text(
-                        "상세보기",
+                        strings.viewDetail,
                         modifier = Modifier.padding(vertical = 4.dp),
                         fontWeight = FontWeight.Medium,
                         letterSpacing = 0.04.em
