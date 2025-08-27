@@ -89,7 +89,8 @@ fun BusanScreen(
     activeBlockchainId: String? = null,
     onBlockchainClick: (MiniApp) -> Unit = {},
     onRegularAppClick: (MiniApp) -> Unit = {},
-    onViewBlockchainDetail: (MiniApp) -> Unit = {}
+    onViewBlockchainDetail: (MiniApp) -> Unit = {},
+    onNavigateToHub: () -> Unit = {}
 ) {
     val listState = rememberLazyListState()
     val tokens = remember { BusanTokensV5() }
@@ -175,7 +176,7 @@ fun BusanScreen(
                     
                     // 더 많은 모듈 다운로드 버튼
                     OutlinedButton(
-                        onClick = { /* Hub로 이동 */ },
+                        onClick = onNavigateToHub,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 16.dp),

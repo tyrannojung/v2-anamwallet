@@ -69,6 +69,16 @@ fun AnamNavHost(
                     // 블록체인 Activity 실행 (블록체인 프로세스)
                     val intent = BlockchainActivity.createIntent(context, blockchainId, currentSkin, currentLanguage)
                     context.startActivity(intent)
+                },
+                onNavigateToHub = {
+                    // Hub 탭으로 이동
+                    navController.navigate(AnamNavRoute.Hub.route) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             )
         }

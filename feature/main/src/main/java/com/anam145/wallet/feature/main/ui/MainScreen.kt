@@ -62,7 +62,8 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
     onNavigateToMiniApp: (String) -> Unit = {},
-    onLaunchBlockchain: (String) -> Unit = {}
+    onLaunchBlockchain: (String) -> Unit = {},
+    onNavigateToHub: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val strings = LocalStrings.current
@@ -135,7 +136,8 @@ fun MainScreen(
                                 viewModel.handleIntent(
                                     MainContract.MainIntent.ClickBlockchainApp(miniApp)
                                 )
-                            }
+                            },
+                            onNavigateToHub = onNavigateToHub
                         )
                     }
                     // 추후 다른 커스텀 스킨 추가 시
