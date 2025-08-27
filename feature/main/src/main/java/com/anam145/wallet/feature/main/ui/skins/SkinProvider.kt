@@ -47,6 +47,11 @@ fun ProvideSkin(
                     viewModel.handleIntent(
                         MainContract.MainIntent.ClickRegularApp(miniApp)
                     )
+                },
+                onViewBlockchainDetail = { miniApp ->
+                    viewModel.handleIntent(
+                        MainContract.MainIntent.ClickBlockchainApp(miniApp)
+                    )
                 }
             )
         }
