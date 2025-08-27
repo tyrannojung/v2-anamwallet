@@ -87,7 +87,8 @@ fun BusanScreen(
     regularApps: List<MiniApp> = emptyList(),
     activeBlockchainId: String? = null,
     onBlockchainClick: (MiniApp) -> Unit = {},
-    onRegularAppClick: (MiniApp) -> Unit = {}
+    onRegularAppClick: (MiniApp) -> Unit = {},
+    onViewBlockchainDetail: (MiniApp) -> Unit = {}
 ) {
     val listState = rememberLazyListState()
     val tokens = remember { BusanTokensV5() }
@@ -146,7 +147,10 @@ fun BusanScreen(
                 ActiveDigitalAssetCard(
                     tokens = tokens,
                     isVisible = isVisible,
-                    activeBlockchain = activeBlockchain
+                    activeBlockchain = activeBlockchain,
+                    onViewDetail = { 
+                        activeBlockchain?.let { onViewBlockchainDetail(it) }
+                    }
                 )
             }
             
@@ -352,7 +356,8 @@ private fun BlockchainSelector(
 private fun ActiveDigitalAssetCard(
     tokens: BusanTokensV5,
     isVisible: Boolean,
-    activeBlockchain: MiniApp? = null
+    activeBlockchain: MiniApp? = null,
+    onViewDetail: () -> Unit = {}
 ) {
     val scale by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0.95f,
@@ -520,12 +525,13 @@ private fun ActiveDigitalAssetCard(
                 
                 // 상세보기 버튼
                 Button(
-                    onClick = { /* 상세 화면으로 이동 */ },
+                    onClick = onViewDetail,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = tokens.busanBlue
                     ),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    enabled = activeBlockchain != null
                 ) {
                     Text(
                         "상세보기",
