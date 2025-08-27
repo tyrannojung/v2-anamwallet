@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.main.ui
+package com.anam145.wallet.feature.main.ui.skins
 
 import com.anam145.wallet.core.common.model.MiniApp
 import android.graphics.BitmapFactory
@@ -82,7 +82,7 @@ data class BusanTokensV5(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BusanCustomScreenV5(
+fun BusanScreen(
     blockchainApps: List<MiniApp> = emptyList(),
     regularApps: List<MiniApp> = emptyList(),
     activeBlockchainId: String? = null,

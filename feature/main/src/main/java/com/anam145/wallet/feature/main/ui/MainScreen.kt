@@ -45,6 +45,7 @@ import com.anam145.wallet.core.ui.language.LocalStrings
 import com.anam145.wallet.core.ui.language.Strings
 import com.anam145.wallet.core.common.constants.SectionOrder
 import com.anam145.wallet.feature.main.ui.components.ThemeIllustration
+import com.anam145.wallet.feature.main.ui.skins.BusanScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
@@ -113,48 +114,55 @@ fun MainScreen(
                 )
             }
             else -> {
-                // 부산 스킨일 때 커스텀 디자인 표시 (테스트용)
-                if (uiState.currentSkin == Skin.BUSAN) {
-                    BusanCustomScreenV5(
-                        blockchainApps = uiState.blockchainApps,
-                        regularApps = uiState.regularApps,
-                        activeBlockchainId = uiState.activeBlockchainId,
-                        onBlockchainClick = { miniApp ->
-                            viewModel.handleIntent(
-                                MainContract.MainIntent.SwitchBlockchain(miniApp)
-                            )
-                        },
-                        onRegularAppClick = { miniApp ->
-                            viewModel.handleIntent(
-                                MainContract.MainIntent.ClickRegularApp(miniApp)
-                            )
-                        }
-                    )  // V5 최종 선택
-                } else {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        // 두 리스트가 모두 비어있을 때 전체 빈 상태 표시
-                        if (uiState.blockchainApps.isEmpty() && uiState.regularApps.isEmpty()) {
-                            EmptyStateView(
-                                strings = strings,
-                                currentSkin = uiState.currentSkin,
+                // 스킨별 커스텀 화면 분기
+                when (uiState.currentSkin) {
+                    Skin.BUSAN -> {
+                        BusanScreen(
+                            blockchainApps = uiState.blockchainApps,
+                            regularApps = uiState.regularApps,
+                            activeBlockchainId = uiState.activeBlockchainId,
+                            onBlockchainClick = { miniApp ->
+                                viewModel.handleIntent(
+                                    MainContract.MainIntent.SwitchBlockchain(miniApp)
+                                )
+                            },
+                            onRegularAppClick = { miniApp ->
+                                viewModel.handleIntent(
+                                    MainContract.MainIntent.ClickRegularApp(miniApp)
+                                )
+                            }
+                        )
+                    }
+                    // 추후 다른 커스텀 스킨 추가 시
+                    // Skin.SEOUL -> SeoulScreen(...)
+                    // Skin.JEJU -> JejuScreen(...)
+                    
+                    else -> {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            // 두 리스트가 모두 비어있을 때 전체 빈 상태 표시
+                            if (uiState.blockchainApps.isEmpty() && uiState.regularApps.isEmpty()) {
+                                EmptyStateView(
+                                    strings = strings,
+                                    currentSkin = uiState.currentSkin,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            } else {
+                                MiniAppList(
+                                    blockchainApps = uiState.blockchainApps,
+                                    regularApps = uiState.regularApps,
+                                    activeBlockchainId = uiState.activeBlockchainId,
+                                    sectionOrder = uiState.sectionOrder,
+                                    onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
+                                    onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) }
+                                )
+                            }
+                            
+                            // 테마별 일러스트레이션 표시
+                            ThemeIllustration(
+                                skin = uiState.currentSkin,
                                 modifier = Modifier.fillMaxSize()
                             )
-                        } else {
-                            MiniAppList(
-                                blockchainApps = uiState.blockchainApps,
-                                regularApps = uiState.regularApps,
-                                activeBlockchainId = uiState.activeBlockchainId,
-                                sectionOrder = uiState.sectionOrder,
-                                onBlockchainClick = { viewModel.handleIntent(MainContract.MainIntent.ClickBlockchainApp(it)) },
-                                onAppClick = { viewModel.handleIntent(MainContract.MainIntent.ClickRegularApp(it)) }
-                            )
                         }
-                        
-                        // 테마별 일러스트레이션 표시
-                        ThemeIllustration(
-                            skin = uiState.currentSkin,
-                            modifier = Modifier.fillMaxSize()
-                        )
                     }
                 }
             }
