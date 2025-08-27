@@ -8,4 +8,6 @@ package com.anam145.wallet.core.common.model
 enum class Skin {
     ANAM,    // 안암 (기본)
     BUSAN    // 부산
+    // SEOUL,   // 서울 (추후 추가 예정)
+    // LA       // 로스앤젤레스 (추후 추가 예정)
 }

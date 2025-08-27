@@ -33,7 +33,13 @@ object SkinConstants {
             "com.anam.h9xkm40xo4ebvi2y",
             "com.anam.jpnzrp311utb5wrj",
             "com.anam.vrrpi9dsrp5go70e"
-        )
+        ),
+        // Skin.SEOUL to listOf(
+        //     // SEOUL 월렛 기본 앱 (필요시 추가)
+        // ),
+        // Skin.LA to listOf(
+        //     // LA 월렛 기본 앱 (필요시 추가)
+        // )
     )
     
     /**
@@ -49,5 +55,7 @@ object SkinConstants {
     val DEFAULT_SECTION_ORDERS = mapOf(
         Skin.ANAM to SectionOrder.BLOCKCHAIN_FIRST,
         Skin.BUSAN to SectionOrder.APPS_FIRST
+        // Skin.SEOUL to SectionOrder.BLOCKCHAIN_FIRST,
+        // Skin.LA to SectionOrder.BLOCKCHAIN_FIRST
     )
 }

@@ -63,6 +63,8 @@ fun SkinSection(
                                 text = when (skin) {
                                     Skin.ANAM -> strings.skinAnam
                                     Skin.BUSAN -> strings.skinBusan
+                                    // Skin.SEOUL -> "Seoul"  // 추후 추가
+                                    // Skin.LA -> "Los Angeles"  // 추후 추가
                                 }
                             )
                         },

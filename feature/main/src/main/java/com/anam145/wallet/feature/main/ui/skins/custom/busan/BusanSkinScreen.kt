@@ -1,4 +1,4 @@
-package com.anam145.wallet.feature.main.ui
+package com.anam145.wallet.feature.main.ui.skins.custom.busan
 
 import com.anam145.wallet.core.common.model.MiniApp
 import android.graphics.BitmapFactory
@@ -53,36 +53,15 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * 부산 월렛 커스텀 화면 V5
- * - V4 기반 + 개선 사항
- * - 셀렉터 설명 추가 (활성 블록체인 전환)
- * - 부산 시그니처 색상 추가
- * - 일러스트 추가
+ * 부산 월렛 커스텀 스킨 화면
+ * 
+ * 부산 지역 특화 디자인을 적용한 커스텀 스킨입니다.
+ * 완전히 새로운 UI 구조를 사용합니다.
  */
-
-// 부산 월렛 색상 토큰 V5
-@Stable
-data class BusanTokensV5(
-    // 부산 시그니처 색상
-    val busanBlue: Color = Color(0xFF0F2A48),    // 진한 남색
-    val busanSkyBlue: Color = Color(0xFF5AABDB), // 하늘색
-    val busanLightBlue: Color = Color(0xFFACCDEC), // 연한 하늘색
-    val busanPaleBlue: Color = Color(0xFFAECDEC), // 연한 민트색
-    
-    // 기존 색상
-    val blue: Color = Color(0xFF0F539E),
-    val black: Color = Color(0xFF0E0E0E),
-    val gray: Color = Color(0xFF8F9295),
-    val lightBlue: Color = Color(0xFFE6F4FF),
-    val white: Color = Color(0xFFFAFCFF),
-    val green: Color = Color(0xFF4CAF50),
-    val bitcoin: Color = Color(0xFFF7931A),
-    val ethereum: Color = Color(0xFF627EEA)
-)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BusanCustomScreenV5(
+fun BusanSkinScreen(
     blockchainApps: List<MiniApp> = emptyList(),
     regularApps: List<MiniApp> = emptyList(),
     activeBlockchainId: String? = null,
@@ -90,7 +69,7 @@ fun BusanCustomScreenV5(
     onRegularAppClick: (MiniApp) -> Unit = {}
 ) {
     val listState = rememberLazyListState()
-    val tokens = remember { BusanTokensV5() }
+    val tokens = remember { BusanTokens() }
     
     // 현재 활성화된 블록체인 찾기
     val activeBlockchain = blockchainApps.find { it.appId == activeBlockchainId }
@@ -208,7 +187,7 @@ fun BusanCustomScreenV5(
 private fun BlockchainSelector(
     selectedBlockchain: String,
     onBlockchainSelected: (String) -> Unit,
-    tokens: BusanTokensV5,
+    tokens: BusanTokens,
     isVisible: Boolean,
     blockchainApps: List<MiniApp> = emptyList(),
     activeBlockchainId: String? = null,
@@ -350,7 +329,7 @@ private fun BlockchainSelector(
 
 @Composable
 private fun ActiveDigitalAssetCard(
-    tokens: BusanTokensV5,
+    tokens: BusanTokens,
     isVisible: Boolean,
     activeBlockchain: MiniApp? = null
 ) {
@@ -544,7 +523,7 @@ private fun InactiveAssetCard(
     modifier: Modifier = Modifier,
     assetName: String,
     appId: String,
-    tokens: BusanTokensV5
+    tokens: BusanTokens
 ) {
     Card(
         modifier = modifier,
@@ -605,7 +584,7 @@ private fun InactiveAssetCard(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CitizenServiceGrid(
-    tokens: BusanTokensV5,
+    tokens: BusanTokens,
     regularApps: List<MiniApp> = emptyList(),
     onRegularAppClick: (MiniApp) -> Unit = {}
 ) {
@@ -661,7 +640,7 @@ private fun CitizenServiceGrid(
 @Composable
 private fun CitizenServiceCard(
     service: BusanCitizenServiceV5,
-    tokens: BusanTokensV5,
+    tokens: BusanTokens,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
@@ -735,7 +714,7 @@ private fun CitizenServiceCard(
 private fun SectionHeader(
     title: String,
     subtitle: String? = null,
-    tokens: BusanTokensV5
+    tokens: BusanTokens
 ) {
     Column {
         Text(

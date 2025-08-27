@@ -61,4 +61,6 @@ private val BusanColorScheme = lightColorScheme(
 fun getColorSchemeForSkin(skin: Skin) = when (skin) {
     Skin.ANAM -> AnamColorScheme
     Skin.BUSAN -> BusanColorScheme
+    // Skin.SEOUL -> AnamColorScheme  // Seoul uses the default color scheme
+    // Skin.LA -> AnamColorScheme      // LA uses the default color scheme
 }

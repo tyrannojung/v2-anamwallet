@@ -44,8 +44,8 @@ fun ThemeIllustration(
                 )
             }
         }
-        Skin.ANAM -> {
-            // ANAM 테마는 일러스트 없음
+        Skin.ANAM -> { // Skin.SEOUL, Skin.LA 추후 추가
+            // 기본 테마들은 일러스트 없음
         }
     }
 }
